@@ -7,10 +7,10 @@ const connectionString = process.env.DATABASE_URL!;
 
 const pool = new Pool({
     connectionString,
-    max: 10, // Maximum number of connections
+    max: 10,
     ssl: {
-        rejectUnauthorized: false
-    }
+        rejectUnauthorized: false,
+    },
 });
 
 // Create Prisma adapter with the pg pool
