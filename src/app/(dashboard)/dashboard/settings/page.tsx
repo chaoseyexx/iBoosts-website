@@ -47,14 +47,16 @@ function EditableRow({
     value,
     placeholder,
     helperText,
-    multiline = false
+    multiline = false,
+    onUpdate
 }: {
     label: string,
     name: string,
     value: string,
     placeholder?: string,
     helperText?: string,
-    multiline?: boolean
+    multiline?: boolean,
+    onUpdate?: () => void
 }) {
     const [isEditing, setIsEditing] = React.useState(false);
 
@@ -62,6 +64,7 @@ function EditableRow({
         const res = await updateProfile(null, formData);
         if (res?.success) {
             setIsEditing(false);
+            if (onUpdate) onUpdate();
         }
     };
 
@@ -208,6 +211,15 @@ export default function SettingsPage() {
     const [profile, setProfile] = React.useState<any>(null);
     const [user, setUser] = React.useState<any>(null);
 
+    const refreshProfile = React.useCallback(async () => {
+        try {
+            const profileData = await getProfile();
+            setProfile(profileData || {});
+        } catch (error) {
+            console.error("Error refreshing profile:", error);
+        }
+    }, []);
+
     React.useEffect(() => {
         const supabase = createClient();
         const loadData = async () => {
@@ -216,8 +228,7 @@ export default function SettingsPage() {
                 if (user) {
                     setUser(user);
                     // Fetch profile from Prisma via Server Action
-                    const profileData = await getProfile();
-                    setProfile(profileData || {});
+                    await refreshProfile();
                 }
             } catch (error) {
                 console.error("Error loading settings:", error);
@@ -226,7 +237,7 @@ export default function SettingsPage() {
             }
         };
         loadData();
-    }, []);
+    }, [refreshProfile]);
 
     const handleAvatarUpload = async (file: File) => {
         try {
@@ -239,7 +250,7 @@ export default function SettingsPage() {
                 alert(result.error);
                 return;
             }
-            // Success handled by revalidation
+            await refreshProfile();
         } catch (error) {
             console.error("Error uploading avatar:", error);
             alert("Error uploading avatar");
@@ -354,10 +365,12 @@ export default function SettingsPage() {
                                 <EditableRow
                                     label="Username:" name="username" value={profile?.username || user?.user_metadata?.full_name || user?.email?.split("@")[0] || ""}
                                     placeholder="Enter your username" helperText="Name that is visible to other Eldorado users. You can change your username once every 90 days."
+                                    onUpdate={refreshProfile}
                                 />
                                 <EditableRow
                                     label="Bio:" name="bio" value={profile?.bio || ""}
                                     placeholder="Tell the community about yourself" helperText="A brief description for your profile (max 160 characters)." multiline
+                                    onUpdate={refreshProfile}
                                 />
                             </CardContent>
                         </Card>
