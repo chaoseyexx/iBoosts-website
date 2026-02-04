@@ -113,7 +113,7 @@ export function Footer() {
 
                 {/* Bottom Bar */}
                 <div className="border-t border-[#2d333b] pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#6b7280]">
-                    <p>© 2026. The iboosts.gg website is operated by ChaosLabs.</p>
+                    <p>© 2026. The iboosts.gg website. All rights reserved.</p>
                     <div className="flex items-center gap-6">
                         <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
                         <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>

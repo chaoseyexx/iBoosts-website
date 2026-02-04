@@ -98,3 +98,49 @@ export async function signInWithProvider(provider: "google" | "discord") {
         redirect(data.url);
     }
 }
+
+export async function checkUsernameAvailability(username: string) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('username')
+        .ilike('username', username)
+        .single();
+
+    if (error && error.code === 'PGRST116') {
+        return true;
+    }
+    return false;
+}
+
+export async function forgotPasswordAction(formData: FormData) {
+    const supabase = await createClient();
+    const email = formData.get("email") as string;
+    const callbackUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/reset-password`; // Supabase will redirect here with a code
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: callbackUrl,
+    });
+
+    if (error) {
+        return { error: error.message };
+    }
+
+    return { success: true, message: "Check your email for the reset link." };
+}
+
+export async function updatePasswordAction(formData: FormData) {
+    const supabase = await createClient();
+    const password = formData.get("password") as string;
+
+    const { error } = await supabase.auth.updateUser({
+        password: password
+    });
+
+    if (error) {
+        return { error: error.message };
+    }
+
+    revalidatePath("/", "layout");
+    redirect("/dashboard");
+}

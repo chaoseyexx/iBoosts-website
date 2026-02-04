@@ -1,5 +1,3 @@
-"use client";
-
 import {
     Users,
     ShoppingCart,
@@ -10,44 +8,78 @@ import {
     AlertCircle
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { prisma } from "@/lib/prisma/client";
 
-// Mock Stats Data
-const STATS = [
-    {
-        title: "Total Revenue",
-        value: "$45,231.89",
-        change: "+20.1% from last month",
-        trend: "up",
-        icon: DollarSign,
-        color: "text-[#238636]"
-    },
-    {
-        title: "Active Orders",
-        value: "2,350",
-        change: "+180 since last hour",
-        trend: "up",
-        icon: ShoppingCart,
-        color: "text-[#f5a623]"
-    },
-    {
-        title: "New Users",
-        value: "+573",
-        change: "+201 since last week",
-        trend: "up",
-        icon: Users,
-        color: "text-[#58a6ff]"
-    },
-    {
-        title: "Active Disputes",
-        value: "12",
-        change: "-2 since yesterday",
-        trend: "down",
-        icon: AlertCircle,
-        color: "text-[#da3633]"
-    }
-];
+export default async function AdminDashboardPage() {
+    // 1. Total Revenue
+    const completedOrders = await prisma.order.findMany({
+        where: { status: "COMPLETED" },
+        select: { finalAmount: true }
+    });
+    const totalRevenue = completedOrders.reduce((sum, order) => sum + Number(order.finalAmount), 0);
 
-export default function AdminDashboardPage() {
+    // 2. Active Orders
+    const activeOrdersCount = await prisma.order.count({
+        where: {
+            status: {
+                in: ["ACTIVE", "DELIVERED"]
+            }
+        }
+    });
+
+    // 3. New Users (Last 7 days)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const newUsersCount = await prisma.user.count({
+        where: {
+            createdAt: {
+                gte: sevenDaysAgo
+            }
+        }
+    });
+
+    // 4. Active Disputes
+    const activeDisputesCount = await prisma.dispute.count({
+        where: {
+            status: "OPEN"
+        }
+    });
+
+    const STATS = [
+        {
+            title: "Total Revenue",
+            value: `$${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            change: "All time",
+            trend: "up",
+            icon: DollarSign,
+            color: "text-[#238636]"
+        },
+        {
+            title: "Active Orders",
+            value: activeOrdersCount.toString(),
+            change: "Currently in progress",
+            trend: "up",
+            icon: ShoppingCart,
+            color: "text-[#f5a623]"
+        },
+        {
+            title: "New Users",
+            value: `+${newUsersCount}`,
+            change: "Last 7 days",
+            trend: "up",
+            icon: Users,
+            color: "text-[#58a6ff]"
+        },
+        {
+            title: "Active Disputes",
+            value: activeDisputesCount.toString(),
+            change: "Requires attention",
+            trend: activeDisputesCount > 0 ? "up" : "down",
+            icon: AlertCircle,
+            color: "text-[#da3633]"
+        }
+    ];
+
     return (
         <div className="space-y-8">
             {/* Header */}

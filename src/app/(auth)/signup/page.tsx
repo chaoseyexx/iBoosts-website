@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { signup, signInWithProvider } from "../actions";
+import { signup, signInWithProvider, checkUsernameAvailability } from "../actions";
 
 export default function SignupPage() {
     const router = useRouter();
@@ -16,21 +16,85 @@ export default function SignupPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    // Validation States
+    const [username, setUsername] = useState("");
+    const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean | null>(null);
+    const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+
+    const [password, setPassword] = useState("");
+    const [isPasswordValid, setIsPasswordValid] = useState(false);
+
+    // Username Check Debounce
+    const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        setUsername(val);
+        setIsUsernameAvailable(null);
+
+        if (val.length < 3) return;
+
+        setIsCheckingUsername(true);
+        // Simple distinct timeout implementation for debounce
+        const timeoutId = setTimeout(async () => {
+            const available = await checkUsernameAvailability(val);
+            setIsUsernameAvailable(available);
+            setIsCheckingUsername(false);
+        }, 500);
+
+        return () => clearTimeout(timeoutId);
+    };
+
+    // Password Validation
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        setPassword(val);
+        // Requirement: Number AND Capital Letter
+        const hasNumber = /\d/.test(val);
+        const hasUpper = /[A-Z]/.test(val);
+        setIsPasswordValid(hasNumber && hasUpper && val.length >= 6);
+    };
+
+    // Use a useEffect-like approach for the username debounce cleanup if sticking to simple handlers, 
+    // but the above returns cleanup only if called in useEffect. 
+    // Let's switch to standard useEffect for username debounce.
+
+    // Correct approach with useEffect for debounce
+    const [debouncedUsername, setDebouncedUsername] = useState("");
+
+    // Custom logic to replace the simple handler above
+    /* eslint-disable react-hooks/exhaustive-deps */
+
     async function handleSubmit(formData: FormData) {
         setIsLoading(true);
         setError(null);
 
         try {
-            const result = await signup(formData);
+            const result = await signup(formData); // This calls the server action
             if (result?.error) {
                 setError(result.error);
-                setIsLoading(false); // Stop loading only on error (redirect handles success)
+                setIsLoading(false);
             }
         } catch (e) {
             setError("An unexpected error occurred.");
             setIsLoading(false);
         }
     }
+
+    // Username Check Effect
+    // Username Check Effect
+    useEffect(() => {
+        const check = async () => {
+            if (username.length < 3) {
+                setIsUsernameAvailable(null);
+                return;
+            }
+            setIsCheckingUsername(true);
+            const available = await checkUsernameAvailability(username);
+            setIsUsernameAvailable(available);
+            setIsCheckingUsername(false);
+        };
+        const timer = setTimeout(check, 500);
+        return () => clearTimeout(timer);
+    }, [username]);
 
     return (
         <Card className="bg-[#161b22] border-[#30363d] shadow-2xl">
@@ -41,18 +105,28 @@ export default function SignupPage() {
                             {error}
                         </div>
                     )}
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                         <Label htmlFor="username">Username</Label>
                         <Input
                             id="username"
                             name="username"
                             type="text"
-                            placeholder="ChaosLabs"
+                            placeholder="iBoostsAdmin"
                             required
-                            className="bg-[#0d1117] border-[#30363d] focus:border-[#f5a623]"
+                            onChange={(e) => setUsername(e.target.value)}
+                            className={`bg-[#0d1117] border-[#30363d] focus:border-[#f5a623] ${isUsernameAvailable === true ? "border-green-500" :
+                                isUsernameAvailable === false ? "border-red-500" : ""
+                                }`}
                         />
+                        {(username.length >= 3 || isCheckingUsername) && (
+                            <div className="flex items-center gap-2 text-xs mt-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                                {isCheckingUsername && <span className="text-gray-500 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Checking...</span>}
+                                {!isCheckingUsername && isUsernameAvailable === true && <span className="text-green-500 flex items-center gap-1"><Check className="w-3 h-3" /> Available</span>}
+                                {!isCheckingUsername && isUsernameAvailable === false && <span className="text-red-500 flex items-center gap-1"><X className="w-3 h-3" /> Username taken</span>}
+                            </div>
+                        )}
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                         <Label htmlFor="email">Email</Label>
                         <Input
                             id="email"
@@ -63,7 +137,7 @@ export default function SignupPage() {
                             className="bg-[#0d1117] border-[#30363d] focus:border-[#f5a623]"
                         />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                         <Label htmlFor="password">Password</Label>
                         <div className="relative">
                             <Input
@@ -72,7 +146,10 @@ export default function SignupPage() {
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Create a strong password"
                                 required
-                                className="bg-[#0d1117] border-[#30363d] focus:border-[#f5a623] pr-10"
+                                onChange={handlePasswordChange}
+                                className={`bg-[#0d1117] border-[#30363d] focus:border-[#f5a623] pr-10 ${password && !isPasswordValid ? "border-red-500" :
+                                    password && isPasswordValid ? "border-green-500" : ""
+                                    }`}
                             />
                             <button
                                 type="button"
@@ -86,6 +163,16 @@ export default function SignupPage() {
                                 )}
                             </button>
                         </div>
+                        {password && (
+                            <div className="text-xs space-y-1 mt-1">
+                                <p className={`flex items-center gap-1 ${/\d/.test(password) ? "text-green-500" : "text-gray-500"}`}>
+                                    {/\d/.test(password) ? <Check className="w-3 h-3" /> : <span className="w-3 h-3 inline-block" />} Must contain a number
+                                </p>
+                                <p className={`flex items-center gap-1 ${/[A-Z]/.test(password) ? "text-green-500" : "text-gray-500"}`}>
+                                    {/[A-Z]/.test(password) ? <Check className="w-3 h-3" /> : <span className="w-3 h-3 inline-block" />} Must contain a capital letter
+                                </p>
+                            </div>
+                        )}
                     </div>
                     <div className="text-xs text-[#8b949e]">
                         By creating an account, you agree to our{" "}
@@ -99,8 +186,8 @@ export default function SignupPage() {
                     </div>
                     <Button
                         type="submit"
-                        className="w-full bg-[#f5a623] text-black hover:bg-[#e09612] font-semibold"
-                        disabled={isLoading}
+                        className="w-full bg-[#f5a623] text-black hover:bg-[#e09612] font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={isLoading || isUsernameAvailable === false || !isPasswordValid}
                     >
                         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Create Account
@@ -154,6 +241,6 @@ export default function SignupPage() {
                     </Link>
                 </p>
             </CardFooter>
-        </Card>
+        </Card >
     );
 }
