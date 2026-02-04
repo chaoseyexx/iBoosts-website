@@ -21,12 +21,7 @@ import {
     AlertTriangle,
     Loader2
 } from "lucide-react";
-import { updateProfile, uploadAvatarAction } from "./actions";
-
-// ----------------------------------------------------------------------------
-// Mock Data for Non-Functional Sections (Restored)
-// ----------------------------------------------------------------------------
-// Static sections moved inside component to access user state
+import { updateProfile, uploadAvatarAction, getProfile } from "./actions";
 
 // ----------------------------------------------------------------------------
 // Components
@@ -207,10 +202,6 @@ function AvatarRow({ url, displayChar, onUpload }: AvatarRowProps) {
     );
 }
 
-// ----------------------------------------------------------------------------
-// Main Page
-// ----------------------------------------------------------------------------
-
 export default function SettingsPage() {
     const [activeSection, setActiveSection] = React.useState("profile");
     const [loading, setLoading] = React.useState(true);
@@ -218,29 +209,15 @@ export default function SettingsPage() {
     const [user, setUser] = React.useState<any>(null);
 
     React.useEffect(() => {
-        let channel: any = null;
         const supabase = createClient();
         const loadData = async () => {
             try {
                 const { data: { user } } = await supabase.auth.getUser();
                 if (user) {
                     setUser(user);
-                    // Real-time subscription
-                    channel = supabase
-                        .channel('schema-db-changes')
-                        .on(
-                            'postgres_changes',
-                            { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` },
-                            (payload) => setProfile(payload.new)
-                        )
-                        .subscribe();
-
-                    const { data } = await supabase
-                        .from('profiles')
-                        .select('*')
-                        .eq('id', user.id)
-                        .maybeSingle();
-                    setProfile(data || {});
+                    // Fetch profile from Prisma via Server Action
+                    const profileData = await getProfile();
+                    setProfile(profileData || {});
                 }
             } catch (error) {
                 console.error("Error loading settings:", error);

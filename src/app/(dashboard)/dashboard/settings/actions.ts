@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import prisma from "@/lib/prisma/client";
 
 export type State = {
     error?: string | null;
@@ -9,55 +10,91 @@ export type State = {
     message?: string | null;
 };
 
+export async function getProfile() {
+    const supabase = await createClient();
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+
+    if (!authUser) return null;
+
+    try {
+        let user = await prisma.user.findUnique({
+            where: { supabaseId: authUser.id }
+        });
+
+        // Self-healing: Create Prisma record if missing but Auth exists
+        if (!user) {
+            const email = authUser.email || "";
+            const username = authUser.user_metadata.username || email.split("@")[0];
+
+            try {
+                user = await prisma.user.create({
+                    data: {
+                        supabaseId: authUser.id,
+                        email: email,
+                        username: username,
+                        displayName: authUser.user_metadata.full_name || username,
+                        role: "BUYER",
+                        status: "ACTIVE"
+                    }
+                });
+            } catch (createError) {
+                console.error("Auto-creation of user failed:", createError);
+            }
+        }
+        return user;
+    } catch (e) {
+        console.error("Failed to fetch profile:", e);
+        return null;
+    }
+}
+
 export async function updateProfile(prevState: State | null, formData: FormData): Promise<State> {
     const supabase = await createClient();
+    const { data: { user: authUser } } = await supabase.auth.getUser();
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!authUser) {
         return { error: "Not authenticated" };
     }
 
-    const updates: any = {
-        updated_at: new Date().toISOString(),
-    };
-
+    const updates: any = {};
     if (formData.has("username")) updates.username = formData.get("username") as string;
-    if (formData.has("display_name")) updates.display_name = formData.get("display_name") as string;
+    if (formData.has("display_name")) updates.displayName = formData.get("display_name") as string;
     if (formData.has("bio")) updates.bio = formData.get("bio") as string;
-    if (formData.has("avatar_url")) updates.avatar_url = formData.get("avatar_url") as string;
-
-    // Strict validation or specific logic per field can go here
 
     try {
-        const { error } = await supabase
-            .from("profiles")
-            .update(updates)
-            .eq("id", user.id);
-
-        if (error) {
-            console.error("Profile update error:", error);
-            if (error.code === '23505') { // Unique violation
-                return { error: "Username already taken." };
+        await prisma.user.upsert({
+            where: { supabaseId: authUser.id },
+            update: updates,
+            create: {
+                supabaseId: authUser.id,
+                email: authUser.email || "",
+                username: (formData.get("username") as string) || authUser.user_metadata.username || authUser.email?.split("@")[0] || "user",
+                displayName: (formData.get("display_name") as string) || authUser.user_metadata.full_name,
+                role: "BUYER",
+                status: "ACTIVE",
+                ...updates
             }
-            return { error: "Failed to update profile." };
-        }
+        });
 
         revalidatePath("/dashboard/settings");
-        revalidatePath("/", "layout"); // Update navbar avatar/name
+        revalidatePath("/", "layout");
 
         return { success: true, message: "Profile updated successfully." };
 
-    } catch (e) {
-        return { error: "An unexpected error occurred." };
+    } catch (e: any) {
+        console.error("Profile update error:", e);
+        if (e.code === 'P2002') {
+            return { error: "Username already taken." };
+        }
+        return { error: `Update failed: ${e.message}` };
     }
 }
 
 export async function uploadAvatarAction(formData: FormData): Promise<State> {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user: authUser } } = await supabase.auth.getUser();
 
-    if (!user) {
+    if (!authUser) {
         return { error: "Not authenticated" };
     }
 
@@ -74,23 +111,23 @@ export async function uploadAvatarAction(formData: FormData): Promise<State> {
     try {
         const buffer = Buffer.from(await file.arrayBuffer());
         const fileExt = file.name.split('.').pop();
-        const fileName = `avatars/${user.id}-${Date.now()}.${fileExt}`;
+        const fileName = `avatars/${authUser.id}-${Date.now()}.${fileExt}`;
 
         const { uploadToR2 } = await import("@/lib/r2");
         const publicUrl = await uploadToR2(buffer, fileName, file.type);
 
-        const { error } = await supabase
-            .from("profiles")
-            .update({
-                avatar_url: publicUrl,
-                updated_at: new Date().toISOString()
-            })
-            .eq("id", user.id);
-
-        if (error) {
-            console.error("Profile update error:", error);
-            return { error: "Failed to update profile with new avatar." };
-        }
+        await prisma.user.upsert({
+            where: { supabaseId: authUser.id },
+            update: { avatar: publicUrl },
+            create: {
+                supabaseId: authUser.id,
+                email: authUser.email || "",
+                username: authUser.user_metadata.username || authUser.email?.split("@")[0] || "user",
+                role: "BUYER",
+                status: "ACTIVE",
+                avatar: publicUrl
+            }
+        });
 
         revalidatePath("/dashboard/settings");
         revalidatePath("/", "layout");

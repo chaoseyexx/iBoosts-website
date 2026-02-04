@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { sendWelcomeEmail } from "@/lib/resend";
+import prisma from "@/lib/prisma/client";
 
 export async function login(formData: FormData) {
     const supabase = await createClient();
@@ -54,19 +55,23 @@ export async function signup(formData: FormData) {
         await sendWelcomeEmail(authData.user.email, username);
     }
 
-    // 3. Create Profile Entry (if Supabase triggers aren't set up yet)
-    // We'll trust Supabase triggers or just rely on metadata for now.
-    // However, explicit creation is safer if triggers fail/don't exist.
+    // 3. Create Prisma User Record (Source of Truth)
     if (authData.user) {
         try {
-            await supabase.from('profiles').insert({
-                id: authData.user.id,
-                username: username,
-                email: email
+            await prisma.user.create({
+                data: {
+                    supabaseId: authData.user.id,
+                    username: username,
+                    email: email,
+                    role: "BUYER", // Default role
+                    status: "ACTIVE"
+                }
             });
         } catch (e) {
-            // Ignore duplicate key error if trigger already handled it
-            // console.warn("Profile creation might have been handled by DB trigger");
+            console.error("User creation failed in Prisma:", e);
+            // If it fails (e.g. duplicate), we might want to handle it or log it.
+            // But Supabase auth is already successful, so we probably shouldn't block.
+            // Ideally we'd rollback auth, but that's complex.
         }
     }
 
@@ -100,17 +105,16 @@ export async function signInWithProvider(provider: "google" | "discord") {
 }
 
 export async function checkUsernameAvailability(username: string) {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-        .from('profiles')
-        .select('username')
-        .ilike('username', username)
-        .single();
+    // Check against Prisma User table
+    const user = await prisma.user.findUnique({
+        where: { username: username },
+        select: { username: true }
+    });
 
-    if (error && error.code === 'PGRST116') {
-        return true;
+    if (user) {
+        return true; // Exists
     }
-    return false;
+    return false; // Available
 }
 
 export async function forgotPasswordAction(formData: FormData) {
