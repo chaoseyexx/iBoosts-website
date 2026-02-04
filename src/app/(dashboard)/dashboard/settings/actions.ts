@@ -58,7 +58,6 @@ export async function updateProfile(prevState: State | null, formData: FormData)
 
     const updates: any = {};
     if (formData.has("username")) updates.username = formData.get("username") as string;
-    if (formData.has("display_name")) updates.displayName = formData.get("display_name") as string;
     if (formData.has("bio")) updates.bio = formData.get("bio") as string;
 
     try {
@@ -69,7 +68,6 @@ export async function updateProfile(prevState: State | null, formData: FormData)
                 supabaseId: authUser.id,
                 email: authUser.email || "",
                 username: (formData.get("username") as string) || authUser.user_metadata.username || authUser.email?.split("@")[0] || "user",
-                displayName: (formData.get("display_name") as string) || authUser.user_metadata.full_name,
                 role: "BUYER",
                 status: "ACTIVE",
                 ...updates
