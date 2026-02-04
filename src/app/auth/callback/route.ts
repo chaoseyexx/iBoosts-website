@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import prisma from "@/lib/prisma/client";
 
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
@@ -14,15 +15,36 @@ export async function GET(request: NextRequest) {
             // Check for Discord metadata and ensure profile exists
             const { data: { user } } = await supabase.auth.getUser();
 
-            if (user && user.user_metadata.full_name) {
-                // Upsert profile with Discord username
-                await supabase.from('profiles').upsert({
-                    id: user.id,
-                    username: user.user_metadata.full_name,
-                    email: user.email,
-                    avatar_url: user.user_metadata.avatar_url || user.user_metadata.picture,
-                    updated_at: new Date().toISOString(),
-                }, { onConflict: 'id' });
+            if (user) {
+                try {
+                    // Start of Sync Logic
+                    const existingUser = await prisma.user.findUnique({
+                        where: { supabaseId: user.id }
+                    });
+
+                    if (!existingUser) {
+                        await prisma.user.create({
+                            data: {
+                                supabaseId: user.id,
+                                email: user.email!,
+                                username: user.user_metadata.full_name || user.user_metadata.name || user.email?.split('@')[0] || `User${Date.now()}`,
+                                role: "BUYER",
+                                status: "ACTIVE",
+                                avatar: user.user_metadata.avatar_url || user.user_metadata.picture
+                            }
+                        });
+                    } else {
+                        // Optional: Update email if it changed in Supabase Auth (e.g. email change confirmed)
+                        if (existingUser.email !== user.email && user.email) {
+                            await prisma.user.update({
+                                where: { id: existingUser.id },
+                                data: { email: user.email }
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to sync user in callback:", e);
+                }
             }
 
             return NextResponse.redirect(new URL(next, request.url));

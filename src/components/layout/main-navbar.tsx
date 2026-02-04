@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/ui/notification-dropdown";
 import { ActivityButton } from "@/components/ui/activity-dropdown";
 import { createClient } from "@/lib/supabase/client";
+import { getProfile } from "@/app/(dashboard)/dashboard/settings/actions";
 
 // Navigation categories
 const navCategories = [
@@ -58,17 +59,13 @@ export function MainNavbar({ variant = "landing" }: MainNavbarProps) {
             try {
                 const { data: { user: authUser } } = await supabase.auth.getUser();
                 if (authUser) {
-                    const { data: profile } = await supabase
-                        .from("profiles")
-                        .select("username, display_name, avatar_url")
-                        .eq("id", authUser.id)
-                        .maybeSingle();
+                    const profile = await getProfile();
 
                     setUser({
                         id: authUser.id,
                         email: authUser.email,
-                        username: profile?.username || profile?.display_name || authUser.user_metadata?.full_name || authUser.email?.split("@")[0] || "User",
-                        avatar: profile?.avatar_url || authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture,
+                        username: profile?.username || authUser.user_metadata?.full_name || authUser.email?.split("@")[0] || "User",
+                        avatar: profile?.avatar || authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture,
                     });
                 }
             } catch (error) {
@@ -80,13 +77,14 @@ export function MainNavbar({ variant = "landing" }: MainNavbarProps) {
 
         checkUser();
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (event === "SIGNED_IN" && session?.user) {
+                const profile = await getProfile();
                 setUser({
                     id: session.user.id,
                     email: session.user.email,
-                    username: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "User",
-                    avatar: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture,
+                    username: profile?.username || session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "User",
+                    avatar: profile?.avatar || session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture,
                 });
             } else if (event === "SIGNED_OUT") {
                 setUser(null);
@@ -98,7 +96,19 @@ export function MainNavbar({ variant = "landing" }: MainNavbarProps) {
         };
     }, []);
 
-    // ... (keep useEffect for click outside)
+    // Close dropdown when clicking outside
+    React.useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     const handleLogout = async () => {
         const supabase = createClient();
@@ -114,12 +124,25 @@ export function MainNavbar({ variant = "landing" }: MainNavbarProps) {
     return (
         <>
             <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#2d333b] bg-[#0a0e13]/90 backdrop-blur-md">
-                {/* ... (keep top bar) ... */}
+                {/* Top bar (Language/Currency) */}
+                <div className="h-8 bg-[#0a0e13] border-b border-[#2d333b] flex items-center justify-end px-6 gap-4 text-xs font-medium text-[#9ca3af] hidden sm:flex">
+                    <button
+                        onClick={() => setLanguageModalOpen(true)}
+                        className="hover:text-white transition-colors flex items-center gap-1.5"
+                    >
+                        <Globe className="h-3 w-3" />
+                        English (EN) / USD ($)
+                        <ChevronDown className="h-3 w-3" />
+                    </button>
+                    <Link href="/support" className="hover:text-white transition-colors">
+                        Support
+                    </Link>
+                </div>
 
                 {/* Main nav */}
                 <div className="flex items-center justify-between px-6 h-14">
                     <div className="flex-1 flex items-center gap-6">
-                        {/* ... (keep logo and links) ... */}
+                        {/* Logo */}
                         <Link href="/" className="flex items-center gap-2">
                             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f5a623] font-bold text-black text-sm">
                                 IB
@@ -127,6 +150,7 @@ export function MainNavbar({ variant = "landing" }: MainNavbarProps) {
                             <span className="font-bold text-white text-lg">iBoosts</span>
                         </Link>
 
+                        {/* Desktop Categories */}
                         <div className="hidden lg:flex items-center gap-1">
                             {navCategories.map((cat) => (
                                 <Link
@@ -139,6 +163,7 @@ export function MainNavbar({ variant = "landing" }: MainNavbarProps) {
                             ))}
                         </div>
 
+                        {/* Search Bar */}
                         <div className="relative hidden md:block flex-1 max-w-xl mx-4">
                             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b7280]" />
                             <input

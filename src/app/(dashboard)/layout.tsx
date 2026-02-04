@@ -3,6 +3,7 @@ import * as React from "react";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { MainNavbar } from "@/components/layout/main-navbar";
+import prisma from "@/lib/prisma/client";
 import "../dashboard.css";
 
 export default async function DashboardLayout({
@@ -16,11 +17,10 @@ export default async function DashboardLayout({
     let userData = null;
 
     if (authUser) {
-        const { data: profile } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", authUser.id)
-            .maybeSingle();
+        // Fetch from Prisma Source of Truth
+        const profile = await prisma.user.findUnique({
+            where: { supabaseId: authUser.id }
+        });
 
         // Format date: MM/DD/YY
         const registeredDate = new Date(authUser.created_at).toLocaleDateString('en-US', {
@@ -31,10 +31,10 @@ export default async function DashboardLayout({
 
         userData = {
             username: profile?.username || authUser.user_metadata?.full_name || authUser.email?.split("@")[0] || "User",
-            displayName: profile?.display_name,
-            avatar: profile?.avatar_url || authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture,
+            displayName: null,
+            avatar: profile?.avatar || authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture,
             registeredAt: registeredDate,
-            verified: true, // You might want to add a real verification check logic here
+            verified: true,
         };
     }
 
