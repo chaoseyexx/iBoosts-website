@@ -45,12 +45,15 @@ export const metadata: Metadata = {
 };
 
 import { RecentPurchasePopup } from "@/components/ui/recent-purchase-popup";
+import Script from "next/script";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cfToken = process.env.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN;
+
   return (
     <html lang="en" className="dark">
       <body
@@ -58,6 +61,14 @@ export default function RootLayout({
       >
         {children}
         <RecentPurchasePopup />
+        {cfToken && (
+          <Script
+            defer
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={`{"token": "${cfToken}"}`}
+            strategy="afterInteractive"
+          />
+        )}
       </body>
     </html>
   );

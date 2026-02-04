@@ -99,6 +99,6 @@ export async function uploadAvatarAction(formData: FormData): Promise<State> {
 
     } catch (error) {
         console.error("Avatar upload error:", error);
-        return { error: "Failed to upload avatar." };
+        return { error: `Upload failed: ${(error as Error).message}` };
     }
 }

@@ -7,6 +7,16 @@ const bucketName = process.env.R2_BUCKET_NAME;
 const publicDomain = process.env.R2_PUBLIC_DOMAIN || "https://cdn.iboosts.gg";
 const jurisdiction = process.env.R2_JURISDICTION; // e.g., "eu"
 
+// Validate critical variables
+if (!accountId || !accessKeyId || !secretAccessKey || !bucketName) {
+    console.error("R2 Error: Missing Environment Variables", {
+        hasAccountId: !!accountId,
+        hasAccessKey: !!accessKeyId,
+        hasSecretKey: !!secretAccessKey,
+        hasBucket: !!bucketName
+    });
+}
+
 // Construct the endpoint URL based on jurisdiction
 const endpoint = jurisdiction
     ? `https://${accountId}.${jurisdiction}.r2.cloudflarestorage.com`
