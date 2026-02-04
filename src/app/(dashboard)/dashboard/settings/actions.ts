@@ -32,7 +32,6 @@ export async function getProfile() {
                         supabaseId: authUser.id,
                         email: email,
                         username: username,
-                        displayName: authUser.user_metadata.full_name || username,
                         role: "BUYER",
                         status: "ACTIVE"
                     }
