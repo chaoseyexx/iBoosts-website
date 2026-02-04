@@ -5,8 +5,15 @@ import { PrismaClient } from "@prisma/client";
 // Connection pool for PostgreSQL
 const connectionString = process.env.DATABASE_URL!;
 
+// Ensure libpq compatibility for SSL modes is enabled (fixes self-signed cert issues on Vercel)
+const finalConnectionString = connectionString.includes("uselibpqcompat")
+    ? connectionString
+    : connectionString.includes("?")
+        ? `${connectionString}&uselibpqcompat=true`
+        : `${connectionString}?uselibpqcompat=true`;
+
 const pool = new Pool({
-    connectionString,
+    connectionString: finalConnectionString,
     max: 10,
     ssl: {
         rejectUnauthorized: false,
