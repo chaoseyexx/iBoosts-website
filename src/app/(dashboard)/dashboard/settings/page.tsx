@@ -358,7 +358,7 @@ export default function SettingsPage() {
                             </CardHeader>
                             <CardContent className="p-0">
                                 <AvatarRow
-                                    url={profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture}
+                                    url={profile?.avatar || user?.user_metadata?.avatar_url || user?.user_metadata?.picture}
                                     displayChar={(profile?.username || user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User").charAt(0).toUpperCase()}
                                     onUpload={handleAvatarUpload}
                                 />
