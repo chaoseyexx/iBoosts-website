@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { forgotPasswordAction } from "../../actions";
+import { forgotPasswordAction } from "../actions";
 
 export default function ForgotPasswordPage() {
     const [isLoading, setIsLoading] = useState(false);

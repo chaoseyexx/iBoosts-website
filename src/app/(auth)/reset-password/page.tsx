@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { updatePasswordAction } from "../../actions";
+import { updatePasswordAction } from "../actions";
 
 export default function ResetPasswordPage() {
     const [isLoading, setIsLoading] = useState(false);
@@ -69,7 +69,7 @@ export default function ResetPasswordPage() {
                                 required
                                 onChange={handlePasswordChange}
                                 className={`bg-[#0d1117] border-[#30363d] focus:border-[#f5a623] pr-10 ${password && !isPasswordValid ? "border-red-500" :
-                                        password && isPasswordValid ? "border-green-500" : ""
+                                    password && isPasswordValid ? "border-green-500" : ""
                                     }`}
                             />
                             <button
