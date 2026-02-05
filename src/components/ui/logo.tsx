@@ -15,20 +15,20 @@ export function Logo({ className, ...props }: LogoProps) {
             preserveAspectRatio="xMinYMid meet"
             {...props}
         >
-            {/* 1. Rocket Icon Box (Yellow Rounded Square) */}
-            <rect x="0" y="4" width="32" height="32" rx="8" fill="#f5a623" />
-
-            {/* 2. Rocket Icon - Simplified High-Quality Path */}
-            <g transform="translate(6, 12) scale(0.9)">
-                <path
-                    d="M14 2C10 2 6 5 5 9C4 11 4 13 5 15L3 19L7 17C9 18 11 18 13 17C17 15 20 10 20 5C20 3.5 19.5 2 18 2Z"
-                    fill="white"
-                />
-                <circle cx="14" cy="7" r="1.5" fill="#f5a623" />
-                <path d="M2.5 20.5C1 19 0 16 3 13.5Q5 15 5 17Q5 19 4 20Z" fill="white" opacity="0.8" />
+            {/* 1. Icon Part (User-provided SVG integrated) */}
+            <g transform="translate(0, 4) scale(0.32)">
+                <rect width="100" height="100" rx="20" ry="20" fill="url(#goldGradient)" />
+                <path d="M50 20 L58 40 L70 45 L58 50 L70 55 L58 60 L50 80 L42 60 L30 55 L42 50 L30 45 L42 40 Z" fill="black" />
+                <circle cx="50" cy="50" r="6" fill="#FFB900" />
+                <defs>
+                    <linearGradient id="goldGradient" x1="0" y1="0" x2="0" y2="100%">
+                        <stop offset="0%" stop-color="#FFB900" />
+                        <stop offset="100%" stop-color="#FFC700" />
+                    </linearGradient>
+                </defs>
             </g>
 
-            {/* 3. "iboosts.gg" Typography - Individual groups for guaranteed spacing */}
+            {/* 2. Typography "iboosts.gg" - Geometric Reconstruction with Absolute Spacing */}
             <g transform="translate(44, 28)" fill="white">
                 {/* i */}
                 <g transform="translate(0, 0)">
