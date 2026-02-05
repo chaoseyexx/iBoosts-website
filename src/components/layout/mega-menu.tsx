@@ -29,35 +29,39 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
         if (onClose) onClose();
     };
 
+    const hasPopularGames = popularGames.length > 0;
+
     return (
         <div className="flex w-full h-[500px] bg-[#161b22] text-[#c9d1d9] overflow-hidden rounded-b-xl shadow-2xl border-t border-[#30363d] overflow-x-hidden">
             {/* Left Column - Popular Games */}
-            <div className="w-[40%] p-6 xl:p-10 border-r border-[#30363d] overflow-y-auto">
-                <h3 className="text-sm font-semibold text-white mb-6 xl:mb-8 uppercase tracking-widest opacity-60">Popular games</h3>
-                <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 xl:gap-6">
-                    {popularGames.map((game) => (
-                        <Link
-                            key={game.id}
-                            href={game.href}
-                            onClick={handleLinkClick}
-                            className="flex flex-col items-center gap-3 p-3 rounded-xl hover:bg-[#1c2128] transition-all group text-center"
-                        >
-                            <Avatar className="h-12 w-12 rounded-lg bg-[#21262d] border border-[#30363d] shadow-sm transform group-hover:scale-105 transition-transform">
-                                <AvatarImage src={game.icon} alt={game.name} />
-                                <AvatarFallback className="text-xs bg-[#21262d] text-[#8b949e]">
-                                    {game.name.charAt(0)}
-                                </AvatarFallback>
-                            </Avatar>
-                            <span className="text-xs font-semibold group-hover:text-[#f5a623] transition-colors line-clamp-1">
-                                {game.name}
-                            </span>
-                        </Link>
-                    ))}
+            {hasPopularGames && (
+                <div className="w-[300px] xl:w-[450px] 2xl:w-[550px] flex-shrink-0 p-6 xl:p-10 border-r border-[#30363d] overflow-y-auto bg-[#1c2128]/30">
+                    <h3 className="text-sm font-semibold text-white mb-6 xl:mb-8 uppercase tracking-widest opacity-60">Popular games</h3>
+                    <div className="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 xl:gap-6">
+                        {popularGames.map((game) => (
+                            <Link
+                                key={game.id}
+                                href={game.href}
+                                onClick={handleLinkClick}
+                                className="flex flex-col items-center gap-3 p-3 rounded-xl hover:bg-[#1c2128] transition-all group text-center"
+                            >
+                                <Avatar className="h-12 w-12 rounded-lg bg-[#21262d] border border-[#30363d] shadow-sm transform group-hover:scale-105 transition-transform">
+                                    <AvatarImage src={game.icon} alt={game.name} />
+                                    <AvatarFallback className="text-xs bg-[#21262d] text-[#8b949e]">
+                                        {game.name.charAt(0)}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <span className="text-xs font-semibold group-hover:text-[#f5a623] transition-colors line-clamp-1">
+                                    {game.name}
+                                </span>
+                            </Link>
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Right Column - All Games + Search */}
-            <div className="w-[60%] flex flex-col bg-[#0d1117]">
+            <div className="flex-1 flex flex-col bg-[#0d1117]">
                 {/* Search Bar */}
                 <div className="p-6 border-b border-[#30363d]">
                     <div className="relative">
@@ -74,7 +78,10 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
 
                 <div className="flex-1 overflow-y-auto p-6 xl:p-10">
                     <h3 className="text-sm font-semibold text-white mb-6 xl:mb-8 uppercase tracking-widest opacity-60">All games</h3>
-                    <div className="grid grid-cols-2 xl:grid-cols-3 gap-x-6 xl:gap-x-10 gap-y-3">
+                    <div className={cn(
+                        "grid gap-x-6 xl:gap-x-10 gap-y-3",
+                        hasPopularGames ? "grid-cols-2 xl:grid-cols-3" : "grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
+                    )}>
                         {filteredGames.length > 0 ? (
                             filteredGames.map((game) => (
                                 <Link
