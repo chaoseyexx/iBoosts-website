@@ -42,6 +42,21 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    icon: [
+      { url: "https://cdn.iboosts.gg/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "https://cdn.iboosts.gg/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "https://cdn.iboosts.gg/favicon.ico" },
+    ],
+    apple: [
+      { url: "https://cdn.iboosts.gg/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    other: [
+      { rel: "android-chrome-192x192", url: "https://cdn.iboosts.gg/android-chrome-192x192.png" },
+      { rel: "android-chrome-512x512", url: "https://cdn.iboosts.gg/android-chrome-512x512.png" },
+    ],
+  },
+  manifest: "https://cdn.iboosts.gg/site.webmanifest",
 };
 
 import { RecentPurchasePopup } from "@/components/ui/recent-purchase-popup";

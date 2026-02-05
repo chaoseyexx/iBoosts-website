@@ -29,7 +29,7 @@ const products = [
         category: "Steam Fresh Account",
         price: 1.00,
         deliveryTime: "20 min",
-        image: "/images/product-placeholder.jpg",
+        image: "https://cdn.iboosts.gg/images/empty-box.png",
         autoDelivery: true,
     },
     {
@@ -39,7 +39,7 @@ const products = [
         category: "Account",
         price: 800.00,
         deliveryTime: "20 min",
-        image: "/images/product-placeholder-2.jpg",
+        image: "https://cdn.iboosts.gg/images/empty-box.png",
         autoDelivery: false,
     }
 ];
@@ -164,7 +164,7 @@ export function UserProfileView({ user }: UserProfileViewProps) {
             <MainNavbar variant="landing" user={user} />
 
             {/* Content Container */}
-            <div className="pt-[88px]">
+            <div className="pt-[96px]">
                 {/* Banner */}
                 <div className="h-48 w-full bg-[#1c2128] relative overflow-hidden">
                     {/* Pattern Overlay */}

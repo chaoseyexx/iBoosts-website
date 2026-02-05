@@ -10,6 +10,8 @@ import {
     ShieldCheck
 } from "lucide-react";
 
+import { Logo } from "@/components/ui/logo";
+
 export function Footer() {
     return (
         <footer className="bg-[#050506] border-t border-[#2d333b] pt-10 pb-6">
@@ -20,10 +22,10 @@ export function Footer() {
 
                     {/* Payment Methods */}
                     <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
-                        <div className="h-6 flex items-center"><Image src="/images/payments/visa.png" alt="Visa" width={32} height={20} className="object-contain" /></div>
-                        <div className="h-6 flex items-center"><Image src="/images/payments/mastercard.png" alt="Mastercard" width={32} height={20} className="object-contain" /></div>
-                        <div className="h-6 flex items-center"><Image src="/images/payments/amex.png" alt="Amex" width={32} height={20} className="object-contain" /></div>
-                        <div className="h-6 flex items-center"><Image src="/images/payments/discover.png" alt="Discover" width={32} height={20} className="object-contain" /></div>
+                        <div className="h-6 flex items-center"><Image src="https://cdn.iboosts.gg/images/payments/visa.png" alt="Visa" width={32} height={20} className="object-contain" /></div>
+                        <div className="h-6 flex items-center"><Image src="https://cdn.iboosts.gg/images/payments/mastercard.png" alt="Mastercard" width={32} height={20} className="object-contain" /></div>
+                        <div className="h-6 flex items-center"><Image src="https://cdn.iboosts.gg/images/payments/amex.png" alt="Amex" width={32} height={20} className="object-contain" /></div>
+                        <div className="h-6 flex items-center"><Image src="https://cdn.iboosts.gg/images/payments/discover.png" alt="Discover" width={32} height={20} className="object-contain" /></div>
 
                         {/* Generic Placeholders for Bitcoin/GPay/ApplePay since user didn't upload them yet, or maybe I should use icons */}
                         {/* Using text placeholder for "+15 more" style */}
@@ -45,13 +47,7 @@ export function Footer() {
                     {/* Brand Column */}
                     <div className="space-y-6">
                         <Link href="/" className="flex items-center gap-2">
-                            <Image
-                                src="/images/logo-full.svg"
-                                alt="iboosts.gg"
-                                width={168}
-                                height={48}
-                                className="h-12 w-auto object-contain"
-                            />
+                            <Logo className="h-12 w-auto" />
                         </Link>
                         <p className="text-[#9ca3af] text-sm leading-relaxed">
                             Join us today to level up your gaming experience!

@@ -118,7 +118,7 @@ export default function HomePage() {
             <MainNavbar variant="landing" />
 
             {/* Hero Section with Three.js */}
-            <section className="relative min-h-[70vh] flex items-center pt-[60px] overflow-hidden">
+            <section className="relative min-h-[70vh] flex items-center pt-[96px] overflow-hidden">
                 {/* 3D Background */}
                 <Suspense fallback={null}>
                     <HeroScene />
@@ -138,7 +138,7 @@ export default function HomePage() {
                         {/* Character 2 (Builder) - Floating Animation with delay */}
                         <div className="absolute left-[100px] top-[150px] animate-float-delayed -z-10">
                             <Image
-                                src="/images/landing-character-2.png"
+                                src="https://cdn.iboosts.gg/images/landing-character-2.png"
                                 alt="Builder Character"
                                 width={280}
                                 height={280}
@@ -151,7 +151,7 @@ export default function HomePage() {
                     <div className="hidden lg:block absolute -right-[300px] top-1/2 -translate-y-1/2 w-[600px] h-[600px] pointer-events-none z-0">
                         <div className="absolute right-[50px] top-[100px] animate-float-slow">
                             <Image
-                                src="/images/landing-character-omen.png"
+                                src="https://cdn.iboosts.gg/images/landing-character-omen.png"
                                 alt="Omen Character"
                                 width={280}
                                 height={280}

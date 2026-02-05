@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Logo } from "@/components/ui/logo";
 
 // Mock user - replace with actual auth
 const mockUser = null; // Set to user object when logged in
@@ -76,11 +77,7 @@ export function Navbar({ user = mockUser, notificationCount = 0 }: NavbarProps) 
                 <div className="flex h-16 items-center justify-between">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2">
-                        <img
-                            src="/images/logo-full.svg"
-                            alt="iboosts.gg"
-                            className="h-10 w-auto object-contain"
-                        />
+                        <Logo className="h-10 w-auto" />
                     </Link>
 
                     {/* Desktop Navigation */}

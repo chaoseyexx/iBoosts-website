@@ -123,8 +123,28 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
 
     return (
         <>
-            <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#2d333b] bg-[#0d1117] h-[60px]">
-                <div className="flex h-full items-center justify-between px-4 max-w-[1920px] mx-auto gap-4">
+            <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0e12] border-b border-[#1c2128]">
+                {/* Top Utility Bar */}
+                <div className="h-8 border-b border-[#1c2128] bg-[#0a0e12]">
+                    <div className="max-w-[1920px] mx-auto h-full flex items-center justify-between px-4 text-[11px] font-bold text-[#8b949e]">
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1.5 hover:text-white cursor-pointer transition-colors">
+                                <span className="text-[#f5a623]">●</span>
+                                <span>24/7 Live Support</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4 uppercase">
+                            <div className="flex items-center gap-1 hover:text-white cursor-pointer transition-colors">
+                                <Globe className="h-3 w-3" />
+                                <span>English | USD - $</span>
+                                <ChevronDown className="h-3 w-3" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Main Navbar */}
+                <div className="flex h-[64px] items-center justify-between px-4 max-w-[1920px] mx-auto gap-6">
 
                     {/* Left Section: Logo & Nav Links */}
                     <div className="flex items-center gap-6">
@@ -134,18 +154,18 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                             </Button>
                         </div>
 
-                        {/* Inline Logo Component - Theme Aware */}
+                        {/* Inline Logo Component */}
                         <Link href="/" className="flex items-center gap-2 shrink-0">
-                            <Logo className="h-[36px] w-auto text-white" />
+                            <Logo className="h-[36px] w-auto" />
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <div className="hidden lg:flex items-center gap-4">
+                        <div className="hidden lg:flex items-center gap-6">
                             {navCategories.map((cat) => (
                                 <Link
                                     key={cat.name}
                                     href={cat.href}
-                                    className="text-sm font-bold text-[#c9d1d9] hover:text-[#f5a623] transition-colors whitespace-nowrap"
+                                    className="text-[15px] font-bold text-white hover:text-[#f5a623] transition-colors whitespace-nowrap"
                                 >
                                     {cat.name}
                                 </Link>
@@ -153,48 +173,27 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                         </div>
                     </div>
 
-                    {/* Middle Section: Search */}
-                    <div className="flex-1 max-w-2xl hidden md:block px-4">
+                    {/* Middle Section: Search - Shifted Left */}
+                    <div className="flex-1 max-w-2xl hidden md:block pl-0 pr-8">
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b949e]" />
                             <input
                                 type="text"
-                                placeholder="Search Eldorado"
-                                className="w-full h-10 pl-10 pr-4 bg-[#161b22] border border-[#30363d] rounded-lg text-sm text-[#c9d1d9] placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
+                                placeholder="Search products..."
+                                className="w-full h-10 pl-10 pr-4 bg-[#161b22] border border-[#30363d] rounded-lg text-sm text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-0 transition-all"
                             />
                         </div>
                     </div>
 
                     {/* Right Section: Actions & Auth */}
-                    <div className="flex items-center gap-2 shrink-0">
-                        {/* Currency/Lang */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="h-9 gap-1.5 text-[#c9d1d9] hover:text-white px-3 hidden sm:flex">
-                                    <Globe className="h-4 w-4" />
-                                    <span className="text-xs font-semibold">EN | USD $</span>
-                                    <ChevronDown className="h-3 w-3 opacity-50" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="bg-[#1c2128] border-[#30363d] text-[#c9d1d9]">
-                                <DropdownMenuItem className="focus:bg-[#30363d] focus:text-white cursor-pointer">
-                                    🇺🇸 USD - US Dollar
-                                </DropdownMenuItem>
-                                <DropdownMenuItem className="focus:bg-[#30363d] focus:text-white cursor-pointer">
-                                    🇪🇺 EUR - Euro
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
+                    <div className="flex items-center gap-4 shrink-0">
                         {loading ? (
                             <div className="h-8 w-20 bg-[#1c2128] rounded-lg animate-pulse" />
                         ) : user ? (
                             <>
-                                <Link href="/dashboard/messages">
-                                    <Button variant="ghost" size="icon" className="h-9 w-9 text-[#c9d1d9] hover:text-white hover:bg-[#21262d]">
-                                        <MessageCircle className="h-5 w-5" />
-                                    </Button>
-                                </Link>
+                                <Button variant="ghost" size="icon" className="h-9 w-9 text-[#c9d1d9] hover:text-white">
+                                    <MessageCircle className="h-5 w-5" />
+                                </Button>
 
                                 <NotificationBell count={0} />
 
@@ -256,14 +255,14 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                             </>
                         ) : (
                             /* Guest Actions */
-                            <div className="flex items-center gap-3 ml-2">
+                            <div className="flex items-center gap-4 ml-2">
                                 <Link href="/login">
-                                    <Button variant="ghost" className="text-[#c9d1d9] hover:text-white font-semibold h-9 px-4">
+                                    <Button variant="ghost" className="text-white hover:text-[#f5a623] font-bold text-[15px] h-9 px-0">
                                         Log In
                                     </Button>
                                 </Link>
-                                <Link href="/register">
-                                    <Button className="bg-[#f5a623] hover:bg-[#e09612] text-black font-bold h-9 px-4">
+                                <Link href="/signup">
+                                    <Button className="bg-[#f5a623] hover:bg-[#e09612] text-black font-bold h-10 px-8 rounded-lg shadow-lg shadow-orange-500/10 text-[15px]">
                                         Sign Up
                                     </Button>
                                 </Link>
@@ -272,9 +271,9 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                     </div>
                 </div>
 
-                {/* Mobile menu */}
+                {/* Mobile menu - Adjust top position */}
                 {mobileMenuOpen && (
-                    <div className="lg:hidden border-t border-[#2d333b] bg-[#0d1117] absolute w-full left-0 top-[60px] shadow-2xl h-[calc(100vh-60px)] overflow-y-auto">
+                    <div className="lg:hidden border-t border-[#2d333b] bg-[#0d1117] absolute w-full left-0 top-[96px] shadow-2xl h-[calc(100vh-96px)] overflow-y-auto">
                         <div className="p-4 space-y-1">
                             {navCategories.map((cat) => (
                                 <Link
