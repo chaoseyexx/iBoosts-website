@@ -118,7 +118,7 @@ export default function HomePage() {
             <MainNavbar variant="landing" />
 
             {/* Hero Section with Three.js */}
-            <section className="relative min-h-[70vh] flex items-center pt-32 overflow-hidden">
+            <section className="relative min-h-[70vh] flex items-center pt-24 overflow-hidden">
                 {/* 3D Background */}
                 <Suspense fallback={null}>
                     <HeroScene />

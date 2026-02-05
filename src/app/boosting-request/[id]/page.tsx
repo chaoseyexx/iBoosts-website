@@ -130,7 +130,7 @@ export default async function BoostingRequestPage({ params }: { params: { id: st
         <div className="min-h-screen bg-[#0a0e13] text-white selection:bg-[#f5a623]/30">
             <MainNavbar variant="landing" />
 
-            <div className="pt-32 max-w-5xl mx-auto px-6 py-12 space-y-8">
+            <div className="pt-24 max-w-5xl mx-auto px-6 py-12 space-y-8">
 
                 {/* Header Content */}
                 <div className="flex items-start gap-4">

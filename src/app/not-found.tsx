@@ -8,7 +8,7 @@ import { Footer } from "@/components/layout/footer";
 
 export default function NotFound() {
     return (
-        <div className="min-h-screen bg-[#0a0e13] flex flex-col pt-[112px]">
+        <div className="min-h-screen bg-[#0a0e13] flex flex-col pt-[88px]">
             <MainNavbar />
 
             <main className="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
