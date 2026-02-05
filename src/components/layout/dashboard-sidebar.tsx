@@ -149,7 +149,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
     };
 
     return (
-        <aside className="sticky top-[88px] flex h-[calc(100vh-88px)] w-64 flex-col border-r border-[#2d333b]/40 bg-[#0d1117] flex-shrink-0">
+        <aside className="sticky top-[112px] flex h-[calc(100vh-112px)] w-64 flex-col border-r border-[#2d333b]/40 bg-[#0d1117] flex-shrink-0">
             {/* User Profile Section */}
             <div className="border-b border-[#2d333b]/40 py-5 px-4">
                 <div className="flex items-center gap-3">

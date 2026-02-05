@@ -163,14 +163,14 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                 </div>
 
                 {/* Main nav */}
-                <div className="flex items-center justify-between px-6 h-14">
+                <div className="flex items-center justify-between px-6 h-20">
                     <div className="flex-1 flex items-center gap-6">
                         {/* Logo */}
                         <Link href="/" className="flex items-center gap-2">
                             <Image
                                 src="/images/logo-full.png"
                                 alt="iboosts.gg"
-                                width={140}
+                                width={240}
                                 height={64}
                                 className="h-16 w-auto object-contain"
                                 priority

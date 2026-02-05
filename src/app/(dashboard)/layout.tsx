@@ -49,7 +49,7 @@ export default async function DashboardLayout({
             } : null} />
 
             {/* Content area with sidebar - positioned below fixed navbar */}
-            <div className="flex pt-[88px]">
+            <div className="flex pt-[112px]">
                 {/* Sidebar */}
                 <React.Suspense fallback={<div className="w-64 bg-[#0d1117] border-r border-[#2d333b]/40" />}>
                     {/* @ts-ignore */}
@@ -57,7 +57,7 @@ export default async function DashboardLayout({
                 </React.Suspense>
 
                 {/* Main Content */}
-                <main className="flex-1 min-h-[calc(100vh-88px)] overflow-y-auto bg-[#0a0e13] p-6">
+                <main className="flex-1 min-h-[calc(100vh-112px)] overflow-y-auto bg-[#0a0e13] p-6">
                     {/* Max width container to keep space on right side */}
                     <div className="max-w-[1200px] w-full">
                         {children}
