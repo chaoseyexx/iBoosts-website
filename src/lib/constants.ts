@@ -135,6 +135,9 @@ export const KYC_STATUS_DISPLAY = {
     },
 } as const;
 
+// CDN Configuration
+export const CDN_URL = "https://cdn.iboosts.gg";
+
 // Navigation items
 export const NAV_ITEMS = {
     main: [

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { Logo } from "@/components/ui/logo";
+import { CDN_URL } from "@/lib/constants";
 
 export function Footer() {
     return (
@@ -22,10 +23,10 @@ export function Footer() {
 
                     {/* Payment Methods */}
                     <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
-                        <div className="h-6 flex items-center"><Image src="https://cdn.iboosts.gg/images/payments/visa.png" alt="Visa" width={32} height={20} className="object-contain" /></div>
-                        <div className="h-6 flex items-center"><Image src="https://cdn.iboosts.gg/images/payments/mastercard.png" alt="Mastercard" width={32} height={20} className="object-contain" /></div>
-                        <div className="h-6 flex items-center"><Image src="https://cdn.iboosts.gg/images/payments/amex.png" alt="Amex" width={32} height={20} className="object-contain" /></div>
-                        <div className="h-6 flex items-center"><Image src="https://cdn.iboosts.gg/images/payments/discover.png" alt="Discover" width={32} height={20} className="object-contain" /></div>
+                        <div className="h-6 flex items-center"><Image src={`${CDN_URL}/images/payments/visa.png`} alt="Visa" width={32} height={20} className="object-contain" /></div>
+                        <div className="h-6 flex items-center"><Image src={`${CDN_URL}/images/payments/mastercard.png`} alt="Mastercard" width={32} height={20} className="object-contain" /></div>
+                        <div className="h-6 flex items-center"><Image src={`${CDN_URL}/images/payments/amex.png`} alt="Amex" width={32} height={20} className="object-contain" /></div>
+                        <div className="h-6 flex items-center"><Image src={`${CDN_URL}/images/payments/discover.png`} alt="Discover" width={32} height={20} className="object-contain" /></div>
 
                         {/* Generic Placeholders for Bitcoin/GPay/ApplePay since user didn't upload them yet, or maybe I should use icons */}
                         {/* Using text placeholder for "+15 more" style */}
