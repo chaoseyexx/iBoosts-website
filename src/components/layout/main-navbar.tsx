@@ -168,9 +168,9 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                         {/* Logo */}
                         <Link href="/" className="flex items-center gap-2">
                             <Image
-                                src="/images/logo-full.png"
+                                src="/images/logo-full.svg"
                                 alt="iboosts.gg"
-                                width={140}
+                                width={60}
                                 height={40}
                                 className="h-10 w-auto object-contain"
                                 priority
