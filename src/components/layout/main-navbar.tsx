@@ -131,18 +131,25 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
         <>
             <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#2d333b] bg-[#0a0e13]/90 backdrop-blur-md">
                 {/* Top bar (Language/Currency) */}
-                <div className="h-8 bg-[#0a0e13] border-b border-[#2d333b] flex items-center justify-end px-6 gap-4 text-xs font-medium text-[#9ca3af] hidden sm:flex">
-                    <button
-                        onClick={() => setLanguageModalOpen(true)}
-                        className="hover:text-white transition-colors flex items-center gap-1.5"
-                    >
-                        <Globe className="h-3 w-3" />
-                        English (EN) / USD ($)
-                        <ChevronDown className="h-3 w-3" />
-                    </button>
-                    <Link href="/support" className="hover:text-white transition-colors">
-                        Support
-                    </Link>
+                <div className="h-8 bg-[#0a0e13] border-b border-[#2d333b] hidden sm:grid grid-cols-3 items-center px-6 text-xs font-medium text-[#9ca3af]">
+                    <div>{/* Left spacer */}</div>
+
+                    <div className="flex justify-center">
+                        <Link href="/support" className="hover:text-white transition-colors">
+                            Live Support
+                        </Link>
+                    </div>
+
+                    <div className="flex justify-end gap-4">
+                        <button
+                            onClick={() => setLanguageModalOpen(true)}
+                            className="hover:text-white transition-colors flex items-center gap-1.5"
+                        >
+                            <Globe className="h-3 w-3" />
+                            English (EN) / USD ($)
+                            <ChevronDown className="h-3 w-3" />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Main nav */}
