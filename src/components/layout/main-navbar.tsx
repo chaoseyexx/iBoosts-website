@@ -136,7 +136,7 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
 
                         {/* Inline Logo Component - Theme Aware */}
                         <Link href="/" className="flex items-center gap-2 shrink-0">
-                            <Logo className="h-[28px] w-auto text-white" />
+                            <Logo className="h-[36px] w-auto text-white" />
                         </Link>
 
                         {/* Desktop Navigation */}
