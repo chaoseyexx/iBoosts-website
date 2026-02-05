@@ -49,8 +49,8 @@ export function Footer() {
                                 src="/images/logo-full.png"
                                 alt="iboosts.gg"
                                 width={160}
-                                height={48}
-                                className="h-12 w-auto object-contain"
+                                height={80}
+                                className="h-20 w-auto object-contain"
                             />
                         </Link>
                         <p className="text-[#9ca3af] text-sm leading-relaxed">
