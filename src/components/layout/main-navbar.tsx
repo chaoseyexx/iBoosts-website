@@ -28,7 +28,8 @@ import { ActivityButton } from "@/components/ui/activity-dropdown";
 import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/ui/logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { NotificationDropdown } from "@/components/ui/notification-dropdown"; // Ensure this matches if used differently under user state
+import { NotificationDropdown } from "@/components/ui/notification-dropdown";
+import { motion, AnimatePresence } from "framer-motion";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -64,6 +65,7 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
     const [user, setUser] = React.useState<{ id: string; email?: string; username?: string; avatar?: string; } | null>(initialUser || null);
     const [loading, setLoading] = React.useState(true);
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+    const [userMenuOpen, setUserMenuOpen] = React.useState(false);
     const [languageModalOpen, setLanguageModalOpen] = React.useState(false);
 
     // Sync user state
@@ -196,62 +198,97 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                                 </Button>
 
                                 <NotificationBell count={0} />
+                                <ActivityButton />
 
                                 {/* User Menu */}
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="relative h-9 w-9 rounded-full ml-1 p-0 hover:bg-transparent">
-                                            <Avatar className="h-9 w-9 border border-[#30363d]">
-                                                <AvatarImage src={user.avatar || ""} alt={user.username} />
-                                                <AvatarFallback className="bg-[#21262d] text-[#c9d1d9]">
-                                                    {user.username?.[0]?.toUpperCase()}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-64 bg-[#1c2128] border-[#30363d] text-[#c9d1d9] p-0" align="end" forceMount>
-                                        <div className="p-4 border-b border-[#30363d] flex items-center justify-between bg-[#161b22]">
-                                            <div className="flex items-center gap-3">
-                                                <Avatar className="h-10 w-10 border border-[#30363d]">
-                                                    <AvatarImage src={user.avatar || ""} alt={user.username} />
-                                                    <AvatarFallback className="bg-[#21262d] text-[#c9d1d9]">
-                                                        {user.username?.[0]?.toUpperCase()}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                                <div className="flex flex-col">
-                                                    <span className="font-bold text-white text-sm">{user.username}</span>
-                                                    <span className="text-[#8b949e] text-xs truncate max-w-[100px]">{user.email}</span>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setUserMenuOpen(!userMenuOpen)}
+                                        className="relative h-9 w-9 rounded-full ml-1 p-0 hover:bg-transparent flex items-center justify-center outline-none"
+                                    >
+                                        <Avatar className="h-9 w-9 border border-[#30363d]">
+                                            <AvatarImage src={user.avatar || ""} alt={user.username} />
+                                            <AvatarFallback className="bg-[#21262d] text-[#c9d1d9]">
+                                                {user.username?.[0]?.toUpperCase()}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    </button>
 
-                                        <div className="p-2 space-y-1">
-                                            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-white cursor-pointer px-3 py-2" onClick={() => router.push('/dashboard')}>
-                                                <LayoutDashboard className="mr-3 h-4 w-4" />
-                                                <span>Dashboard</span>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-white cursor-pointer px-3 py-2" onClick={() => router.push('/dashboard/orders')}>
-                                                <ShoppingCart className="mr-3 h-4 w-4" />
-                                                <span>Orders</span>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-white cursor-pointer px-3 py-2" onClick={() => router.push('/dashboard/offers')}>
-                                                <Tag className="mr-3 h-4 w-4" />
-                                                <span>My Offers</span>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-white cursor-pointer px-3 py-2" onClick={() => router.push('/dashboard/settings')}>
-                                                <Settings className="mr-3 h-4 w-4" />
-                                                <span>Settings</span>
-                                            </DropdownMenuItem>
-                                        </div>
+                                    <AnimatePresence>
+                                        {userMenuOpen && (
+                                            <>
+                                                {/* Backdrop to close */}
+                                                <div
+                                                    className="fixed inset-0 z-40"
+                                                    onClick={() => setUserMenuOpen(false)}
+                                                />
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                    transition={{ duration: 0.15 }}
+                                                    className="absolute right-0 mt-2 w-64 rounded-xl border border-[#30363d] bg-[#1c2128] text-[#c9d1d9] shadow-2xl z-50 overflow-hidden"
+                                                >
+                                                    <div className="p-4 border-b border-[#30363d] flex items-center justify-between bg-[#161b22]">
+                                                        <div className="flex items-center gap-3">
+                                                            <Avatar className="h-10 w-10 border border-[#30363d]">
+                                                                <AvatarImage src={user.avatar || ""} alt={user.username} />
+                                                                <AvatarFallback className="bg-[#21262d] text-[#c9d1d9]">
+                                                                    {user.username?.[0]?.toUpperCase()}
+                                                                </AvatarFallback>
+                                                            </Avatar>
+                                                            <div className="flex flex-col">
+                                                                <span className="font-bold text-white text-sm">{user.username}</span>
+                                                                <span className="text-[#8b949e] text-xs truncate max-w-[140px]">{user.email}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
-                                        <div className="p-2 border-t border-[#30363d]">
-                                            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-red-400 text-[#f85149] cursor-pointer px-3 py-2" onClick={handleLogout}>
-                                                <LogOut className="mr-3 h-4 w-4" />
-                                                <span>Log out</span>
-                                            </DropdownMenuItem>
-                                        </div>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                                    <div className="p-2 space-y-1">
+                                                        <button
+                                                            onClick={() => { router.push('/dashboard'); setUserMenuOpen(false); }}
+                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
+                                                        >
+                                                            <LayoutDashboard className="h-4 w-4" />
+                                                            <span>Dashboard</span>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => { router.push('/dashboard/orders'); setUserMenuOpen(false); }}
+                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
+                                                        >
+                                                            <ShoppingCart className="h-4 w-4" />
+                                                            <span>Orders</span>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => { router.push('/dashboard/offers'); setUserMenuOpen(false); }}
+                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
+                                                        >
+                                                            <Tag className="h-4 w-4" />
+                                                            <span>My Offers</span>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => { router.push('/dashboard/settings'); setUserMenuOpen(false); }}
+                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
+                                                        >
+                                                            <Settings className="h-4 w-4" />
+                                                            <span>Settings</span>
+                                                        </button>
+                                                    </div>
+
+                                                    <div className="p-2 border-t border-[#30363d]">
+                                                        <button
+                                                            onClick={handleLogout}
+                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#f85149] transition-colors hover:bg-[#f85149]/10"
+                                                        >
+                                                            <LogOut className="h-4 w-4" />
+                                                            <span>Log out</span>
+                                                        </button>
+                                                    </div>
+                                                </motion.div>
+                                            </>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
                             </>
                         ) : (
                             /* Guest Actions */
