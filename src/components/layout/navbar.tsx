@@ -77,7 +77,7 @@ export function Navbar({ user = mockUser, notificationCount = 0 }: NavbarProps) 
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2">
                         <img
-                            src="/images/logo-full.svg"
+                            src="/images/logo-full.png"
                             alt="iboosts.gg"
                             className="h-10 w-auto object-contain"
                         />

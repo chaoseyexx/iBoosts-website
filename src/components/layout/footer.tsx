@@ -46,10 +46,10 @@ export function Footer() {
                     <div className="space-y-6">
                         <Link href="/" className="flex items-center gap-2">
                             <Image
-                                src="/images/logo-full.svg"
+                                src="/images/logo-full.png"
                                 alt="iboosts.gg"
-                                width={165}
-                                height={40}
+                                width={160}
+                                height={48}
                                 className="h-12 w-auto object-contain"
                             />
                         </Link>
