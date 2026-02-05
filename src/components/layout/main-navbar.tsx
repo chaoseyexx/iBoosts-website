@@ -41,11 +41,17 @@ const navCategories = [
 
 interface MainNavbarProps {
     variant?: "landing" | "dashboard";
+    user?: {
+        id: string;
+        email?: string;
+        username?: string;
+        avatar?: string;
+    } | null;
 }
 
-export function MainNavbar({ variant = "landing" }: MainNavbarProps) {
+export function MainNavbar({ variant = "landing", user: initialUser }: MainNavbarProps) {
     const router = useRouter();
-    const [user, setUser] = React.useState<{ id: string; email?: string; username?: string; avatar?: string; } | null>(null);
+    const [user, setUser] = React.useState<{ id: string; email?: string; username?: string; avatar?: string; } | null>(initialUser || null);
     const [loading, setLoading] = React.useState(true);
     const [dropdownOpen, setDropdownOpen] = React.useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);

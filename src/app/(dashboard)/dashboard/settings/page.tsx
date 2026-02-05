@@ -215,10 +215,11 @@ export default function SettingsPage() {
         try {
             const profileData = await getProfile();
             setProfile(profileData || {});
+            router.refresh(); // Sync layout/navbar
         } catch (error) {
             console.error("Error refreshing profile:", error);
         }
-    }, []);
+    }, [router]);
 
     React.useEffect(() => {
         const supabase = createClient();

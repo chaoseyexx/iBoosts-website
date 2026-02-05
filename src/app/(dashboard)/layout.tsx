@@ -41,7 +41,12 @@ export default async function DashboardLayout({
     return (
         <div data-dashboard className="dashboard-theme min-h-screen bg-[#0a0e13]">
             {/* Fixed Navbar */}
-            <MainNavbar variant="dashboard" />
+            <MainNavbar variant="dashboard" user={userData ? {
+                id: authUser?.id || '',
+                email: authUser?.email || '',
+                username: userData.username,
+                avatar: userData.avatar || undefined
+            } : null} />
 
             {/* Content area with sidebar - positioned below fixed navbar */}
             <div className="flex pt-[88px]">

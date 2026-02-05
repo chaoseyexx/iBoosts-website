@@ -24,20 +24,11 @@ import {
     ThumbsDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import prisma from "@/lib/prisma/client";
+import { notFound } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
-// Mock user data
-const user = {
-    username: "Chaoseyex",
-    verified: true,
-    rating: "100%",
-    reviews: 56,
-    status: "Online",
-    joined: "1/5/26",
-    location: "United States",
-    banner: "/images/banner-placeholder.jpg", // We'll use a color/gradient for now
-};
-
-// Mock products
+// Mock products (Moved outside component to avoid recreation)
 const products = [
     {
         id: 1,
@@ -64,7 +55,7 @@ const products = [
 // Categories
 const categories = [
     { id: "currency", label: "Currency", count: 1, icon: Coins },
-    { id: "accounts", label: "Accounts", count: 2, icon: Shield }, // Highlighted in screenshot
+    { id: "accounts", label: "Accounts", count: 2, icon: Shield },
     { id: "items", label: "Items", count: 1, icon: Package },
     { id: "top-ups", label: "Top Ups", count: 0, icon: ShoppingBag },
     { id: "gift-cards", label: "Gift Cards", count: 0, icon: Gift },
@@ -121,9 +112,11 @@ const reviews = [
     },
 ];
 
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+interface UserProfileContentProps {
+    user: any; // Using any for Prisma user object to avoid deep import issues for now
+}
 
-function UserProfileContent({ username }: { username: string }) {
+function UserProfileContent({ user }: UserProfileContentProps) {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
@@ -171,9 +164,13 @@ function UserProfileContent({ username }: { username: string }) {
         updateUrl(activeTab, catId);
     };
 
+    // Derived User Props
+    const username = user.username;
+    const joinedDate = new Date(user.createdAt).toLocaleDateString();
+
     return (
         <div className="min-h-screen bg-[#0a0e13]">
-            <MainNavbar variant="landing" />
+            <MainNavbar variant="landing" user={user} />
 
             {/* Content Container */}
             <div className="pt-[88px]">
@@ -193,8 +190,15 @@ function UserProfileContent({ username }: { username: string }) {
                                     {/* Avatar */}
                                     <div className="relative">
                                         <div className="h-24 w-24 rounded-full bg-[#252b33] border-4 border-[#1c2128] flex items-center justify-center text-3xl font-bold text-white overflow-hidden">
-                                            {/* Fallback to initial */}
-                                            {username ? username.charAt(0).toUpperCase() : "?"}
+                                            {user.avatar ? (
+                                                <img
+                                                    src={user.avatar}
+                                                    alt={username}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                username.charAt(0).toUpperCase()
+                                            )}
                                             {/* Online Status Dot (Bordered) */}
                                             <div className="absolute bottom-1 right-1 h-5 w-5 bg-green-500 rounded-full border-4 border-[#1c2128]" />
                                         </div>
@@ -204,23 +208,24 @@ function UserProfileContent({ username }: { username: string }) {
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2">
                                             <h1 className="text-2xl font-bold text-white">{username}</h1>
-                                            {user.verified && (
-                                                <Badge variant="secondary" className="bg-[#5c9eff]/10 text-[#5c9eff] hover:bg-[#5c9eff]/20 border-0 p-1 rounded-full">
-                                                    <Check className="h-3 w-3" />
-                                                </Badge>
-                                            )}
+                                            {/* We can check verification logic later, defaulting to checkmark for now */}
+                                            <Badge variant="secondary" className="bg-[#5c9eff]/10 text-[#5c9eff] hover:bg-[#5c9eff]/20 border-0 p-1 rounded-full">
+                                                <Check className="h-3 w-3" />
+                                            </Badge>
                                         </div>
                                         <div className="flex items-center gap-4 text-sm">
                                             <div className="flex items-center gap-1 text-[#22c55e]">
                                                 <ThumbsUp className="h-4 w-4 fill-current" />
-                                                <span className="font-semibold">{user.rating}</span>
-                                                <span className="text-[#9ca3af] font-normal">{user.reviews} reviews</span>
+                                                <span className="font-semibold">100%</span>
+                                                <span className="text-[#9ca3af] font-normal">{user.reviews || 0} reviews</span>
                                             </div>
                                             <span className="text-[#6b7280]">•</span>
                                             <div className="flex items-center gap-1 text-[#22c55e]">
                                                 <div className="h-2 w-2 rounded-full bg-current" />
-                                                {user.status}
+                                                Online
                                             </div>
+                                            <span className="text-[#6b7280]">•</span>
+                                            <span className="text-[#9ca3af]">Joined {joinedDate}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -404,16 +409,42 @@ function UserProfileContent({ username }: { username: string }) {
     );
 }
 
+// Server Component Fetch Logic
+async function getUser(username: string) {
+    if (!username) return null;
+
+    // Decode URI component (e.g. handle spaces or special chars if any)
+    const decodedUsername = decodeURIComponent(username);
+
+    // Try finding user by username (case insensitive usually done by DB, but here strict for unique constraint)
+    const user = await prisma.user.findFirst({
+        where: {
+            username: {
+                equals: decodedUsername,
+                mode: 'insensitive' // Requires Prisma Postgres, if MySQL use raw query or rely on DB collation
+            }
+        },
+    });
+
+    return user;
+}
+
+
 export default async function UserProfilePage({ params }: { params: Promise<{ username: string }> }) {
     const resolvedParams = await params;
+    const user = await getUser(resolvedParams.username);
+
+    if (!user) {
+        notFound();
+    }
+
     return (
         <React.Suspense fallback={
             <div className="flex min-h-screen items-center justify-center bg-[#0a0e13]">
                 <div className="h-8 w-8 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
             </div>
         }>
-            <UserProfileContent username={resolvedParams.username} />
+            <UserProfileContent user={user} />
         </React.Suspense>
     );
 }
-
