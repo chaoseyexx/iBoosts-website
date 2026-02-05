@@ -59,20 +59,30 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
 
     // Check auth state
     React.useEffect(() => {
+        if (initialUser) {
+            setUser(initialUser);
+        }
+    }, [initialUser]);
+
+    React.useEffect(() => {
         const supabase = createClient();
 
         const checkUser = async () => {
             try {
-                const { data: { user: authUser } } = await supabase.auth.getUser();
-                if (authUser) {
-                    const profile = await getProfile();
+                // If we already have a user from props, we might skip this or just verify
+                // But generally safe to double check or just rely on props if provided
+                if (!initialUser) {
+                    const { data: { user: authUser } } = await supabase.auth.getUser();
+                    if (authUser) {
+                        const profile = await getProfile();
 
-                    setUser({
-                        id: authUser.id,
-                        email: authUser.email,
-                        username: profile?.username || authUser.user_metadata?.full_name || authUser.email?.split("@")[0] || "User",
-                        avatar: profile?.avatar || authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture,
-                    });
+                        setUser({
+                            id: authUser.id,
+                            email: authUser.email,
+                            username: profile?.username || authUser.user_metadata?.full_name || authUser.email?.split("@")[0] || "User",
+                            avatar: profile?.avatar || authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture,
+                        });
+                    }
                 }
             } catch (error) {
                 console.error("Error checking auth:", error);
@@ -100,7 +110,7 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
         return () => {
             subscription.unsubscribe();
         };
-    }, []);
+    }, [initialUser]);
 
     // Close dropdown when clicking outside
     React.useEffect(() => {
