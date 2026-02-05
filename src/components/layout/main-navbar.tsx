@@ -41,12 +41,12 @@ import { getProfile } from "@/app/(dashboard)/dashboard/settings/actions";
 
 // Navigation categories
 const navCategories = [
-    { name: "Currency", href: "/currency" },
-    { name: "Accounts", href: "/accounts" },
-    { name: "Top Ups", href: "/top-ups" },
-    { name: "Items", href: "/items" },
-    { name: "Boosting", href: "/boosting" },
-    { name: "Gift Cards", href: "/gift-cards" },
+    { name: "Currency" },
+    { name: "Accounts" },
+    { name: "Top Ups" },
+    { name: "Items" },
+    { name: "Boosting" },
+    { name: "Gift Cards" },
 ];
 
 interface MainNavbarProps {
@@ -163,13 +163,12 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                         {/* Desktop Navigation */}
                         <div className="hidden lg:flex items-center gap-6">
                             {navCategories.map((cat) => (
-                                <Link
+                                <span
                                     key={cat.name}
-                                    href={cat.href}
-                                    className="text-[15px] font-bold text-white hover:text-[#f5a623] transition-colors whitespace-nowrap"
+                                    className="text-[15px] font-bold text-white hover:text-[#f5a623] transition-colors whitespace-nowrap cursor-default"
                                 >
                                     {cat.name}
-                                </Link>
+                                </span>
                             ))}
                         </div>
                     </div>
@@ -277,14 +276,12 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                     <div className="lg:hidden border-t border-[#2d333b] bg-[#0d1117] absolute w-full left-0 top-[96px] shadow-2xl h-[calc(100vh-96px)] overflow-y-auto">
                         <div className="p-4 space-y-1">
                             {navCategories.map((cat) => (
-                                <Link
+                                <div
                                     key={cat.name}
-                                    href={cat.href}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="block px-4 py-3 text-base font-medium text-[#c9d1d9] hover:text-white hover:bg-[#1c2128] rounded-lg transition-colors"
+                                    className="block px-4 py-3 text-base font-medium text-[#c9d1d9] hover:text-white hover:bg-[#1c2128] rounded-lg transition-colors cursor-default"
                                 >
                                     {cat.name}
-                                </Link>
+                                </div>
                             ))}
                         </div>
                     </div>
