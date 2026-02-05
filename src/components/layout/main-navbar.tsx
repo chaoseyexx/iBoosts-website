@@ -227,8 +227,9 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                                     transition={{ duration: 0.15 }}
-                                                    className="absolute right-0 mt-2 w-64 rounded-xl border border-[#30363d] bg-[#1c2128] text-[#c9d1d9] shadow-2xl z-50 overflow-hidden"
+                                                    className="absolute right-0 mt-2 w-72 rounded-xl border border-[#30363d] bg-[#1c2128] text-[#c9d1d9] shadow-2xl z-50 overflow-hidden"
                                                 >
+                                                    {/* Header */}
                                                     <div className="p-4 border-b border-[#30363d] flex items-center justify-between bg-[#161b22]">
                                                         <div className="flex items-center gap-3">
                                                             <Avatar className="h-10 w-10 border border-[#30363d]">
@@ -239,11 +240,17 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                                                             </Avatar>
                                                             <div className="flex flex-col">
                                                                 <span className="font-bold text-white text-sm">{user.username}</span>
-                                                                <span className="text-[#8b949e] text-xs truncate max-w-[140px]">{user.email}</span>
+                                                                <span className="text-[#9ca3af] text-xs">$0.00</span>
                                                             </div>
                                                         </div>
+                                                        <Link href="/dashboard/listings/create" onClick={() => setUserMenuOpen(false)}>
+                                                            <Button className="bg-[#f5a623] hover:bg-[#e09612] text-black font-bold h-8 px-4 text-xs">
+                                                                Sell
+                                                            </Button>
+                                                        </Link>
                                                     </div>
 
+                                                    {/* Marketplace Group */}
                                                     <div className="p-2 space-y-1">
                                                         <button
                                                             onClick={() => { router.push('/dashboard'); setUserMenuOpen(false); }}
@@ -264,18 +271,67 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                                                             className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
                                                         >
                                                             <Tag className="h-4 w-4" />
-                                                            <span>My Offers</span>
+                                                            <span>Offers</span>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => { router.push('/dashboard/boosting'); setUserMenuOpen(false); }}
+                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
+                                                        >
+                                                            <ChevronsUp className="h-4 w-4" />
+                                                            <span>Boosting</span>
+                                                        </button>
+                                                    </div>
+
+                                                    {/* Account Group */}
+                                                    <div className="p-2 border-t border-[#30363d] space-y-1">
+                                                        <button
+                                                            onClick={() => { router.push('/dashboard/wallet'); setUserMenuOpen(false); }}
+                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
+                                                        >
+                                                            <Wallet className="h-4 w-4" />
+                                                            <span>Wallet</span>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => { router.push('/dashboard/messages'); setUserMenuOpen(false); }}
+                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
+                                                        >
+                                                            <MessageCircle className="h-4 w-4" />
+                                                            <span>Messages</span>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => { router.push('/dashboard/notifications'); setUserMenuOpen(false); }}
+                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
+                                                        >
+                                                            <Bell className="h-4 w-4" />
+                                                            <span>Notifications</span>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => { router.push('/dashboard/feedback'); setUserMenuOpen(false); }}
+                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
+                                                        >
+                                                            <Star className="h-4 w-4" />
+                                                            <span>Feedback</span>
                                                         </button>
                                                         <button
                                                             onClick={() => { router.push('/dashboard/settings'); setUserMenuOpen(false); }}
                                                             className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
                                                         >
                                                             <Settings className="h-4 w-4" />
-                                                            <span>Settings</span>
+                                                            <span>Account settings</span>
                                                         </button>
                                                     </div>
 
-                                                    <div className="p-2 border-t border-[#30363d]">
+                                                    {/* App Group */}
+                                                    <div className="p-2 border-t border-[#30363d] space-y-1">
+                                                        <div className="w-full flex items-center justify-between rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white cursor-pointer">
+                                                            <div className="flex items-center gap-3">
+                                                                <Moon className="h-4 w-4" />
+                                                                <span>Offline mode</span>
+                                                            </div>
+                                                            <div className="w-8 h-4 rounded-full bg-[#30363d] relative">
+                                                                <div className="absolute left-1 top-1 h-2 w-2 rounded-full bg-[#8b949e]" />
+                                                            </div>
+                                                        </div>
                                                         <button
                                                             onClick={handleLogout}
                                                             className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#f85149] transition-colors hover:bg-[#f85149]/10"
