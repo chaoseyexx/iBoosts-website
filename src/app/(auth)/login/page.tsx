@@ -21,14 +21,9 @@ export default function LoginPage() {
         setIsLoading(true);
         setError(null);
 
-        try {
-            const result = await login(formData);
-            if (result?.error) {
-                setError(result.error);
-                setIsLoading(false);
-            }
-        } catch (e) {
-            setError("Invalid credentials.");
+        const result = await login(formData);
+        if (result?.error) {
+            setError(result.error);
             setIsLoading(false);
         }
     }
