@@ -79,7 +79,7 @@ export function Navbar({ user = mockUser, notificationCount = 0 }: NavbarProps) 
                         <img
                             src="/images/logo-full.png"
                             alt="iboosts.gg"
-                            className="h-9 w-auto object-contain"
+                            className="h-11 w-auto object-contain"
                         />
                     </Link>
 

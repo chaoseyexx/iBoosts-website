@@ -171,8 +171,8 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                                 src="/images/logo-full.png"
                                 alt="iboosts.gg"
                                 width={140}
-                                height={32}
-                                className="h-8 w-auto object-contain"
+                                height={40}
+                                className="h-10 w-auto object-contain"
                                 priority
                             />
                         </Link>
