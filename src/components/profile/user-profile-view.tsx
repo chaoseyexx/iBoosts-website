@@ -345,6 +345,7 @@ export function UserProfileView({ user }: UserProfileViewProps) {
                     {/* Reviews Content */}
                     {activeTab === "Reviews" && (
                         <div className="space-y-6 pb-12">
+                            {/* ... (existing reviews content) ... */}
                             {/* Header */}
                             <div>
                                 <h2 className="text-2xl font-bold text-white mb-6">Reviews</h2>
@@ -392,6 +393,24 @@ export function UserProfileView({ user }: UserProfileViewProps) {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    )}
+
+                    {/* About Content */}
+                    {activeTab === "About" && (
+                        <div className="space-y-6 pb-12">
+                            <h2 className="text-2xl font-bold text-white mb-6">About</h2>
+                            <Card className="bg-[#1c2128] border-[#2d333b]">
+                                <CardContent className="p-6">
+                                    {user.bio ? (
+                                        <p className="text-[#9ca3af] whitespace-pre-wrap">{user.bio}</p>
+                                    ) : (
+                                        <div className="text-center py-8 text-[#6b7280]">
+                                            <p>No bio available.</p>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
                         </div>
                     )}
                 </div>
