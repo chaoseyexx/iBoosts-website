@@ -8,56 +8,82 @@ interface LogoProps extends React.SVGProps<SVGSVGElement> {
 export function Logo({ className, ...props }: LogoProps) {
     return (
         <svg
-            viewBox="0 0 180 32"
+            viewBox="0 0 240 40"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             className={cn("h-full w-auto", className)}
+            preserveAspectRatio="xMinYMid meet"
             {...props}
         >
-            {/* Rocket Icon Box */}
-            <rect width="32" height="32" rx="8" fill="#F5A623" />
+            {/* 1. Rocket Icon Box (Yellow Rounded Square) */}
+            <rect x="0" y="4" width="32" height="32" rx="8" fill="#f5a623" />
 
-            {/* Rocket Icon Path */}
-            <path d="M22.6667 9.33333C22.6667 9.33333 22.6667 14.6667 18.6667 18.6667C17.3333 20 16 20.6667 14.6667 21.3333L12 24L13.3333 20C12.6667 18.6667 12 17.3333 13.3333 16C17.3333 12 22.6667 9.33333 22.6667 9.33333Z" fill="white" />
-            <path d="M12 24C12 24 6.66667 24 2.66667 20C1.33333 18.6667 0.666667 17.3333 0 16L4 17.3333C5.33333 16.6667 6.66667 16 8 17.3333C12 21.3333 12 24 12 24Z" fill="white" transform="translate(4, -2)" />
-            <circle cx="18" cy="14" r="1.5" fill="#F5A623" />
+            {/* 2. Rocket Icon - Simplified High-Quality Path */}
+            <g transform="translate(6, 12) scale(0.9)">
+                <path
+                    d="M14 2C10 2 6 5 5 9C4 11 4 13 5 15L3 19L7 17C9 18 11 18 13 17C17 15 20 10 20 5C20 3.5 19.5 2 18 2Z"
+                    fill="white"
+                />
+                <circle cx="14" cy="7" r="1.5" fill="#f5a623" />
+                <path d="M2.5 20.5C1 19 0 16 3 13.5Q5 15 5 17Q5 19 4 20Z" fill="white" opacity="0.8" />
+            </g>
 
-            {/* "iboosts.gg" Typography as high-quality paths */}
-            <g transform="translate(40, 22)" fill="white">
+            {/* 3. "iboosts.gg" Typography - Individual groups for guaranteed spacing */}
+            <g transform="translate(44, 28)" fill="white">
                 {/* i */}
-                <path d="M0 -16 H4 V0 H0 Z M0 -21 H4 V-18 H0 Z" />
+                <g transform="translate(0, 0)">
+                    <circle cx="2" cy="-21" r="2.2" />
+                    <rect x="0" y="-16" width="4.5" height="16" rx="1" />
+                </g>
 
                 {/* b */}
-                <path fillRule="evenodd" clipRule="evenodd" d="M7 -22 H11 V-14.5 C11 -12.5 12 -11 15 -11 C18 -11 19 -12.5 19 -14.5 V-22 H23 V-14.5 C23 -10 21 -7 15 -7 C9 -7 7 -10 7 -14.5 V-22Z" />
+                <g transform="translate(10, 0)">
+                    <rect x="0" y="-22" width="4" height="22" rx="1" />
+                    <path fillRule="evenodd" d="M4 -14.5 A6 6 0 1 1 4 -2.5 A6 6 0 0 1 4 -14.5 Z M4 -11.5 A3 3 0 1 1 4 -5.5 A3 3 0 0 1 4 -11.5 Z" />
+                </g>
 
                 {/* o */}
-                <path fillRule="evenodd" clipRule="evenodd" d="M32 -14.5 C32 -10 34 -7 38.5 -7 C43 -7 45 -10 45 -14.5 C45 -19 43 -22 38.5 -22 C34 -22 32 -19 32 -14.5 Z M36 -14.5 C36 -17.5 37 -19 38.5 -19 C40 -19 41 -17.5 41 -14.5 C41 -11.5 40 -10 38.5 -10 C37 -10 36 -11.5 36 -14.5 Z" />
+                <g transform="translate(28, 0)">
+                    <path fillRule="evenodd" d="M6.5 -14.5 A6.5 6.5 0 1 1 6.5 -1.5 A6.5 6.5 0 0 1 6.5 -14.5 Z M6.5 -11.5 A3.5 3.5 0 1 1 6.5 -4.5 A3.5 3.5 0 0 1 6.5 -11.5 Z" />
+                </g>
 
                 {/* o */}
-                <path fillRule="evenodd" clipRule="evenodd" d="M50 -14.5 C50 -10 52 -7 56.5 -7 C61 -7 63 -10 63 -14.5 C63 -19 61 -22 56.5 -22 C52 -22 50 -19 50 -14.5 Z M54 -14.5 C54 -17.5 55 -19 56.5 -19 C58 -19 59 -17.5 59 -14.5 C59 -11.5 58 -10 56.5 -10 C55 -10 54 -11.5 54 -14.5 Z" />
+                <g transform="translate(46, 0)">
+                    <path fillRule="evenodd" d="M6.5 -14.5 A6.5 6.5 0 1 1 6.5 -1.5 A6.5 6.5 0 0 1 6.5 -14.5 Z M6.5 -11.5 A3.5 3.5 0 1 1 6.5 -4.5 A3.5 3.5 0 0 1 6.5 -11.5 Z" />
+                </g>
 
                 {/* s */}
-                <path d="M68 -10 C68 -8 69 -7 72 -7 H77 V-10 H73 C72 -10 72 -10.5 72 -11 C72 -11.5 72 -12 73 -12 H75 C78 -12 79 -13 79 -16 C79 -19 78 -22 73 -22 H68 V-19 H73 C74 -19 75 -18.5 75 -18 C75 -17.5 75 -17 74 -17 H72 C69 -17 68 -15 68 -13 V-10 Z" />
+                <g transform="translate(64, 0)">
+                    <path d="M1 -3.5 Q1 0 5 0 L9 0 L9 -3.5 L5 -3.5 Q4 -3.5 4 -4.5 Q4 -5.5 5 -5.5 L7 -5.5 Q10 -5.5 10 -9 Q10 -13 6.5 -13 L1 -13 L1 -9.5 L5.5 -9.5 Q7 -9.5 7 -8.5 Q7 -7.5 5.5 -7.5 L3.5 -7.5 Q1 -7.5 1 -3.5 Z" />
+                </g>
 
                 {/* t */}
-                <path d="M84 -22 H88 V-12 H91 V-9 H88 V-3 C88 -1 89 0 91 0 H93 V3 H90 C86 3 84 1 84 -3 V-22 Z" transform="translate(0, -3) scale(1, 0.9)" />
+                <g transform="translate(79, 0)">
+                    <rect x="2.5" y="-19" width="3.5" height="19" rx="1" />
+                    <rect x="0" y="-14" width="8.5" height="3" rx="1" />
+                    <path d="M6 -3 L6 0 L9 0 L9 -3 Z" />
+                </g>
 
                 {/* s */}
-                <path d="M96 -10 C96 -8 97 -7 100 -7 H105 V-10 H101 C100 -10 100 -10.5 100 -11 C100 -11.5 100 -12 101 -12 H103 C106 -12 107 -13 107 -16 C107 -19 106 -22 101 -22 H96 V-19 H101 C102 -19 103 -18.5 103 -18 C103 -17.5 103 -17 102 -17 H100 C97 -17 96 -15 96 -13 V-10 Z" />
+                <g transform="translate(93, 0)">
+                    <path d="M1 -3.5 Q1 0 5 0 L9 0 L9 -3.5 L5 -3.5 Q4 -3.5 4 -4.5 Q4 -5.5 5 -5.5 L7 -5.5 Q10 -5.5 10 -9 Q10 -13 6.5 -13 L1 -13 L1 -9.5 L5.5 -9.5 Q7 -9.5 7 -8.5 Q7 -7.5 5.5 -7.5 L3.5 -7.5 Q1 -7.5 1 -3.5 Z" />
+                </g>
 
                 {/* . */}
-                <circle cx="113" cy="-10" r="2.5" fill="#F5A623" transform="translate(0, 8)" />
-
-                {/* g */}
-                <g fill="#F5A623">
-                    <path fillRule="evenodd" clipRule="evenodd" d="M118 -14.5 C118 -10 120 -7 124.5 -7 C129 -7 131 -10 131 -14.5 C131 -19 129 -22 124.5 -22 C120 -22 118 -19 118 -14.5 Z M122 -14.5 C122 -17.5 123 -19 124.5 -19 C126 -19 127 -17.5 127 -14.5 C127 -11.5 126 -10 124.5 -10 C123 -10 122 -11.5 122 -14.5 Z" />
-                    <path d="M131 -14.5 V-1 C131 3 129 5 124.5 5 H120 V2 H124.5 C126 2 127 1 127 -1 V-14.5 H131 Z" />
+                <g transform="translate(108, 0)" fill="#f5a623">
+                    <circle cx="2" cy="-2.5" r="2.8" />
                 </g>
 
                 {/* g */}
-                <g fill="#F5A623" transform="translate(16, 0)">
-                    <path fillRule="evenodd" clipRule="evenodd" d="M118 -14.5 C118 -10 120 -7 124.5 -7 C129 -7 131 -10 131 -14.5 C131 -19 129 -22 124.5 -22 C120 -22 118 -19 118 -14.5 Z M122 -14.5 C122 -17.5 123 -19 124.5 -19 C126 -19 127 -17.5 127 -14.5 C127 -11.5 126 -10 124.5 -10 C123 -10 122 -11.5 122 -14.5 Z" />
-                    <path d="M131 -14.5 V-1 C131 3 129 5 124.5 5 H120 V2 H124.5 C126 2 127 1 127 -1 V-14.5 H131 Z" />
+                <g transform="translate(116, 0)" fill="#f5a623">
+                    <path fillRule="evenodd" d="M5.5 -14.5 A6 6 0 1 1 5.5 -2.5 A6 6 0 0 1 5.5 -14.5 Z M5.5 -11.5 A3 3 0 1 1 5.5 -5.5 A3 3 0 0 1 5.5 -11.5 Z" />
+                    <path d="M9.5 -13 L11.5 -13 L11.5 2 Q11.5 5 7 5 L2 5 L2 2 L7 2 Q8.5 2 8.5 0 L9.5 -11.5 Z" />
+                </g>
+
+                {/* g */}
+                <g transform="translate(133, 0)" fill="#f5a623">
+                    <path fillRule="evenodd" d="M5.5 -14.5 A6 6 0 1 1 5.5 -2.5 A6 6 0 0 1 5.5 -14.5 Z M5.5 -11.5 A3 3 0 1 1 5.5 -5.5 A3 3 0 0 1 5.5 -11.5 Z" />
+                    <path d="M9.5 -13 L11.5 -13 L11.5 2 Q11.5 5 7 5 L2 5 L2 2 L7 2 Q8.5 2 8.5 0 L9.5 -11.5 Z" />
                 </g>
             </g>
         </svg>
