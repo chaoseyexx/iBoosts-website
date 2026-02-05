@@ -127,13 +127,14 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                 {/* Top Utility Bar */}
                 <div className="h-8 border-b border-[#1c2128] bg-[#0a0e12]">
                     <div className="max-w-[1920px] mx-auto h-full flex items-center justify-between px-4 text-[11px] font-bold text-[#8b949e]">
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-1.5 hover:text-white cursor-pointer transition-colors">
-                                <span className="text-[#f5a623]">●</span>
-                                <span>24/7 Live Support</span>
-                            </div>
+                        <div className="flex-1 hidden lg:block" /> {/* Left Spacer */}
+
+                        <div className="flex items-center gap-1.5 hover:text-white cursor-pointer transition-colors mx-auto lg:mx-0">
+                            <span className="text-[#f5a623]">●</span>
+                            <span>24/7 Live Support</span>
                         </div>
-                        <div className="flex items-center gap-4 uppercase">
+
+                        <div className="flex-1 flex justify-end items-center gap-4 uppercase">
                             <div className="flex items-center gap-1 hover:text-white cursor-pointer transition-colors">
                                 <Globe className="h-3 w-3" />
                                 <span>English | USD - $</span>
@@ -156,7 +157,7 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
 
                         {/* Inline Logo Component */}
                         <Link href="/" className="flex items-center gap-2 shrink-0">
-                            <Logo className="h-[36px] w-auto" />
+                            <Logo className="h-[44px] w-auto" />
                         </Link>
 
                         {/* Desktop Navigation */}

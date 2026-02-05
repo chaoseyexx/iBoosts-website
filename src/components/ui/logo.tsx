@@ -30,10 +30,11 @@ export function Logo({ className, ...props }: LogoProps) {
                 x="120"
                 y="68"
                 style={{
-                    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "48px",
-                    fill: "white"
+                    fontFamily: "system-ui, -apple-system, sans-serif",
+                    fontWeight: 800,
+                    fontSize: "56px",
+                    fill: "white",
+                    letterSpacing: "-0.02em"
                 }}
             >
                 iboosts
