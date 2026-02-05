@@ -8,7 +8,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MainNavbar } from "@/components/layout/main-navbar";
 import { Footer } from "@/components/layout/footer";
 
@@ -178,7 +178,12 @@ export default async function BoostingRequestPage({ params }: { params: { id: st
                                 {/* User Row */}
                                 <div className="flex items-center justify-between py-4 border-t border-[#2d333b]/30">
                                     <div className="flex items-center gap-3">
-                                        <Avatar className="h-10 w-10 border border-[#2d333b]" src={request.user.avatar} fallback={request.user.username} />
+                                        <Avatar className="h-10 w-10 border border-[#2d333b]">
+                                            <AvatarImage src={request.user.avatar || undefined} alt={request.user.username} />
+                                            <AvatarFallback className="bg-[#21262d] text-sm text-[#4b5563]">
+                                                {request.user.username.charAt(0).toUpperCase()}
+                                            </AvatarFallback>
+                                        </Avatar>
                                         <div>
                                             <div className="flex items-center gap-1.5 leading-none">
                                                 <span className="font-bold text-sm">{request.user.username}</span>
@@ -265,7 +270,10 @@ export default async function BoostingRequestPage({ params }: { params: { id: st
                                         {/* Mock Offer 1 */}
                                         <div className="p-4 flex items-center justify-between group hover:bg-[#1c2128]/20 transition-colors">
                                             <div className="flex items-center gap-3">
-                                                <Avatar className="h-8 w-8" fallback="UN" src="https://i.imgur.com/8N48l8b.png" />
+                                                <Avatar className="h-8 w-8">
+                                                    <AvatarImage src="https://i.imgur.com/8N48l8b.png" alt="pouting" />
+                                                    <AvatarFallback>P</AvatarFallback>
+                                                </Avatar>
                                                 <div>
                                                     <div className="flex items-center gap-1.5 leading-none">
                                                         <span className="font-bold text-sm">pouting</span>
@@ -289,7 +297,10 @@ export default async function BoostingRequestPage({ params }: { params: { id: st
                                         {/* Mock Offer 2 (Only if sold or multiple) */}
                                         <div className="p-4 flex items-center justify-between group bg-[#1c2128]/10 border-l-2 border-[#f5a623]">
                                             <div className="flex items-center gap-3">
-                                                <Avatar className="h-8 w-8" fallback="XN" src="https://i.imgur.com/39A8n8A.png" />
+                                                <Avatar className="h-8 w-8">
+                                                    <AvatarImage src="https://i.imgur.com/39A8n8A.png" alt="XeN0o0" />
+                                                    <AvatarFallback>X</AvatarFallback>
+                                                </Avatar>
                                                 <div>
                                                     <div className="flex items-center gap-1.5 leading-none">
                                                         <span className="font-bold text-sm">XeN0o0</span>

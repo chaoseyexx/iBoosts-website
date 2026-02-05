@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatCurrency } from "@/lib/utils";
 
 interface ListingCardProps {
@@ -69,11 +69,12 @@ export function ListingCard({ listing }: ListingCardProps) {
 
                     {/* Seller Info */}
                     <div className="flex items-center gap-2 mb-3">
-                        <Avatar
-                            src={listing.seller.avatar}
-                            fallback={listing.seller.username}
-                            size="xs"
-                        />
+                        <Avatar className="h-6 w-6">
+                            <AvatarImage src={listing.seller.avatar || undefined} alt={listing.seller.username} />
+                            <AvatarFallback className="text-[10px]">
+                                {listing.seller.username.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                        </Avatar>
                         <span className="text-sm text-[var(--text-muted)] truncate flex-1">
                             {listing.seller.username}
                         </span>

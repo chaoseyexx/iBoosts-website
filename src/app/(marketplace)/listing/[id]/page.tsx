@@ -3,7 +3,7 @@ import { Footer } from "@/components/layout/footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import {
     Star,
@@ -187,11 +187,12 @@ export default function ListingDetailPage({
                                             >
                                                 <div className="flex items-center justify-between mb-2">
                                                     <div className="flex items-center gap-3">
-                                                        <Avatar
-                                                            src={review.user.avatar}
-                                                            fallback={review.user.username}
-                                                            size="sm"
-                                                        />
+                                                        <Avatar className="h-8 w-8">
+                                                            <AvatarImage src={review.user.avatar || undefined} alt={review.user.username} />
+                                                            <AvatarFallback>
+                                                                {review.user.username.charAt(0).toUpperCase()}
+                                                            </AvatarFallback>
+                                                        </Avatar>
                                                         <span className="font-medium text-[var(--text-primary)]">
                                                             {review.user.username}
                                                         </span>
@@ -202,8 +203,8 @@ export default function ListingDetailPage({
                                                                 <Star
                                                                     key={i}
                                                                     className={`h-3 w-3 ${i < review.rating
-                                                                            ? "fill-[var(--warning)] text-[var(--warning)]"
-                                                                            : "text-[var(--text-muted)]"
+                                                                        ? "fill-[var(--warning)] text-[var(--warning)]"
+                                                                        : "text-[var(--text-muted)]"
                                                                         }`}
                                                                 />
                                                             ))}
@@ -331,12 +332,12 @@ export default function ListingDetailPage({
                                         href={`/seller/${listing.seller.username}`}
                                         className="flex items-center gap-4 group"
                                     >
-                                        <Avatar
-                                            src={listing.seller.avatar}
-                                            fallback={listing.seller.displayName}
-                                            size="lg"
-                                            status="online"
-                                        />
+                                        <Avatar className="h-12 w-12">
+                                            <AvatarImage src={listing.seller.avatar || undefined} alt={listing.seller.displayName} />
+                                            <AvatarFallback>
+                                                {listing.seller.displayName.charAt(0).toUpperCase()}
+                                            </AvatarFallback>
+                                        </Avatar>
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">
                                                 <span className="font-semibold text-[var(--text-primary)] group-hover:text-[var(--olive-400)] transition-colors">

@@ -12,7 +12,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
             {/* 2. Main Content Area: Split Layout */}
             {/* Added top padding to account for fixed navbar height (approx 80px) */}
-            <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 pt-20">
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 pt-[60px]">
 
                 {/* LEFT COL: Form Area */}
                 <div className="flex flex-col items-center justify-center p-8 lg:p-16 relative">

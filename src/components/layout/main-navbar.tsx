@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
     Search,
@@ -15,18 +14,29 @@ import {
     X,
     Globe,
     ChevronDown,
-    Headphones,
-    Tag,
     ChevronsUp,
     Wallet,
     Bell,
     Star,
     Moon,
+    LayoutDashboard,
+    Tag
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/ui/notification-dropdown";
 import { ActivityButton } from "@/components/ui/activity-dropdown";
 import { createClient } from "@/lib/supabase/client";
+import { Logo } from "@/components/ui/logo";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { NotificationDropdown } from "@/components/ui/notification-dropdown"; // Ensure this matches if used differently under user state
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { getProfile } from "@/app/(dashboard)/dashboard/settings/actions";
 
 // Navigation categories
@@ -53,34 +63,27 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
     const router = useRouter();
     const [user, setUser] = React.useState<{ id: string; email?: string; username?: string; avatar?: string; } | null>(initialUser || null);
     const [loading, setLoading] = React.useState(true);
-    const [dropdownOpen, setDropdownOpen] = React.useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-    const dropdownRef = React.useRef<HTMLDivElement>(null);
+    const [languageModalOpen, setLanguageModalOpen] = React.useState(false);
 
-    // Check auth state
+    // Sync user state
     React.useEffect(() => {
-        if (initialUser) {
-            setUser(initialUser);
-        }
+        if (initialUser) setUser(initialUser);
     }, [initialUser]);
 
     React.useEffect(() => {
         const supabase = createClient();
-
         const checkUser = async () => {
             try {
-                // If we already have a user from props, we might skip this or just verify
-                // But generally safe to double check or just rely on props if provided
                 if (!initialUser) {
                     const { data: { user: authUser } } = await supabase.auth.getUser();
                     if (authUser) {
                         const profile = await getProfile();
-
                         setUser({
                             id: authUser.id,
                             email: authUser.email,
                             username: profile?.username || authUser.user_metadata?.full_name || authUser.email?.split("@")[0] || "User",
-                            avatar: profile?.avatar || authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture,
+                            avatar: profile?.avatar || authUser.user_metadata?.avatar_url,
                         });
                     }
                 }
@@ -100,269 +103,185 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                     id: session.user.id,
                     email: session.user.email,
                     username: profile?.username || session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "User",
-                    avatar: profile?.avatar || session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture,
+                    avatar: profile?.avatar || session.user.user_metadata?.avatar_url,
                 });
             } else if (event === "SIGNED_OUT") {
                 setUser(null);
             }
         });
 
-        return () => {
-            subscription.unsubscribe();
-        };
+        return () => subscription.unsubscribe();
     }, [initialUser]);
-
-    // Close dropdown when clicking outside
-    React.useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setDropdownOpen(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
 
     const handleLogout = async () => {
         const supabase = createClient();
         await supabase.auth.signOut();
         setUser(null);
-        setDropdownOpen(false);
-        router.push("/");
+        router.push("/login");
         router.refresh();
     };
 
-    const [languageModalOpen, setLanguageModalOpen] = React.useState(false);
-
     return (
         <>
-            <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#2d333b] bg-[#0a0e13]/90 backdrop-blur-md">
-                {/* Top bar (Language/Currency) */}
-                <div className="h-8 bg-[#0a0e13] border-b border-[#2d333b] hidden sm:grid grid-cols-3 items-center px-6 text-xs font-medium text-[#9ca3af]">
-                    <div>{/* Left spacer */}</div>
+            <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#2d333b] bg-[#0d1117] h-[60px]">
+                <div className="flex h-full items-center justify-between px-4 max-w-[1920px] mx-auto gap-4">
 
-                    <div className="flex justify-center">
-                        <Link href="/support" className="hover:text-white transition-colors">
-                            Live Support
-                        </Link>
-                    </div>
+                    {/* Left Section: Logo & Nav Links */}
+                    <div className="flex items-center gap-6">
+                        <div className="lg:hidden">
+                            <Button variant="ghost" size="icon" className="text-[#c9d1d9]" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                            </Button>
+                        </div>
 
-                    <div className="flex justify-end gap-4">
-                        <button
-                            onClick={() => setLanguageModalOpen(true)}
-                            className="hover:text-white transition-colors flex items-center gap-1.5"
-                        >
-                            <Globe className="h-3 w-3" />
-                            English (EN) / USD ($)
-                            <ChevronDown className="h-3 w-3" />
-                        </button>
-                    </div>
-                </div>
-
-                {/* Main nav */}
-                <div className="flex items-center justify-between px-6 h-14">
-                    <div className="flex-1 flex items-center gap-6">
-                        {/* Logo */}
-                        <Link href="/" className="flex items-center gap-2">
-                            <Image
-                                src="/images/logo-full.svg"
-                                alt="iboosts.gg"
-                                width={140}
-                                height={40}
-                                className="h-10 w-auto object-contain"
-                                priority
-                            />
+                        {/* Inline Logo Component - Theme Aware */}
+                        <Link href="/" className="flex items-center gap-2 shrink-0">
+                            <Logo className="h-[28px] w-auto text-white" />
                         </Link>
 
-                        {/* Desktop Categories */}
-                        <div className="hidden lg:flex items-center gap-1">
+                        {/* Desktop Navigation */}
+                        <div className="hidden lg:flex items-center gap-4">
                             {navCategories.map((cat) => (
                                 <Link
                                     key={cat.name}
                                     href={cat.href}
-                                    className="px-3 py-2 text-[15px] font-bold text-white hover:text-[#f5a623] transition-colors whitespace-nowrap"
+                                    className="text-sm font-bold text-[#c9d1d9] hover:text-[#f5a623] transition-colors whitespace-nowrap"
                                 >
                                     {cat.name}
                                 </Link>
                             ))}
                         </div>
+                    </div>
 
-                        {/* Search Bar */}
-                        <div className="relative hidden md:block flex-1 max-w-xl mx-4">
-                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b7280]" />
+                    {/* Middle Section: Search */}
+                    <div className="flex-1 max-w-2xl hidden md:block px-4">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b949e]" />
                             <input
                                 type="text"
-                                placeholder="Search iBoosts"
-                                className="h-9 w-full rounded-lg border border-[#2d333b] bg-[#1c2128] pl-10 pr-4 text-sm text-white placeholder:text-[#6b7280] focus:border-[#f5a623] focus:outline-none transition-all"
+                                placeholder="Search Eldorado"
+                                className="w-full h-10 pl-10 pr-4 bg-[#161b22] border border-[#30363d] rounded-lg text-sm text-[#c9d1d9] placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
                             />
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    {/* Right Section: Actions & Auth */}
+                    <div className="flex items-center gap-2 shrink-0">
+                        {/* Currency/Lang */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-9 gap-1.5 text-[#c9d1d9] hover:text-white px-3 hidden sm:flex">
+                                    <Globe className="h-4 w-4" />
+                                    <span className="text-xs font-semibold">EN | USD $</span>
+                                    <ChevronDown className="h-3 w-3 opacity-50" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-[#1c2128] border-[#30363d] text-[#c9d1d9]">
+                                <DropdownMenuItem className="focus:bg-[#30363d] focus:text-white cursor-pointer">
+                                    🇺🇸 USD - US Dollar
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="focus:bg-[#30363d] focus:text-white cursor-pointer">
+                                    🇪🇺 EUR - Euro
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
                         {loading ? (
                             <div className="h-8 w-20 bg-[#1c2128] rounded-lg animate-pulse" />
                         ) : user ? (
                             <>
-                                <ActivityButton />
-                                <Link href="/dashboard/messages" className="text-[#9ca3af] hover:text-white transition-colors hidden sm:block">
-                                    <MessageCircle className="h-5 w-5" />
-                                </Link>
-                                <NotificationBell count={99} />
-
-                                <div className="relative" ref={dropdownRef}>
-                                    <button
-                                        onClick={() => setDropdownOpen(!dropdownOpen)}
-                                        className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-[#1c2128] transition-colors"
-                                    >
-                                        <div className="h-8 w-8 rounded-full bg-[#252b33] overflow-hidden border border-[#2d333b] flex items-center justify-center relative">
-                                            {user.avatar ? (
-                                                <img
-                                                    src={user.avatar}
-                                                    alt={user.username || "User"}
-                                                    className="h-full w-full object-cover"
-                                                />
-                                            ) : (
-                                                <span className="text-sm font-medium text-white">
-                                                    {user.username?.charAt(0).toUpperCase()}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <ChevronDown className="h-4 w-4 text-[#9ca3af]" />
-                                    </button>
-
-
-                                    {/* Dropdown menu */}
-                                    {dropdownOpen && (
-                                        <div className="absolute right-0 top-full mt-2 w-72 bg-[#1c2128] border border-[#2d333b] rounded-lg shadow-xl overflow-hidden z-50">
-                                            {/* Header */}
-                                            <div className="p-4 border-b border-[#2d333b] flex items-center justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="h-10 w-10 rounded-full bg-[#252b33] overflow-hidden border border-[#2d333b] flex items-center justify-center relative">
-                                                        {user.avatar ? (
-                                                            <img
-                                                                src={user.avatar}
-                                                                alt={user.username || "User"}
-                                                                className="h-full w-full object-cover"
-                                                            />
-                                                        ) : (
-                                                            <div className="text-lg font-bold text-white">
-                                                                {user.username?.charAt(0).toUpperCase()}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-bold text-white text-sm">{user.username}</div>
-                                                        <div className="text-[#9ca3af] text-xs">$0.00</div>
-                                                    </div>
-                                                </div>
-                                                <Link href="/dashboard/listings/create">
-                                                    <Button className="bg-[#f5a623] hover:bg-[#e09612] text-black font-bold h-8 px-4 text-xs">
-                                                        Sell
-                                                    </Button>
-                                                </Link>
-                                            </div>
-
-                                            {/* Menu Groups */}
-                                            <div className="py-2">
-                                                <Link href="/dashboard/orders" className="flex items-center gap-3 px-4 py-2.5 text-sm text-white hover:bg-[#252b33] transition-colors">
-                                                    <ShoppingCart className="h-4 w-4 text-[#9ca3af]" />
-                                                    Orders
-                                                </Link>
-                                                <Link href="/dashboard/offers" className="flex items-center gap-3 px-4 py-2.5 text-sm text-white hover:bg-[#252b33] transition-colors">
-                                                    <Tag className="h-4 w-4 text-[#9ca3af]" />
-                                                    Offers
-                                                </Link>
-                                                <Link href="/dashboard/boosting" className="flex items-center gap-3 px-4 py-2.5 text-sm text-white hover:bg-[#252b33] transition-colors">
-                                                    <ChevronsUp className="h-4 w-4 text-[#9ca3af]" />
-                                                    Boosting
-                                                </Link>
-                                            </div>
-
-                                            <div className="border-t border-[#2d333b] py-2">
-                                                <Link href="/dashboard/wallet" className="flex items-center gap-3 px-4 py-2.5 text-sm text-white hover:bg-[#252b33] transition-colors">
-                                                    <Wallet className="h-4 w-4 text-[#9ca3af]" />
-                                                    Wallet
-                                                </Link>
-                                                <Link href="/dashboard/messages" className="flex items-center gap-3 px-4 py-2.5 text-sm text-white hover:bg-[#252b33] transition-colors">
-                                                    <MessageCircle className="h-4 w-4 text-[#9ca3af]" />
-                                                    Messages
-                                                </Link>
-                                                <Link href="/dashboard/notifications" className="flex items-center gap-3 px-4 py-2.5 text-sm text-white hover:bg-[#252b33] transition-colors">
-                                                    <Bell className="h-4 w-4 text-[#9ca3af]" />
-                                                    Notifications
-                                                </Link>
-                                                <Link href="/dashboard/feedback" className="flex items-center gap-3 px-4 py-2.5 text-sm text-white hover:bg-[#252b33] transition-colors">
-                                                    <Star className="h-4 w-4 text-[#9ca3af]" />
-                                                    Feedback
-                                                </Link>
-                                                <Link href="/dashboard/settings" className="flex items-center gap-3 px-4 py-2.5 text-sm text-white hover:bg-[#252b33] transition-colors">
-                                                    <Settings className="h-4 w-4 text-[#9ca3af]" />
-                                                    Account settings
-                                                </Link>
-                                            </div>
-
-                                            <div className="border-t border-[#2d333b] py-2">
-                                                <div className="flex items-center justify-between px-4 py-2.5 text-sm text-white hover:bg-[#252b33] transition-colors cursor-pointer">
-                                                    <div className="flex items-center gap-3">
-                                                        <Moon className="h-4 w-4 text-[#9ca3af]" />
-                                                        <span>Offline mode</span>
-                                                    </div>
-                                                    {/* Custom Toggle Switch */}
-                                                    <div className="w-9 h-5 rounded-full bg-[#374151] relative">
-                                                        <div className="absolute left-1 top-1 h-3 w-3 rounded-full bg-[#9ca3af] transition-transform" />
-                                                    </div>
-                                                </div>
-                                                <button
-                                                    onClick={handleLogout}
-                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#9ca3af] hover:bg-[#252b33] hover:text-white transition-colors"
-                                                >
-                                                    <LogOut className="h-4 w-4" />
-                                                    Log out
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </>
-                        ) : (
-                            // Logged out state
-                            <>
-                                <Link href="/login">
-                                    <Button variant="ghost" className="text-[#9ca3af] hover:text-white">
-                                        Sign In
+                                <Link href="/dashboard/messages">
+                                    <Button variant="ghost" size="icon" className="h-9 w-9 text-[#c9d1d9] hover:text-white hover:bg-[#21262d]">
+                                        <MessageCircle className="h-5 w-5" />
                                     </Button>
                                 </Link>
-                                <Link href="/signup">
-                                    <Button className="bg-[#f5a623] hover:bg-[#e09612] text-black font-semibold">
+
+                                <NotificationBell count={0} />
+
+                                {/* User Menu */}
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="relative h-9 w-9 rounded-full ml-1 p-0 hover:bg-transparent">
+                                            <Avatar className="h-9 w-9 border border-[#30363d]">
+                                                <AvatarImage src={user.avatar || ""} alt={user.username} />
+                                                <AvatarFallback className="bg-[#21262d] text-[#c9d1d9]">
+                                                    {user.username?.[0]?.toUpperCase()}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="w-64 bg-[#1c2128] border-[#30363d] text-[#c9d1d9] p-0" align="end" forceMount>
+                                        <div className="p-4 border-b border-[#30363d] flex items-center justify-between bg-[#161b22]">
+                                            <div className="flex items-center gap-3">
+                                                <Avatar className="h-10 w-10 border border-[#30363d]">
+                                                    <AvatarImage src={user.avatar || ""} alt={user.username} />
+                                                    <AvatarFallback className="bg-[#21262d] text-[#c9d1d9]">
+                                                        {user.username?.[0]?.toUpperCase()}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-white text-sm">{user.username}</span>
+                                                    <span className="text-[#8b949e] text-xs truncate max-w-[100px]">{user.email}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="p-2 space-y-1">
+                                            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-white cursor-pointer px-3 py-2" onClick={() => router.push('/dashboard')}>
+                                                <LayoutDashboard className="mr-3 h-4 w-4" />
+                                                <span>Dashboard</span>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-white cursor-pointer px-3 py-2" onClick={() => router.push('/dashboard/orders')}>
+                                                <ShoppingCart className="mr-3 h-4 w-4" />
+                                                <span>Orders</span>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-white cursor-pointer px-3 py-2" onClick={() => router.push('/dashboard/offers')}>
+                                                <Tag className="mr-3 h-4 w-4" />
+                                                <span>My Offers</span>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-white cursor-pointer px-3 py-2" onClick={() => router.push('/dashboard/settings')}>
+                                                <Settings className="mr-3 h-4 w-4" />
+                                                <span>Settings</span>
+                                            </DropdownMenuItem>
+                                        </div>
+
+                                        <div className="p-2 border-t border-[#30363d]">
+                                            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-red-400 text-[#f85149] cursor-pointer px-3 py-2" onClick={handleLogout}>
+                                                <LogOut className="mr-3 h-4 w-4" />
+                                                <span>Log out</span>
+                                            </DropdownMenuItem>
+                                        </div>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </>
+                        ) : (
+                            /* Guest Actions */
+                            <div className="flex items-center gap-3 ml-2">
+                                <Link href="/login">
+                                    <Button variant="ghost" className="text-[#c9d1d9] hover:text-white font-semibold h-9 px-4">
+                                        Log In
+                                    </Button>
+                                </Link>
+                                <Link href="/register">
+                                    <Button className="bg-[#f5a623] hover:bg-[#e09612] text-black font-bold h-9 px-4">
                                         Sign Up
                                     </Button>
                                 </Link>
-                            </>
+                            </div>
                         )}
-
-                        {/* Mobile menu button */}
-                        <button
-                            className="lg:hidden text-[#9ca3af] hover:text-white"
-                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        >
-                            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                        </button>
                     </div>
                 </div>
 
                 {/* Mobile menu */}
                 {mobileMenuOpen && (
-                    <div className="lg:hidden border-t border-[#2d333b] bg-[#0f1419]">
-                        <div className="px-4 py-3 space-y-1">
+                    <div className="lg:hidden border-t border-[#2d333b] bg-[#0d1117] absolute w-full left-0 top-[60px] shadow-2xl h-[calc(100vh-60px)] overflow-y-auto">
+                        <div className="p-4 space-y-1">
                             {navCategories.map((cat) => (
                                 <Link
                                     key={cat.name}
                                     href={cat.href}
                                     onClick={() => setMobileMenuOpen(false)}
-                                    className="block px-3 py-2 text-sm text-[#9ca3af] hover:text-white hover:bg-[#1c2128] rounded-lg transition-colors"
+                                    className="block px-4 py-3 text-base font-medium text-[#c9d1d9] hover:text-white hover:bg-[#1c2128] rounded-lg transition-colors"
                                 >
                                     {cat.name}
                                 </Link>
@@ -371,72 +290,6 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                     </div>
                 )}
             </nav>
-
-            {/* Language/Currency Modal */}
-            {languageModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="w-full max-w-md bg-[#1c2128] border border-[#2d333b] rounded-xl shadow-2xl p-6 relative">
-                        {/* Header */}
-                        <div className="flex items-start justify-between mb-6">
-                            <h3 className="flex items-center gap-2 text-lg font-bold text-white">
-                                <Globe className="h-5 w-5" />
-                                Choose your language and currency
-                            </h3>
-                            <button
-                                onClick={() => setLanguageModalOpen(false)}
-                                className="text-[#9ca3af] hover:text-white transition-colors"
-                            >
-                                <X className="h-5 w-5" />
-                            </button>
-                        </div>
-
-                        {/* Form */}
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-white">Language</label>
-                                <div className="relative">
-                                    <select className="w-full h-10 px-3 rounded-lg bg-[#0a0e13] border border-[#2d333b] text-white appearance-none focus:border-[#f5a623] focus:outline-none">
-                                        <option>English (EN)</option>
-                                    </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#6b7280]">
-                                        ▼
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-white">Currency</label>
-                                <div className="relative">
-                                    <select className="w-full h-10 px-3 rounded-lg bg-[#0a0e13] border border-[#2d333b] text-white appearance-none focus:border-[#f5a623] focus:outline-none">
-                                        <option>USD - $</option>
-                                        <option>EUR - €</option>
-                                        <option>GBP - £</option>
-                                    </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#6b7280]">
-                                        ▼
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col gap-3 pt-4">
-                                <Button
-                                    className="w-full bg-[#f5a623] hover:bg-[#e09612] text-black font-bold h-11"
-                                    onClick={() => setLanguageModalOpen(false)}
-                                >
-                                    Save
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    className="w-full text-white hover:bg-[#252b33] h-11 border border-[#2d333b]"
-                                    onClick={() => setLanguageModalOpen(false)}
-                                >
-                                    Cancel
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </>
     );
 }

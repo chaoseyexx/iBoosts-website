@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     ShoppingBag,
     ChevronDown,
@@ -149,15 +149,16 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
     };
 
     return (
-        <aside className="sticky top-[88px] flex h-[calc(100vh-88px)] w-64 flex-col border-r border-[#2d333b]/40 bg-[#0d1117] flex-shrink-0">
+        <aside className="sticky top-[60px] flex h-[calc(100vh-60px)] w-64 flex-col border-r border-[#2d333b]/40 bg-[#0d1117] flex-shrink-0">
             {/* User Profile Section */}
             <div className="border-b border-[#2d333b]/40 py-5 px-4">
                 <div className="flex items-center gap-3">
-                    <Avatar
-                        src={user?.avatar || undefined}
-                        fallback={user?.username || "User"}
-                        size="md"
-                    />
+                    <Avatar className="h-10 w-10 border border-[#2d333b]">
+                        <AvatarImage src={user?.avatar || undefined} alt={user?.username || "User"} />
+                        <AvatarFallback className="bg-[#21262d] text-sm text-[#4b5563]">
+                            {user?.username?.charAt(0).toUpperCase() || "U"}
+                        </AvatarFallback>
+                    </Avatar>
                     <div className="flex flex-col flex-1 min-w-0">
                         <div className="flex items-center gap-1.5 mb-0.5">
                             <span className="font-bold text-white truncate text-base">

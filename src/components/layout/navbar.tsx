@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
 // Mock user - replace with actual auth
@@ -128,11 +128,12 @@ export function Navbar({ user = mockUser, notificationCount = 0 }: NavbarProps) 
                                         onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                                         className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-[var(--bg-elevated)]"
                                     >
-                                        <Avatar
-                                            src={user.avatar}
-                                            fallback={user.displayName || user.username}
-                                            size="sm"
-                                        />
+                                        <Avatar className="h-8 w-8">
+                                            <AvatarImage src={user.avatar || undefined} alt={user.displayName || user.username} />
+                                            <AvatarFallback>
+                                                {(user.displayName || user.username || "U").charAt(0).toUpperCase()}
+                                            </AvatarFallback>
+                                        </Avatar>
                                         <ChevronDown
                                             className={cn(
                                                 "h-4 w-4 text-[var(--text-muted)] transition-transform",

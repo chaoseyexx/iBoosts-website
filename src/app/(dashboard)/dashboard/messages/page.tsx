@@ -4,7 +4,7 @@ import * as React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, Search, Send, Paperclip, MoreVertical } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 // Mock conversations
 const mockConversations = [
@@ -80,7 +80,12 @@ export default function MessagesPage() {
                                     }`}
                             >
                                 <div className="flex items-start gap-3">
-                                    <Avatar fallback={conv.user.username} size="sm" />
+                                    <Avatar className="h-8 w-8">
+                                        <AvatarImage src={conv.user.avatar || undefined} alt={conv.user.username} />
+                                        <AvatarFallback>
+                                            {conv.user.username.charAt(0).toUpperCase()}
+                                        </AvatarFallback>
+                                    </Avatar>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between">
                                             <span className="font-medium text-white text-sm">{conv.user.username}</span>
@@ -101,7 +106,12 @@ export default function MessagesPage() {
                     {/* Chat Header */}
                     <div className="p-4 border-b border-[#2d333b] flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <Avatar fallback={selectedConversation?.user.username || "U"} size="sm" />
+                            <Avatar className="h-8 w-8">
+                                <AvatarImage src={selectedConversation?.user.avatar || undefined} alt={selectedConversation?.user.username} />
+                                <AvatarFallback>
+                                    {(selectedConversation?.user.username || "U").charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                            </Avatar>
                             <div>
                                 <span className="font-medium text-white">{selectedConversation?.user.username}</span>
                                 <p className="text-xs text-[#5c9eff]">{selectedConversation?.orderId}</p>
