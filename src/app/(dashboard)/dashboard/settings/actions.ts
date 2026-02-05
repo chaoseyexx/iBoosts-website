@@ -110,8 +110,14 @@ export async function uploadAvatarAction(formData: FormData): Promise<State> {
         const fileExt = file.name.split('.').pop();
         const fileName = `avatars/${authUser.id}-${Date.now()}.${fileExt}`;
 
-        const { uploadToR2 } = await import("@/lib/r2");
+        const { uploadToR2, deleteFromR2 } = await import("@/lib/r2");
         const publicUrl = await uploadToR2(buffer, fileName, file.type);
+
+        // Fetch current user to check for existing avatar
+        const currentUser = await prisma.user.findUnique({
+            where: { supabaseId: authUser.id },
+            select: { avatar: true }
+        });
 
         await prisma.user.upsert({
             where: { supabaseId: authUser.id },
@@ -125,6 +131,20 @@ export async function uploadAvatarAction(formData: FormData): Promise<State> {
                 avatar: publicUrl
             }
         });
+
+        // Cleanup old avatar if it exists and is an R2 URL
+        if (currentUser?.avatar && currentUser.avatar.includes("cdn.iboosts.gg")) {
+            try {
+                // Extract key from URL (e.g. https://cdn.iboosts.gg/avatars/123.png -> avatars/123.png)
+                const oldKey = currentUser.avatar.replace("https://cdn.iboosts.gg/", "");
+                if (oldKey && oldKey !== currentUser.avatar) {
+                    await deleteFromR2(oldKey);
+                }
+            } catch (cleanupError) {
+                console.error("Failed to delete old avatar:", cleanupError);
+                // Non-blocking error
+            }
+        }
 
         revalidatePath("/dashboard/settings");
         revalidatePath("/", "layout");

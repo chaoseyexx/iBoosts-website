@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 const accountId = process.env.R2_ACCOUNT_ID;
 const accessKeyId = process.env.R2_ACCESS_KEY_ID;
@@ -63,5 +63,27 @@ export async function uploadToR2(
     } catch (error) {
         console.error("Error uploading to R2:", error);
         throw error;
+    }
+}
+
+/**
+ * Deletes a file from Cloudflare R2.
+ * @param fileName - The file key to delete (e.g., 'avatars/user.png')
+ */
+export async function deleteFromR2(fileName: string): Promise<void> {
+    if (!bucketName) {
+        throw new Error("R2_BUCKET_NAME is not defined");
+    }
+
+    try {
+        const command = new DeleteObjectCommand({
+            Bucket: bucketName,
+            Key: fileName,
+        });
+
+        await r2.send(command);
+    } catch (error) {
+        console.error("Error deleting from R2:", error);
+        // We generally don't want to throw here to avoid breaking the main flow if cleanup fails
     }
 }
