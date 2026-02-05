@@ -63,3 +63,72 @@ export async function adminManageOrder(orderId: string, action: "FORCE_COMPLETE"
         return { error: error.message };
     }
 }
+
+export async function createGame(data: {
+    name: string;
+    slug: string;
+    description?: string;
+    icon?: string;
+    isPopular?: boolean;
+    categoryIds: string[];
+}) {
+    try {
+        const game = await prisma.game.create({
+            data: {
+                name: data.name,
+                slug: data.slug,
+                description: data.description,
+                icon: data.icon,
+                isPopular: data.isPopular || false,
+                categories: {
+                    connect: data.categoryIds.map(id => ({ id }))
+                }
+            }
+        });
+
+        // Trigger notification for all users
+        const users = await prisma.user.findMany({
+            where: { status: "ACTIVE" },
+            select: { id: true }
+        });
+
+        await prisma.notification.createMany({
+            data: users.map(user => ({
+                userId: user.id,
+                type: "SYSTEM",
+                title: `🔥 New ${data.name} Game Added! 🔥`,
+                content: `${data.name} has been added to our platform. You can start listing your offers now!`,
+                link: `/${data.categoryIds[0] || 'marketplace'}?game=${data.slug}`,
+            }))
+        });
+
+        revalidatePath("/admin/cms");
+        revalidatePath("/"); // To update navbar if it's dynamic later
+        return { success: true, game };
+    } catch (error: any) {
+        console.error("Error creating game:", error);
+        return { error: error.message };
+    }
+}
+
+export async function fetchCategories() {
+    try {
+        return await prisma.category.findMany({
+            where: { isActive: true },
+            orderBy: { sortOrder: 'asc' }
+        });
+    } catch (error) {
+        return [];
+    }
+}
+
+export async function fetchGames() {
+    try {
+        return await prisma.game.findMany({
+            include: { categories: true },
+            orderBy: { createdAt: 'desc' }
+        });
+    } catch (error) {
+        return [];
+    }
+}

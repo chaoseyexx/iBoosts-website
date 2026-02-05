@@ -299,9 +299,26 @@ model Category {
   listings     Listing[]
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+  games        Game[]     @relation("GameCategories")
 
   @@index([slug])
   @@index([parentId])
+}
+
+model Game {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  description String?
+  icon        String?    // URL or local path
+  banner      String?    // URL or local path
+  isPopular   Boolean    @default(false)
+  isActive    Boolean    @default(true)
+  categories  Category[] @relation("GameCategories")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([slug])
 }
 
 model Listing {

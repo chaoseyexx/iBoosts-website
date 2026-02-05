@@ -2,8 +2,9 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { X, Bell, ShoppingBag, TrendingUp, PackageCheck, AlertTriangle, MessageCircle, Shield } from "lucide-react";
+import { X, Bell, ShoppingBag, TrendingUp, PackageCheck, AlertTriangle, MessageCircle, Shield, Info, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from "@/app/(dashboard)/dashboard/notifications/actions";
 
 // Notification types with icons
 const notificationIcons: Record<string, React.ElementType> = {
@@ -13,6 +14,7 @@ const notificationIcons: Record<string, React.ElementType> = {
     dispute: AlertTriangle,
     message: MessageCircle,
     security: Shield,
+    SYSTEM: Bell,
     default: Bell,
 };
 
@@ -24,6 +26,7 @@ const notificationColors: Record<string, string> = {
     dispute: "#ef4444",
     message: "#f5a623",
     security: "#f59e0b",
+    SYSTEM: "#3b82f6",
     default: "#6b7280",
 };
 
@@ -122,18 +125,19 @@ function useNotificationSound() {
 interface NotificationDropdownProps {
     isOpen: boolean;
     onClose: () => void;
-    notifications?: Notification[];
-    totalCount?: number;
+    userId?: string;
+    onCountChange?: (count: number) => void;
 }
 
 export function NotificationDropdown({
     isOpen,
     onClose,
-    notifications = mockNotifications,
-    totalCount = 910,
+    userId,
+    onCountChange,
 }: NotificationDropdownProps) {
     const [isConnected, setIsConnected] = React.useState(true);
-    const [localNotifications, setLocalNotifications] = React.useState(notifications);
+    const [localNotifications, setLocalNotifications] = React.useState<any[]>([]);
+    const [loading, setLoading] = React.useState(false);
     const playSound = useNotificationSound();
     const dropdownRef = React.useRef<HTMLDivElement>(null);
 
@@ -165,17 +169,45 @@ export function NotificationDropdown({
         return () => clearInterval(interval);
     }, [isOpen]);
 
-    const markAllAsRead = () => {
-        setLocalNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    const fetchNotifications = React.useCallback(async () => {
+        if (!userId) return;
+        setLoading(true);
+        const data = await getNotifications(userId);
+        setLocalNotifications(data || []);
+        if (onCountChange) {
+            onCountChange(data?.filter((n: any) => !n.isRead).length || 0);
+        }
+        setLoading(false);
+    }, [userId, onCountChange]);
+
+    React.useEffect(() => {
+        if (isOpen && userId) {
+            fetchNotifications();
+        }
+    }, [isOpen, userId, fetchNotifications]);
+
+    // Initial count fetch
+    React.useEffect(() => {
+        if (userId) {
+            fetchNotifications();
+        }
+    }, [userId]);
+
+    const markAllAsRead = async () => {
+        if (!userId) return;
+        await markAllNotificationsAsRead(userId);
+        setLocalNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+        if (onCountChange) onCountChange(0);
     };
 
-    const dismissNotification = (id: string, e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setLocalNotifications((prev) => prev.filter((n) => n.id !== id));
+    const handleMarkAsRead = async (id: string) => {
+        await markNotificationAsRead(id);
+        setLocalNotifications((prev) => prev.map((n) => n.id === id ? { ...n, isRead: true } : n));
+        const newUnreadCount = localNotifications.filter(n => !n.isRead && n.id !== id).length;
+        if (onCountChange) onCountChange(newUnreadCount);
     };
 
-    const unreadCount = localNotifications.filter((n) => !n.read).length;
+    const unreadCount = localNotifications.filter((n) => !n.isRead).length;
 
     if (!isOpen) return null;
 
@@ -218,34 +250,32 @@ export function NotificationDropdown({
 
             {/* Notifications list */}
             <div className="max-h-[400px] overflow-y-auto">
-                {localNotifications.length > 0 ? (
+                {loading ? (
+                    <div className="p-8 text-center bg-[#1c2128]">
+                        <Loader2 className="h-6 w-6 animate-spin text-[#f5a623] mx-auto" />
+                    </div>
+                ) : localNotifications.length > 0 ? (
                     localNotifications.map((notification) => {
-                        const IconComponent = notificationIcons[notification.type] || notificationIcons.default;
-                        const color = notificationColors[notification.type] || notificationColors.default;
+                        const IconComponent = (notificationIcons[notification.type] || Info) as React.ElementType;
+                        const color = notificationColors[notification.type] || "#f5a623";
 
                         return (
                             <Link
                                 key={notification.id}
                                 href={notification.link || "/dashboard/notifications"}
+                                onClick={() => handleMarkAsRead(notification.id)}
                                 className={cn(
                                     "flex items-start gap-3 p-4 hover:bg-[#252b33] transition-colors border-b border-[#2d333b] last:border-b-0",
-                                    !notification.read && "bg-[#f5a623]/5"
+                                    !notification.isRead && "bg-[#f5a623]/5"
                                 )}
                             >
                                 {/* Icon */}
                                 <div className="flex-shrink-0">
-                                    {notification.icon ? (
-                                        <div className="w-10 h-10 rounded-lg bg-[#252b33] flex items-center justify-center text-xl">
-                                            {notification.icon}
-                                        </div>
-                                    ) : (
-                                        <div
-                                            className="w-10 h-10 rounded-lg flex items-center justify-center"
-                                            style={{ backgroundColor: `${color}20` }}
-                                        >
-                                            {React.createElement(IconComponent as any, { className: "h-5 w-5", color: color })}
-                                        </div>
-                                    )}
+                                    <div
+                                        className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#21262d] border border-[#30363d]"
+                                    >
+                                        <IconComponent className="h-5 w-5" style={{ color }} />
+                                    </div>
                                 </div>
 
                                 {/* Content */}
@@ -254,22 +284,17 @@ export function NotificationDropdown({
                                         <div>
                                             <p className="text-sm font-medium text-white">
                                                 {notification.title}
-                                                <span className="ml-2 text-xs text-[#6b7280] font-normal">
-                                                    {notification.timestamp}
+                                                <span className="ml-2 text-[10px] text-[#6b7280] font-normal">
+                                                    {new Date(notification.createdAt).toLocaleDateString()}
                                                 </span>
                                             </p>
-                                            {notification.details.map((detail, i) => (
-                                                <p key={i} className="text-sm text-[#9ca3af]">
-                                                    {detail}
-                                                </p>
-                                            ))}
+                                            <p className="text-xs text-[#8b949e] mt-1 line-clamp-2">
+                                                {notification.content}
+                                            </p>
                                         </div>
-                                        <button
-                                            onClick={(e) => dismissNotification(notification.id, e)}
-                                            className="flex-shrink-0 h-6 w-6 rounded flex items-center justify-center text-[#6b7280] hover:text-white hover:bg-[#2d333b] transition-colors"
-                                        >
-                                            <X className="h-4 w-4" />
-                                        </button>
+                                        {!notification.isRead && (
+                                            <div className="h-2 w-2 rounded-full bg-[#f5a623] shrink-0 mt-1.5" />
+                                        )}
                                     </div>
                                 </div>
                             </Link>
@@ -277,8 +302,9 @@ export function NotificationDropdown({
                     })
                 ) : (
                     <div className="p-8 text-center">
-                        <Bell className="h-10 w-10 text-[#6b7280] mx-auto mb-3" />
-                        <p className="text-[#6b7280]">No notifications</p>
+                        <Bell className="h-10 w-10 text-[#6b7280] mx-auto mb-3 opacity-20" />
+                        <p className="text-[#6b7280] text-sm font-medium">No notifications yet</p>
+                        <p className="text-[#8b949e] text-xs mt-1">We'll alert you when something happens.</p>
                     </div>
                 )}
             </div>
@@ -290,7 +316,7 @@ export function NotificationDropdown({
                     onClick={onClose}
                     className="block w-full py-2 px-4 text-center text-sm bg-[#252b33] hover:bg-[#2d333b] text-white rounded-lg transition-colors"
                 >
-                    View all ({totalCount})
+                    View all notifications
                 </Link>
             </div>
         </div>
@@ -299,11 +325,12 @@ export function NotificationDropdown({
 
 // Notification bell button with dropdown
 interface NotificationBellProps {
-    count?: number;
+    userId?: string;
 }
 
-export function NotificationBell({ count = 2 }: NotificationBellProps) {
+export function NotificationBell({ userId }: NotificationBellProps) {
     const [isOpen, setIsOpen] = React.useState(false);
+    const [count, setCount] = React.useState(0);
 
     return (
         <div className="relative">
@@ -319,7 +346,12 @@ export function NotificationBell({ count = 2 }: NotificationBellProps) {
                 )}
             </button>
 
-            <NotificationDropdown isOpen={isOpen} onClose={() => setIsOpen(false)} />
+            <NotificationDropdown
+                isOpen={isOpen}
+                onClose={() => setIsOpen(false)}
+                userId={userId}
+                onCountChange={setCount}
+            />
         </div>
     );
 }

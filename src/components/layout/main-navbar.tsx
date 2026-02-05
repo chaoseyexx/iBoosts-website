@@ -39,6 +39,15 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getProfile } from "@/app/(dashboard)/dashboard/settings/actions";
+import { MegaMenu } from "./mega-menu";
+import { GAMES_DATA } from "@/lib/constants/games-data";
+import {
+    NavigationMenu,
+    NavigationMenuContent,
+    NavigationMenuItem,
+    NavigationMenuList,
+    NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 // Navigation categories
 const navCategories = [
@@ -164,14 +173,26 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
 
                         {/* Desktop Navigation */}
                         <div className="hidden lg:flex items-center gap-6">
-                            {navCategories.map((cat) => (
-                                <span
-                                    key={cat.name}
-                                    className="text-[15px] font-bold text-white hover:text-[#f5a623] transition-colors whitespace-nowrap cursor-default"
-                                >
-                                    {cat.name}
-                                </span>
-                            ))}
+                            <NavigationMenu viewport={false}>
+                                <NavigationMenuList className="gap-6 translate-y-[2px]">
+                                    {navCategories.map((cat) => (
+                                        <NavigationMenuItem key={cat.name}>
+                                            <NavigationMenuTrigger
+                                                className="bg-transparent text-[15px] font-bold text-white hover:text-[#f5a623] data-[state=open]:text-[#f5a623] hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent transition-colors whitespace-nowrap p-0 h-auto gap-1"
+                                            >
+                                                {cat.name}
+                                            </NavigationMenuTrigger>
+                                            <NavigationMenuContent className="fixed top-[96px] left-1/2 -translate-x-1/2 !w-[1400px] max-w-[98vw] border-[#30363d] overflow-hidden rounded-b-xl shadow-2xl">
+                                                <MegaMenu
+                                                    category={cat.name}
+                                                    popularGames={GAMES_DATA[cat.name]?.popular || []}
+                                                    allGames={GAMES_DATA[cat.name]?.all || []}
+                                                />
+                                            </NavigationMenuContent>
+                                        </NavigationMenuItem>
+                                    ))}
+                                </NavigationMenuList>
+                            </NavigationMenu>
                         </div>
                     </div>
 
@@ -197,7 +218,7 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                                     <MessageCircle className="h-5 w-5" />
                                 </Button>
 
-                                <NotificationBell count={0} />
+                                <NotificationBell userId={user.id} />
                                 <ActivityButton />
 
                                 {/* User Menu */}
