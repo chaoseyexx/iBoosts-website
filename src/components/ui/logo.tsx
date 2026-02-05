@@ -8,7 +8,7 @@ interface LogoProps extends React.SVGProps<SVGSVGElement> {
 export function Logo({ className, ...props }: LogoProps) {
     return (
         <svg
-            viewBox="0 0 240 40"
+            viewBox="0 0 260 40"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             className={cn("h-full w-auto", className)}
@@ -35,38 +35,60 @@ export function Logo({ className, ...props }: LogoProps) {
                 />
             </g>
 
-            {/* 3. "iboosts.gg" Typography - Full SVG Paths for Perfect Responsiveness */}
+            {/* 3. "iboosts.gg" Typography - Individual groups for perfect spacing */}
             <g transform="translate(42, 28)" fill="white">
                 {/* i */}
-                <circle cx="2" cy="-21" r="2.5" />
-                <rect x="0" y="-16" width="4" height="16" rx="1" />
+                <g transform="translate(0, 0)">
+                    <circle cx="2" cy="-21" r="2.5" />
+                    <rect x="0" y="-16" width="4.5" height="16" rx="1" />
+                </g>
 
-                {/* b - Manual Path */}
-                <path d="M7 -16 L7 0 L11 0 L11 -2 A6 6 0 1 0 11 -14 L11 -16 Z M11 -4 A3 3 0 1 1 11 -12 Z" />
+                {/* b */}
+                <g transform="translate(8, 0)">
+                    <path d="M0 -22 L0 0 L4 0 L4 -2 A6.5 6.5 0 1 0 4 -14.5 L4 -16.5 Z M4 -4.5 A3 3 0 1 1 4 -12 Z" />
+                </g>
 
-                {/* o - Manual Path */}
-                <path d="M26 -8 A6 6 0 1 0 26 -8.001 Z M26 -11 A3 3 0 1 1 26 -11.001 Z" transform="translate(-1, 0)" />
+                {/* o */}
+                <g transform="translate(24, 0)">
+                    <path d="M6.5 -8 A6.5 6.5 0 1 0 6.5 -8.001 Z M6.5 -11.5 A3 3 0 1 1 6.5 -11.501 Z" />
+                </g>
 
-                {/* o - Manual Path */}
-                <path d="M39 -8 A6 6 0 1 0 39 -8.001 Z M39 -11 A3 3 0 1 1 39 -11.001 Z" transform="translate(-1, 0)" />
+                {/* o */}
+                <g transform="translate(40, 0)">
+                    <path d="M6.5 -8 A6.5 6.5 0 1 0 6.5 -8.001 Z M6.5 -11.5 A3 3 0 1 1 6.5 -11.501 Z" />
+                </g>
 
-                {/* s - Manual Path */}
-                <path d="M48 -4 Q48 -1 51 -1 L56 -1 L56 -4 L52 -4 Q51 -4 51 -5 Q51 -6 52 -6 L54 -6 Q56 -6 56 -9 Q56 -12 53 -12 L48 -12 L48 -9 L52 -9 Q53 -9 53 -8 Q53 -7 52 -7 L50 -7 Q48 -7 48 -4 Z" transform="translate(1, 0)" />
+                {/* s */}
+                <g transform="translate(56, 0)">
+                    <path d="M0 -4.5 Q0 -1 3.5 -1 L8.5 -1 L8.5 -4.5 L4.5 -4.5 Q3.5 -4.5 3.5 -5.5 Q3.5 -6.5 4.5 -6.5 L6.5 -6.5 Q8.5 -6.5 8.5 -10 Q8.5 -13.5 5 -13.5 L0 -13.5 L0 -10 L4.5 -10 Q5.5 -10 5.5 -9 Q5.5 -8 4.5 -8 L3 -8 Q0 -8 0 -4.5 Z" />
+                </g>
 
-                {/* t - Manual Path */}
-                <path d="M60 -19 L60 -16 L58 -16 L58 -13 L60 -13 L60 -4 Q60 -1 63 -1 L66 -1 L66 -4 L64 -4 Q64 -4 64 -5 L64 -13 L66 -13 L66 -16 L64 -16 L64 -19 Z" transform="translate(1, 0)" />
+                {/* t */}
+                <g transform="translate(68, 0)">
+                    <path d="M2.5 -19 L2.5 -15 L0 -15 L0 -11.5 L2.5 -11.5 L2.5 -3 Q2.5 0 5.5 0 L8.5 0 L8.5 -3.5 L6.5 -3.5 Q6 -3.5 6 -4.5 L6 -11.5 L8.5 -11.5 L8.5 -15 L6 -15 L6 -19 Z" />
+                </g>
 
-                {/* s - Manual Path */}
-                <path d="M69 -4 Q69 -1 72 -1 L77 -1 L77 -4 L73 -4 Q72 -4 72 -5 Q72 -6 73 -6 L75 -6 Q77 -6 77 -9 Q77 -12 74 -12 L69 -12 L69 -9 L73 -9 Q74 -9 74 -8 Q74 -7 73 -7 L71 -7 Q69 -7 69 -4 Z" transform="translate(1, 0)" />
+                {/* s */}
+                <g transform="translate(80, 0)">
+                    <path d="M0 -4.5 Q0 -1 3.5 -1 L8.5 -1 L8.5 -4.5 L4.5 -4.5 Q3.5 -4.5 3.5 -5.5 Q3.5 -6.5 4.5 -6.5 L6.5 -6.5 Q8.5 -6.5 8.5 -10 Q8.5 -13.5 5 -13.5 L0 -13.5 L0 -10 L4.5 -10 Q5.5 -10 5.5 -9 Q5.5 -8 4.5 -8 L3 -8 Q0 -8 0 -4.5 Z" />
+                </g>
 
-                {/* . - Dot */}
-                <circle cx="83" cy="-2" r="2.5" fill="#f5a623" />
+                {/* . */}
+                <g transform="translate(93, 0)">
+                    <circle cx="2" cy="-2" r="2.5" fill="#f5a623" />
+                </g>
 
-                {/* g - Manual Path */}
-                <path d="M88 -8 A5 5 0 1 0 88 -8.1 Z M90 -4.5 A2.5 2.5 0 1 1 90 -4.6 Z M97 -12 L97 0 Q97 4 93 4 L88 4 L88 1 L92 1 Q94 1 94 -1 L94 -4.5" fill="#f5a623" transform="translate(1, 0)" />
+                {/* g */}
+                <g transform="translate(100, 0)" fill="#f5a623">
+                    <path d="M4 -7.5 A5 5 0 1 0 4 -7.6 Z M4 -5 Q1 -5 1 -8 Q1 -11 4 -11 Q7 -11 7 -8 Q7 -5 4 -5 Z" />
+                    <path d="M9 -11.5 L9 0 Q9 4 5 4 L0 4 L0 1 L4 1 Q5 1 5 -1 L5 -4.5" />
+                </g>
 
-                {/* g - Manual Path */}
-                <path d="M102 -8 A5 5 0 1 0 102 -8.1 Z M104 -4.5 A2.5 2.5 0 1 1 104 -4.6 Z M111 -12 L111 0 Q111 4 107 4 L102 4 L102 1 L106 1 Q108 1 108 -1 L108 -4.5" fill="#f5a623" transform="translate(1, 0)" />
+                {/* g */}
+                <g transform="translate(114, 0)" fill="#f5a623">
+                    <path d="M4 -7.5 A5 5 0 1 0 4 -7.6 Z M4 -5 Q1 -5 1 -8 Q1 -11 4 -11 Q7 -11 7 -8 Q7 -5 4 -5 Z" />
+                    <path d="M9 -11.5 L9 0 Q9 4 5 4 L0 4 L0 1 L4 1 Q5 1 5 -1 L5 -4.5" />
+                </g>
             </g>
         </svg>
     );
