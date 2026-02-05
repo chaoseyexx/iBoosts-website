@@ -167,10 +167,14 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                     <div className="flex-1 flex items-center gap-6">
                         {/* Logo */}
                         <Link href="/" className="flex items-center gap-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f5a623] font-bold text-black text-sm">
-                                IB
-                            </div>
-                            <span className="font-bold text-white text-lg">iBoosts</span>
+                            <Image
+                                src="/images/logo-full.png"
+                                alt="iboosts.gg"
+                                width={140}
+                                height={32}
+                                className="h-8 w-auto object-contain"
+                                priority
+                            />
                         </Link>
 
                         {/* Desktop Categories */}

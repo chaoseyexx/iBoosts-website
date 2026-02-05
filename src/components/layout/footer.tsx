@@ -45,10 +45,13 @@ export function Footer() {
                     {/* Brand Column */}
                     <div className="space-y-6">
                         <Link href="/" className="flex items-center gap-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f5a623] font-bold text-black text-sm">
-                                IB
-                            </div>
-                            <span className="font-bold text-white text-xl">iBoosts</span>
+                            <Image
+                                src="/images/logo-full.png"
+                                alt="iboosts.gg"
+                                width={160}
+                                height={36}
+                                className="h-9 w-auto object-contain"
+                            />
                         </Link>
                         <p className="text-[#9ca3af] text-sm leading-relaxed">
                             Join us today to level up your gaming experience!
