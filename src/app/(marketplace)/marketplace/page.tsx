@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/layout/navbar";
+import { MainNavbar } from "@/components/layout/main-navbar";
 import { Footer } from "@/components/layout/footer";
 import { ListingCard } from "@/components/marketplace/listing-card";
 import { Card } from "@/components/ui/card";
@@ -119,7 +119,7 @@ const sortOptions = [
 export default function MarketplacePage() {
     return (
         <div className="min-h-screen bg-[var(--bg-primary)]">
-            <Navbar />
+            <MainNavbar />
 
             <main className="pt-20 pb-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

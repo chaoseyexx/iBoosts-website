@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/layout/navbar";
+import { MainNavbar } from "@/components/layout/main-navbar";
 import { Footer } from "@/components/layout/footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -121,7 +121,7 @@ export default function ListingDetailPage({
 
     return (
         <div className="min-h-screen bg-[var(--bg-primary)]">
-            <Navbar />
+            <MainNavbar />
 
             <main className="pt-20 pb-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
