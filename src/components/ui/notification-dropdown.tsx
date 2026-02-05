@@ -2,18 +2,19 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { X, Bell, ShoppingBag, TrendingUp, PackageCheck, AlertTriangle, MessageCircle, Shield, Info, Loader2 } from "lucide-react";
+import { X, Bell, ShoppingBag, TrendingUp, PackageCheck, AlertTriangle, MessageCircle, Shield, Info, Loader2, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from "@/app/(dashboard)/dashboard/notifications/actions";
 
 // Notification types with icons
-const notificationIcons: Record<string, React.ElementType> = {
-    order: ShoppingBag,
-    boosting: TrendingUp,
-    delivered: PackageCheck,
-    dispute: AlertTriangle,
-    message: MessageCircle,
-    security: Shield,
+const notificationIcons: Record<string, any> = {
+    ORDER_NEW: ShoppingBag,
+    ORDER_DELIVERED: PackageCheck,
+    ORDER_COMPLETED: PackageCheck,
+    ORDER_CANCELLED: X,
+    ORDER_DISPUTED: AlertTriangle,
+    MESSAGE_NEW: MessageCircle,
+    OFFER_RECEIVED: Tag,
     SYSTEM: Bell,
     default: Bell,
 };
@@ -32,68 +33,31 @@ const notificationColors: Record<string, string> = {
 
 export interface Notification {
     id: string;
-    type: "order" | "boosting" | "delivered" | "dispute" | "message" | "security" | "default";
+    type: string;
     title: string;
-    details: string[];
-    timestamp: string;
-    read: boolean;
-    icon?: string; // Optional custom icon (emoji or image URL)
-    link?: string;
+    content: string;
+    isRead: boolean;
+    link?: string | null;
+    createdAt: Date | string;
 }
 
 // Mock notifications
 const mockNotifications: Notification[] = [
     {
         id: "1",
-        type: "boosting",
+        type: "ORDER_NEW",
         title: "Marvel Rivals (Hero proficiency)",
-        details: ["Adam Warlock", "Captain", "Lord", "PlayStation"],
-        timestamp: "3min ago",
-        read: false,
-        icon: "🎮",
+        content: "Adam Warlock Hero proficiency order received.",
+        isRead: false,
+        createdAt: new Date().toISOString(),
     },
     {
         id: "2",
-        type: "boosting",
-        title: "Rainbow Six Siege X (Leveling Boost)",
-        details: ["45", "50", "PC", "North America"],
-        timestamp: "3min ago",
-        read: false,
-        icon: "🎯",
-    },
-    {
-        id: "3",
-        type: "boosting",
-        title: "Marvel Rivals (Rank Boost)",
-        details: ["Grandmaster I", "Celestial I", "PC"],
-        timestamp: "6min ago",
-        read: false,
-        icon: "🎮",
-    },
-    {
-        id: "4",
-        type: "boosting",
-        title: "Valorant (Rank Boost)",
-        details: ["Silver I", "Diamond I", "NA"],
-        timestamp: "6min ago",
-        read: true,
-        icon: "❤️",
-    },
-    {
-        id: "5",
-        type: "order",
-        title: "New Order Received",
-        details: ["GamerX purchased Discord Nitro", "$79.99"],
-        timestamp: "10min ago",
-        read: true,
-    },
-    {
-        id: "6",
-        type: "delivered",
-        title: "Order Delivered",
-        details: ["Order ORD-2026-001234 confirmed", "Funds released to wallet"],
-        timestamp: "15min ago",
-        read: true,
+        type: "MESSAGE_NEW",
+        title: "New message from Seller",
+        content: "Hello, I can start your order now.",
+        isRead: true,
+        createdAt: new Date().toISOString(),
     },
 ];
 
@@ -256,8 +220,8 @@ export function NotificationDropdown({
                     </div>
                 ) : localNotifications.length > 0 ? (
                     localNotifications.map((notification) => {
-                        const IconComponent = (notificationIcons[notification.type] || Info) as React.ElementType;
-                        const color = notificationColors[notification.type] || "#f5a623";
+                        const Icon = notificationIcons[notification.type] || notificationIcons.default;
+                        const color = notificationColors[notification.type] || notificationColors.default;
 
                         return (
                             <Link
@@ -274,7 +238,7 @@ export function NotificationDropdown({
                                     <div
                                         className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#21262d] border border-[#30363d]"
                                     >
-                                        <IconComponent className="h-5 w-5" style={{ color }} />
+                                        <Icon className="h-5 w-5" style={{ color }} />
                                     </div>
                                 </div>
 

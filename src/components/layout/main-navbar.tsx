@@ -182,7 +182,7 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                                             >
                                                 {cat.name}
                                             </NavigationMenuTrigger>
-                                            <NavigationMenuContent className="fixed top-[96px] left-1/2 -translate-x-1/2 !w-[1400px] max-w-[98vw] border-[#30363d] overflow-hidden rounded-b-xl shadow-2xl">
+                                            <NavigationMenuContent className="fixed top-[96px] left-1/2 -translate-x-1/2 w-[calc(100vw-40px)] lg:w-[980px] xl:w-[1200px] 2xl:w-[1400px] border-[#30363d] overflow-hidden rounded-b-xl shadow-2xl">
                                                 <MegaMenu
                                                     category={cat.name}
                                                     popularGames={GAMES_DATA[cat.name]?.popular || []}

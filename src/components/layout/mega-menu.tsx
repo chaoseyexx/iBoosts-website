@@ -30,11 +30,11 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
     };
 
     return (
-        <div className="flex w-full h-[500px] bg-[#161b22] text-[#c9d1d9] overflow-hidden rounded-b-xl shadow-2xl border-t border-[#30363d]">
+        <div className="flex w-full h-[500px] bg-[#161b22] text-[#c9d1d9] overflow-hidden rounded-b-xl shadow-2xl border-t border-[#30363d] overflow-x-hidden">
             {/* Left Column - Popular Games */}
-            <div className="w-[40%] p-10 border-r border-[#30363d] overflow-y-auto">
-                <h3 className="text-sm font-semibold text-white mb-8 uppercase tracking-widest opacity-60">Popular games</h3>
-                <div className="grid grid-cols-4 gap-6">
+            <div className="w-[40%] p-6 xl:p-10 border-r border-[#30363d] overflow-y-auto">
+                <h3 className="text-sm font-semibold text-white mb-6 xl:mb-8 uppercase tracking-widest opacity-60">Popular games</h3>
+                <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 xl:gap-6">
                     {popularGames.map((game) => (
                         <Link
                             key={game.id}
@@ -72,9 +72,9 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-10">
-                    <h3 className="text-sm font-semibold text-white mb-8 uppercase tracking-widest opacity-60">All games</h3>
-                    <div className="grid grid-cols-3 gap-x-10 gap-y-3">
+                <div className="flex-1 overflow-y-auto p-6 xl:p-10">
+                    <h3 className="text-sm font-semibold text-white mb-6 xl:mb-8 uppercase tracking-widest opacity-60">All games</h3>
+                    <div className="grid grid-cols-2 xl:grid-cols-3 gap-x-6 xl:gap-x-10 gap-y-3">
                         {filteredGames.length > 0 ? (
                             filteredGames.map((game) => (
                                 <Link
