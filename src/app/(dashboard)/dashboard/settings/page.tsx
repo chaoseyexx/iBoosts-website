@@ -205,11 +205,13 @@ function AvatarRow({ url, displayChar, onUpload }: AvatarRowProps) {
     );
 }
 
+import { useRouter } from "next/navigation";
+// ... (imports)
+
 export default function SettingsPage() {
+    const router = useRouter();
     const [activeSection, setActiveSection] = React.useState("profile");
-    const [loading, setLoading] = React.useState(true);
-    const [profile, setProfile] = React.useState<any>(null);
-    const [user, setUser] = React.useState<any>(null);
+    // ...
 
     const refreshProfile = React.useCallback(async () => {
         try {
