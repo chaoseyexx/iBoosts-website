@@ -170,7 +170,7 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                             <Image
                                 src="/images/logo-full.svg"
                                 alt="iboosts.gg"
-                                width={60}
+                                width={140}
                                 height={40}
                                 className="h-10 w-auto object-contain"
                                 priority

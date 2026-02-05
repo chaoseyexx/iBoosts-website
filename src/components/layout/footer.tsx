@@ -48,7 +48,7 @@ export function Footer() {
                             <Image
                                 src="/images/logo-full.svg"
                                 alt="iboosts.gg"
-                                width={72}
+                                width={168}
                                 height={48}
                                 className="h-12 w-auto object-contain"
                             />
