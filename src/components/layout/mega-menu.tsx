@@ -32,7 +32,7 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
     const hasPopularGames = popularGames.length > 0;
 
     return (
-        <div className="grid grid-cols-12 w-full min-h-[450px] max-h-[600px] bg-[#161b22] text-[#c9d1d9] overflow-hidden rounded-b-xl shadow-2xl border-t border-[#30363d]">
+        <div className="grid grid-cols-12 w-full min-w-[900px] min-h-[450px] max-h-[600px] bg-[#161b22] text-[#c9d1d9] overflow-hidden rounded-b-xl shadow-2xl border-t border-[#30363d]">
             {/* Left Column - Popular Games */}
             {hasPopularGames && (
                 <div className="col-span-5 lg:col-span-4 2xl:col-span-3 flex flex-col p-4 sm:p-6 lg:p-8 border-r border-[#30363d] overflow-y-auto bg-[#1c2128]/40">
