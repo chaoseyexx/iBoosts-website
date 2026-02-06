@@ -12,7 +12,8 @@ import {
     LogOut,
     Gamepad2,
     Tags,
-    Wallet
+    Wallet,
+    ShieldCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ const ADMIN_NAV_ITEMS = [
     { label: "Games & Categories", href: "/admin/cms", icon: Gamepad2 },
     { label: "Disputes", href: "/admin/disputes", icon: Swords },
     { label: "Finance", href: "/admin/finance", icon: Wallet },
+    { label: "Audit Logs", href: "/admin/logs", icon: ShieldCheck },
     { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 

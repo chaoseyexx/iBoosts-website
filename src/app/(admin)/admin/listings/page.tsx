@@ -56,9 +56,9 @@ export default async function AdminListingsPage({
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <h1 className="text-4xl font-black text-white tracking-tighter drop-shadow-md">
-                        Inventory <span className="text-[#f5a623]">Matrix</span>
+                        Listings <span className="text-[#f5a623]">Management</span>
                     </h1>
-                    <p className="text-[#8b949e] font-medium mt-1">Supervise the high-fidelity asset flow across the marketplace.</p>
+                    <p className="text-[#8b949e] font-medium mt-1">Manage all active marketplace listings.</p>
                 </div>
 
                 {/* Search / Status Filters */}
@@ -88,19 +88,19 @@ export default async function AdminListingsPage({
                                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Marketplace Asset</span>
                                 </th>
                                 <th className="px-8 py-6">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Sector</span>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Category</span>
                                 </th>
                                 <th className="px-8 py-6">
                                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Merchant</span>
                                 </th>
                                 <th className="px-8 py-6">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Price Point</span>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Price</span>
                                 </th>
                                 <th className="px-8 py-6">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Market Status</span>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Status</span>
                                 </th>
                                 <th className="px-8 py-6 text-right">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Protocol</span>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Actions</span>
                                 </th>
                             </tr>
                         </thead>
@@ -116,7 +116,7 @@ export default async function AdminListingsPage({
                                             <div className="h-8 w-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center">
                                                 <Gamepad2 className="h-4 w-4 text-[#f5a623]" />
                                             </div>
-                                            <span className="text-xs font-bold text-white uppercase tracking-wider">{item.category?.name || "Generic Sector"}</span>
+                                            <span className="text-xs font-bold text-white uppercase tracking-wider">{item.category?.name || "Uncategorized"}</span>
                                         </div>
                                     </td>
                                     <td className="px-8 py-6">
@@ -125,7 +125,7 @@ export default async function AdminListingsPage({
                                                 {item.seller?.username?.charAt(0).toUpperCase() || "G"}
                                             </div>
                                             <span className="text-xs font-bold text-white group-hover/seller:text-[#58a6ff] transition-colors">
-                                                {item.seller?.username || "GUEST_ALPHA"}
+                                                {item.seller?.username || "Unknown"}
                                             </span>
                                         </div>
                                     </td>
@@ -165,27 +165,27 @@ export default async function AdminListingsPage({
                                             >
                                                 <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
 
-                                                <DropdownMenuLabel className="font-black text-[10px] uppercase tracking-widest text-[#8b949e] px-4 py-3">Asset protocol</DropdownMenuLabel>
+                                                <DropdownMenuLabel className="font-black text-[10px] uppercase tracking-widest text-[#8b949e] px-4 py-3">Listing Actions</DropdownMenuLabel>
 
                                                 <DropdownMenuItem className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 cursor-pointer transition-colors group">
                                                     <div className="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-[#f5a623]/20 transition-colors text-[#f5a623]">
                                                         <Eye className="h-4 w-4" />
                                                     </div>
-                                                    <span className="font-bold text-sm">Preview Asset</span>
+                                                    <span className="font-bold text-sm">View Listing</span>
                                                 </DropdownMenuItem>
 
                                                 <DropdownMenuItem className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 cursor-pointer transition-colors group">
                                                     <div className="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-[#58a6ff]/20 transition-colors text-[#58a6ff]">
                                                         <Edit className="h-4 w-4" />
                                                     </div>
-                                                    <span className="font-bold text-sm">Modify Entry</span>
+                                                    <span className="font-bold text-sm">Edit Listing</span>
                                                 </DropdownMenuItem>
 
                                                 <DropdownMenuItem className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-rose-500/10 cursor-pointer transition-all group mt-2 text-rose-400 focus:text-rose-400">
                                                     <div className="h-8 w-8 rounded-lg bg-rose-500/5 flex items-center justify-center group-hover:bg-rose-500/20 transition-colors">
                                                         <Trash2 className="h-4 w-4 shadow-[0_0_8px_rgba(244,63,94,0.3)]" />
                                                     </div>
-                                                    <span className="font-black text-xs uppercase tracking-tighter">Liquidate Asset</span>
+                                                    <span className="font-black text-xs uppercase tracking-tighter">Delete Listing</span>
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>

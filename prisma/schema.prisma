@@ -67,6 +67,8 @@ enum DisputeResolution {
   FULL_REFUND
   PARTIAL_REFUND
   RELEASE_TO_SELLER
+  BUYER_FAVOR
+  SELLER_FAVOR
   SPLIT
   NO_ACTION
 }
@@ -89,6 +91,7 @@ enum TransactionType {
   BONUS
   PENALTY
   CREDIT
+  DEBIT
 }
 
 enum ListingStatus {
@@ -209,6 +212,8 @@ model User {
   couponsUsed       CouponUsage[]
   withdrawals       Withdrawal[]
   badges            UserBadge[]
+  adminLogs         AdminLog[]      @relation("AdminLogs")
+
 
   @@index([email])
   @@index([username])
@@ -896,4 +901,25 @@ model ScheduledJob {
   @@index([type, status])
   @@index([scheduledAt])
   @@index([targetId, targetType])
+}
+
+// ==========================================
+// ADMIN AUDIT LOGGING
+// ==========================================
+
+model AdminLog {
+  id          String   @id @default(cuid())
+  adminId     String
+  admin       User     @relation("AdminLogs", fields: [adminId], references: [id])
+  action      String   // ADD_BALANCE, BAN_USER, RESOLVE_DISPUTE, etc.
+  targetId    String
+  targetType  String   // USER, ORDER, DISPUTE, WITHDRAWAL
+  metadata    Json?    // Additional data about the action
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@index([adminId])
+  @@index([action])
+  @@index([targetId, targetType])
+  @@index([createdAt])
 }
