@@ -27,8 +27,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <AdminSidebar />
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto bg-[#0d1117]">
-                <div className="max-w-7xl mx-auto p-8">
+            <main className="flex-1 overflow-y-auto relative">
+                <div className="absolute inset-0 bg-[#0d1117] -z-20" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,#f5a62308,transparent_50%)] -z-10" />
+
+                <div className="max-w-[1600px] mx-auto p-10 relative">
+                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#f5a623]/2 rounded-full blur-[120px] -z-10" />
                     {children}
                 </div>
             </main>

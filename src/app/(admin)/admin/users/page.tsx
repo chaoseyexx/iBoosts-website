@@ -50,49 +50,65 @@ export default async function AdminUsersPage({
     });
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-8 max-w-7xl mx-auto">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight">User Management</h1>
-                    <p className="text-[#8b949e]">Manage access and roles for all platform members.</p>
+                    <h1 className="text-4xl font-black text-white tracking-tighter drop-shadow-md">
+                        Identity <span className="text-[#58a6ff]">Matrix</span>
+                    </h1>
+                    <p className="text-[#8b949e] font-medium mt-1">Direct oversight of platform citizens, roles, and status.</p>
+                </div>
+
+                {/* Search / Status Filters */}
+                <div className="relative group w-full md:w-96">
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-[#58a6ff]/20 to-transparent rounded-xl blur opacity-0 group-hover:opacity-100 transition duration-500" />
+                    <div className="relative">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b949e] group-hover:text-[#58a6ff] transition-colors" />
+                        <form>
+                            <Input
+                                name="q"
+                                defaultValue={query}
+                                placeholder="Search by identifier..."
+                                className="pl-11 h-12 bg-[#0d1117]/80 backdrop-blur-xl border-[#30363d]/50 text-white rounded-xl focus:border-[#58a6ff]/50 focus:ring-0 font-bold placeholder:text-[#8b949e]/30 transition-all"
+                            />
+                        </form>
+                    </div>
                 </div>
             </div>
 
-            {/* Filters & Search */}
-            <Card className="bg-[#161b22] border-[#30363d]">
-                <CardContent className="p-4 flex gap-4">
-                    <form className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b949e]" />
-                        <Input
-                            name="q"
-                            defaultValue={query}
-                            placeholder="Search by Username or Email..."
-                            className="pl-9 h-10 bg-[#0d1117] border-[#30363d] text-white focus:border-[#f5a623]"
-                        />
-                    </form>
-                </CardContent>
-            </Card>
-
-            {/* Users Table */}
-            <Card className="bg-[#161b22] border-[#30363d] overflow-hidden">
+            {/* Users Table / Data Grid */}
+            <div className="relative group border border-[#30363d]/50 bg-[#161b22]/40 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm text-[#c9d1d9]">
-                        <thead className="bg-[#0d1117] border-b border-[#30363d] uppercase font-semibold text-xs text-[#8b949e]">
-                            <tr>
-                                <th className="px-6 py-4">User</th>
-                                <th className="px-6 py-4">Role</th>
-                                <th className="px-6 py-4">Status</th>
-                                <th className="px-6 py-4">Wallet Balance</th>
-                                <th className="px-6 py-4">Joined</th>
-                                <th className="px-6 py-4 text-right">Actions</th>
+                        <thead>
+                            <tr className="bg-black/40 border-b border-[#30363d]/50">
+                                <th className="px-8 py-5">
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Individual</span>
+                                </th>
+                                <th className="px-8 py-5">
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Access Level</span>
+                                </th>
+                                <th className="px-8 py-5">
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Circuit Status</span>
+                                </th>
+                                <th className="px-8 py-5">
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Wallet Reserve</span>
+                                </th>
+                                <th className="px-8 py-5">
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Registration</span>
+                                </th>
+                                <th className="px-8 py-5 text-right">
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Protocols</span>
+                                </th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#30363d]">
+                        <tbody className="divide-y divide-[#30363d]/30">
                             {users.map((user) => (
-                                <tr key={user.id} className="group hover:bg-[#1f2937]/50 transition-colors">
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-8 w-8 rounded-full bg-[#30363d] flex items-center justify-center font-bold text-white overflow-hidden">
+                                <tr key={user.id} className="group/row hover:bg-[#58a6ff]/5 transition-all duration-300">
+                                    <td className="px-8 py-5">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#30363d] to-[#161b22] border border-[#30363d] flex items-center justify-center font-black text-white overflow-hidden shadow-inner group-hover/row:scale-105 transition-transform">
                                                 {user.avatar ? (
                                                     <img src={user.avatar} alt={user.username} className="h-full w-full object-cover" />
                                                 ) : (
@@ -100,38 +116,47 @@ export default async function AdminUsersPage({
                                                 )}
                                             </div>
                                             <div>
-                                                <div className="font-medium text-white">{user.username}</div>
-                                                <div className="text-xs text-[#8b949e]">{user.email}</div>
+                                                <div className="font-bold text-white tracking-tight">{user.username}</div>
+                                                <div className="text-[11px] text-[#8b949e] font-medium opacity-60">{user.email}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <Badge variant="outline" className={cn(
-                                            "border-[#30363d] capitalize",
+                                    <td className="px-8 py-5">
+                                        <div className={cn(
+                                            "inline-flex items-center px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wider shadow-sm",
                                             user.role === 'ADMIN' ? "text-[#f5a623] border-[#f5a623]/20 bg-[#f5a623]/10" :
                                                 user.role === 'SELLER' ? "text-[#58a6ff] border-[#58a6ff]/20 bg-[#58a6ff]/10" :
-                                                    "text-[#c9d1d9]"
+                                                    "text-[#c9d1d9] border-[#30363d] bg-white/5"
                                         )}>
-                                            {user.role.toLowerCase()}
-                                        </Badge>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className={cn(
-                                            "inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium",
-                                            user.status === 'ACTIVE' ? "bg-green-500/10 text-green-500" :
-                                                "bg-red-500/10 text-red-500"
-                                        )}>
-                                            {user.status === 'ACTIVE' ? <Shield className="h-3 w-3" /> : <ShieldBan className="h-3 w-3" />}
-                                            <span className="capitalize">{user.status.toLowerCase()}</span>
+                                            {user.role}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 font-mono text-white">
-                                        ${Number(user.wallet?.balance || 0).toFixed(2)}
+                                    <td className="px-8 py-5">
+                                        <div className={cn(
+                                            "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-tight",
+                                            user.status === 'ACTIVE'
+                                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                                : "bg-rose-500/10 text-rose-400 border border-rose-500/20 shadow-[0_0_15px_rgba(244,63,94,0.1)]"
+                                        )}>
+                                            <div className={cn(
+                                                "h-1.5 w-1.5 rounded-full animate-pulse",
+                                                user.status === 'ACTIVE' ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" : "bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.5)]"
+                                            )} />
+                                            {user.status}
+                                        </div>
                                     </td>
-                                    <td className="px-6 py-4 text-[#8b949e]">
-                                        {new Date(user.createdAt).toLocaleDateString()}
+                                    <td className="px-8 py-5">
+                                        <span className="font-black text-white text-lg tracking-tighter tabular-nums">
+                                            ${Number(user.wallet?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </span>
                                     </td>
-                                    <td className="px-6 py-4 text-right">
+                                    <td className="px-8 py-5">
+                                        <div className="flex flex-col">
+                                            <span className="text-[11px] font-bold text-white">{new Date(user.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                            <span className="text-[10px] text-[#8b949e] font-bold opacity-50 uppercase tracking-widest">{new Date(user.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-5 text-right">
                                         <UserActions user={user} />
                                     </td>
                                 </tr>
@@ -139,7 +164,7 @@ export default async function AdminUsersPage({
                         </tbody>
                     </table>
                 </div>
-            </Card>
+            </div>
         </div>
     );
 }

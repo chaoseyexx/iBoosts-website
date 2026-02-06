@@ -49,6 +49,7 @@ import {
     NavigationMenuTrigger,
     NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
+import { cn } from "@/lib/utils";
 
 // Navigation categories
 const navCategories = [
@@ -174,16 +175,22 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
 
                         {/* Desktop Navigation */}
                         <div className="hidden lg:flex items-center gap-6">
-                            <NavigationMenu viewport={true} className="relative !max-w-none">
+                            <NavigationMenu viewport={true} showViewport={false} className="relative !max-w-none">
                                 <NavigationMenuList className="gap-6">
                                     {navCategories.map((cat) => (
                                         <NavigationMenuItem key={cat.name}>
                                             <NavigationMenuTrigger
-                                                className="bg-transparent text-[15px] font-bold text-white hover:text-[#f5a623] data-[state=open]:text-[#f5a623] hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent transition-colors whitespace-nowrap p-0 h-auto gap-1"
+                                                className={cn(
+                                                    "bg-transparent text-[15px] font-bold hover:text-[#f5a623] data-[state=open]:text-[#f5a623] hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent transition-colors whitespace-nowrap p-0 h-auto gap-1",
+                                                    cat.name === "Boosting" ? "text-[#f5a623]" : "text-white"
+                                                )}
                                             >
                                                 {cat.name}
+                                                {cat.name === "Boosting" && (
+                                                    <span className="flex h-1.5 w-1.5 rounded-full bg-[#f5a623] animate-pulse ml-0.5" />
+                                                )}
                                             </NavigationMenuTrigger>
-                                            <NavigationMenuContent className="border-[#30363d] overflow-hidden rounded-xl shadow-2xl">
+                                            <NavigationMenuContent className="w-[1100px] xl:w-[1240px] 2xl:w-[1400px] max-w-[95vw] border-[#30363d] overflow-hidden rounded-xl shadow-2xl">
                                                 <MegaMenu
                                                     category={cat.name}
                                                     popularGames={GAMES_DATA[cat.name]?.popular || []}
@@ -193,9 +200,9 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                                         </NavigationMenuItem>
                                     ))}
                                 </NavigationMenuList>
-                                <div className="!fixed !top-[96px] !left-0 !right-0 w-screen flex justify-center pointer-events-none z-[100]">
+                                <div className="fixed top-[96px] left-0 right-0 flex justify-center pointer-events-none z-[100]">
                                     <div className="w-[1100px] xl:w-[1240px] 2xl:w-[1400px] max-w-[95vw] pointer-events-auto">
-                                        <NavigationMenuViewport className="!w-full border-[#30363d] overflow-hidden rounded-b-xl shadow-2xl bg-[#161b22] !left-0 !transform-none" />
+                                        <NavigationMenuViewport className="w-full border-[#30363d] overflow-hidden rounded-b-xl shadow-2xl bg-[#161b22]/95 backdrop-blur-md" />
                                     </div>
                                 </div>
                             </NavigationMenu>
@@ -406,7 +413,7 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                         </div>
                     </div>
                 )}
-            </nav>
+            </nav >
         </>
     );
 }

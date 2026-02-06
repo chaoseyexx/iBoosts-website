@@ -32,18 +32,21 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
     const hasPopularGames = popularGames.length > 0;
 
     return (
-        <div className="grid grid-cols-12 w-full min-h-[400px] max-h-[70vh] bg-[#161b22] text-[#c9d1d9] overflow-hidden rounded-b-xl shadow-2xl border-t border-[#30363d]">
+        <div className="grid grid-cols-12 w-full min-h-[420px] max-h-[75vh] bg-transparent text-[#c9d1d9] overflow-hidden border-t border-[#30363d] relative">
+            {/* Top Glow Accent */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#f5a623]/40 to-transparent z-10" />
+
             {/* Left Column - Popular Games */}
             {hasPopularGames && (
-                <div className="col-span-4 lg:col-span-4 2xl:col-span-3 flex flex-col p-4 sm:p-5 lg:p-6 border-r border-[#30363d] overflow-y-auto bg-[#1c2128]/40">
-                    <h3 className="text-[10px] sm:text-xs font-bold text-[#8b949e] mb-4 sm:mb-6 uppercase tracking-[0.2em]">Popular games</h3>
+                <div className="col-span-4 flex flex-col p-5 lg:p-7 border-r border-[#30363d] overflow-y-auto bg-[#161b22]/70 backdrop-blur-md">
+                    <h3 className="text-[10px] font-black text-[#8b949e] mb-6 uppercase tracking-[0.25em] opacity-80">Popular games</h3>
                     <div className="grid grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-2 sm:gap-4 lg:gap-5">
                         {popularGames.map((game) => (
                             <Link
                                 key={game.id}
                                 href={game.href}
                                 onClick={handleLinkClick}
-                                className="flex flex-col items-center gap-3 p-3 rounded-xl hover:bg-[#1c2128] transition-all group text-center"
+                                className="flex flex-col items-center gap-4 p-4 rounded-2xl bg-[#1c2128]/40 border border-[#30363d]/50 hover:border-[#f5a623]/40 hover:bg-[#1c2128]/80 hover:shadow-[0_0_20px_rgba(245,166,35,0.05)] transition-all duration-300 group text-center"
                             >
                                 <Avatar className="h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 rounded-lg bg-[#21262d] border border-[#30363d] shadow-sm transform group-hover:scale-105 transition-transform">
                                     <AvatarImage src={game.icon} alt={game.name} />
@@ -51,7 +54,7 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
                                         {game.name.charAt(0)}
                                     </AvatarFallback>
                                 </Avatar>
-                                <span className="text-[10px] sm:text-xs font-bold group-hover:text-[#f5a623] transition-colors line-clamp-1">
+                                <span className="text-xs font-black tracking-tight group-hover:text-[#f5a623] transition-colors line-clamp-1">
                                     {game.name}
                                 </span>
                             </Link>
@@ -62,8 +65,8 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
 
             {/* Right Column - All Games + Search */}
             <div className={cn(
-                "flex flex-col bg-[#0d1117]",
-                hasPopularGames ? "col-span-8 lg:col-span-8 2xl:col-span-9" : "col-span-12"
+                "flex flex-col bg-[#0d1117]/90 backdrop-blur-sm",
+                hasPopularGames ? "col-span-8" : "col-span-12"
             )}>
                 {/* Search Bar */}
                 <div className="p-6 border-b border-[#30363d]">
@@ -74,13 +77,13 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
                             placeholder="Search for game"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full h-10 bg-[#161b22] border border-[#30363d] rounded-lg pl-10 pr-4 text-sm text-white placeholder:text-[#8b949e] focus:border-[#f5a623] focus:ring-1 focus:ring-[#f5a623] focus:outline-none transition-all"
+                            className="w-full h-11 bg-[#161b22]/50 border border-[#30363d] rounded-xl pl-11 pr-4 text-sm text-white placeholder:text-[#8b949e]/60 focus:border-[#f5a623] focus:ring-1 focus:ring-[#f5a623]/10 focus:outline-none transition-all duration-300"
                         />
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 sm:p-5 lg:p-6">
-                    <h3 className="text-[10px] sm:text-xs font-bold text-[#8b949e] mb-4 sm:mb-6 uppercase tracking-[0.2em]">All games</h3>
+                <div className="flex-1 overflow-y-auto p-6 lg:p-8">
+                    <h3 className="text-[10px] font-black text-[#8b949e] mb-6 uppercase tracking-[0.25em] opacity-80">All games</h3>
                     <div className={cn(
                         "grid gap-x-4 sm:gap-x-6 lg:gap-x-8 gap-y-2 sm:gap-y-3",
                         hasPopularGames ? "grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3" : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5"
@@ -91,13 +94,12 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
                                     key={game.id}
                                     href={game.href}
                                     onClick={handleLinkClick}
-                                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1c2128] transition-colors group"
+                                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1c2128] border border-transparent hover:border-[#30363d] transition-colors group"
                                 >
                                     <div className="h-8 w-8 rounded-md bg-[#21262d] border border-[#30363d] flex items-center justify-center shrink-0">
-                                        {/* Use a generic icon if no specific image is available for 'all games' list to save load */}
                                         <Gamepad2 className="h-4 w-4 text-[#8b949e]" />
                                     </div>
-                                    <span className="text-sm font-medium text-[#8b949e] group-hover:text-white transition-colors">
+                                    <span className="text-sm font-bold tracking-tight text-[#8b949e] group-hover:text-white transition-colors">
                                         {game.name}
                                     </span>
                                 </Link>
