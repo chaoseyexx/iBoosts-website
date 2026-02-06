@@ -46,8 +46,9 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
 
             {/* Left Column - Popular Games */}
             {hasPopularGames && (
-                <div className="col-span-4 flex flex-col p-5 lg:p-7 border-r border-[#30363d] overflow-y-auto bg-[#161b22]/70 backdrop-blur-md">
-                    <h3 className="text-[10px] font-black text-[#8b949e] mb-6 uppercase tracking-[0.25em] opacity-80">Popular games</h3>
+                <div className="col-span-4 flex flex-col p-5 lg:p-7 border-r border-[#30363d] overflow-y-auto bg-[#0d1117]/80 backdrop-blur-xl relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#f5a623]/5 to-transparent pointer-events-none" />
+                    <h3 className="text-[10px] font-black text-[#f5a623] mb-6 uppercase tracking-[0.25em] relative z-10">Popular games</h3>
                     <div className="grid grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-2 sm:gap-4 lg:gap-5">
                         {popularGames.map((game) => (
                             <Link
@@ -62,7 +63,7 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
                                         {game.name.charAt(0)}
                                     </AvatarFallback>
                                 </Avatar>
-                                <span className="text-xs font-black tracking-tight group-hover:text-[#f5a623] transition-colors">
+                                <span className="text-xs font-black tracking-tight text-white group-hover:text-[#f5a623] transition-colors relative z-10">
                                     {game.name}
                                 </span>
                             </Link>
@@ -73,7 +74,7 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
 
             {/* Right Column - All Games + Search */}
             <div className={cn(
-                "flex flex-col bg-[#0d1117]/90 backdrop-blur-sm",
+                "flex flex-col bg-[#050506]/95 backdrop-blur-lg",
                 hasPopularGames ? "col-span-8" : "col-span-12"
             )}>
                 {/* Search Bar */}
@@ -104,10 +105,10 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
                                     onClick={handleLinkClick}
                                     className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1c2128] border border-transparent hover:border-[#30363d] transition-colors group"
                                 >
-                                    <div className="h-8 w-8 rounded-md bg-[#21262d] border border-[#30363d] flex items-center justify-center shrink-0">
-                                        <Gamepad2 className="h-4 w-4 text-[#8b949e]" />
+                                    <div className="h-8 w-8 rounded-md bg-[#1c2128] border border-[#30363d] flex items-center justify-center shrink-0 group-hover:border-[#f5a623]/30 transition-colors">
+                                        <Gamepad2 className="h-4 w-4 text-[#8b949e] group-hover:text-[#f5a623]" />
                                     </div>
-                                    <span className="text-sm font-bold tracking-tight text-[#8b949e] group-hover:text-white transition-colors">
+                                    <span className="text-sm font-bold tracking-tight text-[#fdfcf0]/80 group-hover:text-white transition-colors">
                                         {game.name}
                                     </span>
                                 </Link>

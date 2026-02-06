@@ -240,12 +240,12 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                                             <NavigationMenuItem key={cat.id}>
                                                 <NavigationMenuTrigger
                                                     className={cn(
-                                                        "bg-transparent text-[15px] font-bold hover:text-[#f5a623] data-[state=open]:text-[#f5a623] hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent transition-colors whitespace-nowrap p-0 h-auto gap-1",
-                                                        cat.name === "Boosting" ? "text-[#f5a623]" : "text-white"
+                                                        "bg-transparent text-[14px] lg:text-[15px] font-bold transition-all duration-300 whitespace-nowrap p-0 h-auto gap-1 hover:bg-transparent outline-none focus:bg-transparent data-[state=open]:bg-transparent border-none ring-0 focus:ring-0",
+                                                        cat.name === "Boosting" ? "text-[#f5a623]" : "text-[#c9d1d9] hover:text-white data-[state=open]:text-[#f5a623]"
                                                     )}
                                                 >
                                                     {cat.name}
-                                                    {cat.name === "Boosting" && (
+                                                    {(cat.name === "Boosting" || cat.name === "Currency") && (
                                                         <span className="flex h-1.5 w-1.5 rounded-full bg-[#f5a623] animate-pulse ml-0.5" />
                                                     )}
                                                 </NavigationMenuTrigger>
