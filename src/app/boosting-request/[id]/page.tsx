@@ -9,7 +9,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MainNavbar } from "@/components/layout/main-navbar";
+import { NavbarServer } from "@/components/layout/navbar-server";
 import { Footer } from "@/components/layout/footer";
 
 type RequestStatus = "available" | "sold" | "cancelled";
@@ -48,7 +48,7 @@ const mockRequests: Record<string, RequestData> = {
         user: { username: "ExcaliburPrime", rating: 99.8, reviews: 1422, verified: true },
         created: "Feb 3, 2026, 2:32:03 PM",
         expires: "Feb 10, 2026, 2:32:03 PM",
-        icon: "/images/placeholder.svg",
+        icon: "https://i.imgur.com/u7FvX8B.png",
     },
     "2": {
         id: "2",
@@ -67,7 +67,7 @@ const mockRequests: Record<string, RequestData> = {
             { label: "Server", value: "EU" },
             { label: "Method", value: "Solo" }
         ],
-        icon: "/images/placeholder.svg",
+        icon: "https://i.imgur.com/8N48l8b.png",
     },
     "3": {
         id: "3",
@@ -85,7 +85,7 @@ const mockRequests: Record<string, RequestData> = {
             { label: "Desired rank", value: "Immortal I" },
             { label: "Server", value: "NA" }
         ],
-        icon: "/images/placeholder.svg",
+        icon: "https://i.imgur.com/8N48l8b.png",
     },
     "4": {
         id: "4",
@@ -98,7 +98,7 @@ const mockRequests: Record<string, RequestData> = {
         user: { username: "CleanCoast-rE2g", rating: 100, reviews: 54, verified: false },
         created: "Feb 3, 2026, 2:32:03 PM",
         expires: "Feb 10, 2026, 2:32:03 PM",
-        icon: "/images/placeholder.svg",
+        icon: "https://i.imgur.com/39A8n8A.png",
     },
     "6": {
         id: "6",
@@ -118,7 +118,7 @@ const mockRequests: Record<string, RequestData> = {
             { label: "Server", value: "EU" },
             { label: "Method", value: "Solo" }
         ],
-        icon: "/images/placeholder.svg",
+        icon: "https://i.imgur.com/8N48l8b.png",
     }
 };
 
@@ -128,7 +128,7 @@ export default async function BoostingRequestPage({ params }: { params: { id: st
 
     return (
         <div className="min-h-screen bg-[#0a0e13] text-white selection:bg-[#f5a623]/30">
-            <MainNavbar variant="landing" />
+            <NavbarServer variant="landing" />
 
             <div className="pt-24 max-w-5xl mx-auto px-6 py-12 space-y-8">
 
@@ -271,7 +271,7 @@ export default async function BoostingRequestPage({ params }: { params: { id: st
                                         <div className="p-4 flex items-center justify-between group hover:bg-[#1c2128]/20 transition-colors">
                                             <div className="flex items-center gap-3">
                                                 <Avatar className="h-8 w-8">
-                                                    <AvatarImage src="/images/placeholder.svg" alt="pouting" />
+                                                    <AvatarImage src="https://i.imgur.com/8N48l8b.png" alt="pouting" />
                                                     <AvatarFallback>P</AvatarFallback>
                                                 </Avatar>
                                                 <div>
@@ -298,7 +298,7 @@ export default async function BoostingRequestPage({ params }: { params: { id: st
                                         <div className="p-4 flex items-center justify-between group bg-[#1c2128]/10 border-l-2 border-[#f5a623]">
                                             <div className="flex items-center gap-3">
                                                 <Avatar className="h-8 w-8">
-                                                    <AvatarImage src="/images/placeholder.svg" alt="XeN0o0" />
+                                                    <AvatarImage src="https://i.imgur.com/39A8n8A.png" alt="XeN0o0" />
                                                     <AvatarFallback>X</AvatarFallback>
                                                 </Avatar>
                                                 <div>

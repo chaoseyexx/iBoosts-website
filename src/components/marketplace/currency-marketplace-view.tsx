@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-
-import { Footer } from "@/components/layout/footer";
 import { RecommendedSellerCard } from "./recommended-seller-card";
 import { CurrencyListingsTable } from "./currency-listings-table";
 import { Input } from "@/components/ui/input";
@@ -45,8 +43,6 @@ export function CurrencyMarketplaceView({ category, game, listings }: CurrencyMa
 
     return (
         <div className="min-h-screen bg-[#050506]">
-
-
             <main className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
                 {/* Breadcrumbs / Back */}
                 <div className="mb-8 flex items-center gap-2">
@@ -138,8 +134,6 @@ export function CurrencyMarketplaceView({ category, game, listings }: CurrencyMa
                     <CurrencyListingsTable listings={filteredListings} />
                 </div>
             </main>
-
-            <Footer />
         </div>
     );
 }

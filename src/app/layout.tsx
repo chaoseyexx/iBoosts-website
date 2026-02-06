@@ -60,14 +60,16 @@ export const metadata: Metadata = {
 };
 
 import { RecentPurchasePopup } from "@/components/ui/recent-purchase-popup";
+import { fetchRecentActivity } from "@/app/(admin)/admin/actions";
 import Script from "next/script";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const cfToken = process.env.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN;
+  const initialActivities = await fetchRecentActivity();
 
   return (
     <html lang="en" className="dark">
@@ -75,7 +77,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-[var(--bg-primary)]`}
       >
         {children}
-        <RecentPurchasePopup />
+        <RecentPurchasePopup initialActivities={initialActivities} />
         {cfToken && (
           <Script
             defer

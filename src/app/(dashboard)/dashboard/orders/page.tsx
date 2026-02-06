@@ -27,23 +27,23 @@ interface Order {
 }
 
 const mockPurchased: Order[] = [
-    { id: "1", game: "Valorant", productName: "Boosting", type: "Boosting", user: "Ned6", date: "Jan 19, 2026, 4:16:18 AM", status: "completed", quantity: 1, price: 1.00, discount: 0.00, icon: "/images/placeholder.svg" },
-    { id: "2", game: "Marvel Rivals", productName: "Boosting", type: "Boosting", user: "FerchasBOOSTING", date: "Jan 17, 2026, 10:11:14 PM", status: "completed", quantity: 1, price: 5.00, discount: 0.00, icon: "/images/placeholder.svg" },
-    { id: "3", game: "Valorant", productName: "Boosting", type: "Boosting", user: "kittyBoosting", date: "Jan 17, 2026, 5:40:28 AM", status: "completed", quantity: 1, price: 4.00, discount: 0.00, icon: "/images/placeholder.svg" },
-    { id: "4", game: "Valorant", productName: "Boosting", type: "Boosting", user: "remmyuh", date: "Jan 17, 2026, 3:29:43 AM", status: "completed", quantity: 1, price: 6.00, discount: 0.00, icon: "/images/placeholder.svg" },
-    { id: "5", game: "Rocket League", productName: "Boosting", type: "Boosting", user: "Lagumixu", date: "Jan 15, 2026, 7:51:17 PM", status: "completed", quantity: 1, price: 1.00, discount: 0.00, icon: "/images/placeholder.svg" },
-    { id: "6", game: "Star Citizen", productName: "Currency", type: "Currency", user: "Retroshooter94", date: "Jan 15, 2026, 5:01:46 AM", status: "cancelled", quantity: "1,000 M", price: 0.50, discount: 0.00, icon: "/images/placeholder.svg" },
-    { id: "7", game: "Valorant", productName: "Boosting", type: "Boosting", user: "TrimCoin-NoMz", date: "Jan 14, 2026, 7:41:09 PM", status: "completed", quantity: 1, price: 1.00, discount: 0.00, icon: "/images/placeholder.svg" },
+    { id: "1", game: "Valorant", productName: "Boosting", type: "Boosting", user: "Ned6", date: "Jan 19, 2026, 4:16:18 AM", status: "completed", quantity: 1, price: 1.00, discount: 0.00, icon: "https://i.imgur.com/8N48l8b.png" },
+    { id: "2", game: "Marvel Rivals", productName: "Boosting", type: "Boosting", user: "FerchasBOOSTING", date: "Jan 17, 2026, 10:11:14 PM", status: "completed", quantity: 1, price: 5.00, discount: 0.00, icon: "https://i.imgur.com/vHq8S9s.png" },
+    { id: "3", game: "Valorant", productName: "Boosting", type: "Boosting", user: "kittyBoosting", date: "Jan 17, 2026, 5:40:28 AM", status: "completed", quantity: 1, price: 4.00, discount: 0.00, icon: "https://i.imgur.com/8N48l8b.png" },
+    { id: "4", game: "Valorant", productName: "Boosting", type: "Boosting", user: "remmyuh", date: "Jan 17, 2026, 3:29:43 AM", status: "completed", quantity: 1, price: 6.00, discount: 0.00, icon: "https://i.imgur.com/8N48l8b.png" },
+    { id: "5", game: "Rocket League", productName: "Boosting", type: "Boosting", user: "Lagumixu", date: "Jan 15, 2026, 7:51:17 PM", status: "completed", quantity: 1, price: 1.00, discount: 0.00, icon: "https://i.imgur.com/h9v9s8B.png" },
+    { id: "6", game: "Star Citizen", productName: "Currency", type: "Currency", user: "Retroshooter94", date: "Jan 15, 2026, 5:01:46 AM", status: "cancelled", quantity: "1,000 M", price: 0.50, discount: 0.00, icon: "https://i.imgur.com/u7FvX8B.png" },
+    { id: "7", game: "Valorant", productName: "Boosting", type: "Boosting", user: "TrimCoin-NoMz", date: "Jan 14, 2026, 7:41:09 PM", status: "completed", quantity: 1, price: 1.00, discount: 0.00, icon: "https://i.imgur.com/8N48l8b.png" },
 ];
 
 const mockSold: Order[] = [
-    { id: "s1", game: "Roblox", productName: "TAXI BOSS - $10 Million", type: "Items", user: "24apricot", date: "Feb 1, 2026, 3:24:04 PM", status: "cancelled", quantity: 1, price: 3.00, icon: "/images/placeholder.svg" },
-    { id: "s2", game: "Roblox", productName: "TAXI BOSS - $10 Million", type: "Items", user: "24apricot", date: "Feb 1, 2026, 2:54:17 PM", status: "cancelled", quantity: 1, price: 3.00, icon: "/images/placeholder.svg" },
-    { id: "s3", game: "Bee Swarm Simulator", productName: "Boost, 20 bees & Starter Hive | Honey, Quests & Badges Grind", type: "Items", user: "ApthyQuiz-6mYK", date: "Jan 31, 2026, 5:37:25 PM", status: "cancelled", quantity: 1, price: 22.00, icon: "/images/placeholder.svg" },
-    { id: "s4", game: "Roblox", productName: "Boosting", type: "Boosting", user: "Luvvz", date: "Jan 30, 2026, 9:07:51 PM", status: "cancelled", quantity: 1, price: 4.25, icon: "/images/placeholder.svg" },
-    { id: "s5", game: "Roblox", productName: "TAXI BOSS - $10 Million", type: "Items", user: "KindPlum-11aO", date: "Jan 30, 2026, 5:26:21 AM", status: "cancelled", quantity: 1, price: 3.00, icon: "/images/placeholder.svg" },
-    { id: "s6", game: "Roblox", productName: "TAXI BOSS - $10 Million", type: "Items", user: "PrimeEcho-ught", date: "Jan 29, 2026, 7:54:11 PM", status: "completed", quantity: 3, price: 9.00, icon: "/images/placeholder.svg" },
-    { id: "s7", game: "Roblox", productName: "TAXI BOSS - $10 Million", type: "Items", user: "PrimeEcho-ught", date: "Jan 29, 2026, 6:25:02 PM", status: "cancelled", quantity: 3, price: 9.00, icon: "/images/placeholder.svg" },
+    { id: "s1", game: "Roblox", productName: "TAXI BOSS - $10 Million", type: "Items", user: "24apricot", date: "Feb 1, 2026, 3:24:04 PM", status: "cancelled", quantity: 1, price: 3.00, icon: "https://i.imgur.com/39A8n8A.png" },
+    { id: "s2", game: "Roblox", productName: "TAXI BOSS - $10 Million", type: "Items", user: "24apricot", date: "Feb 1, 2026, 2:54:17 PM", status: "cancelled", quantity: 1, price: 3.00, icon: "https://i.imgur.com/39A8n8A.png" },
+    { id: "s3", game: "Bee Swarm Simulator", productName: "Boost, 20 bees & Starter Hive | Honey, Quests & Badges Grind", type: "Items", user: "ApthyQuiz-6mYK", date: "Jan 31, 2026, 5:37:25 PM", status: "cancelled", quantity: 1, price: 22.00, icon: "https://i.imgur.com/pYVjL4z.png" },
+    { id: "s4", game: "Roblox", productName: "Boosting", type: "Boosting", user: "Luvvz", date: "Jan 30, 2026, 9:07:51 PM", status: "cancelled", quantity: 1, price: 4.25, icon: "https://i.imgur.com/39A8n8A.png" },
+    { id: "s5", game: "Roblox", productName: "TAXI BOSS - $10 Million", type: "Items", user: "KindPlum-11aO", date: "Jan 30, 2026, 5:26:21 AM", status: "cancelled", quantity: 1, price: 3.00, icon: "https://i.imgur.com/39A8n8A.png" },
+    { id: "s6", game: "Roblox", productName: "TAXI BOSS - $10 Million", type: "Items", user: "PrimeEcho-ught", date: "Jan 29, 2026, 7:54:11 PM", status: "completed", quantity: 3, price: 9.00, icon: "https://i.imgur.com/39A8n8A.png" },
+    { id: "s7", game: "Roblox", productName: "TAXI BOSS - $10 Million", type: "Items", user: "PrimeEcho-ught", date: "Jan 29, 2026, 6:25:02 PM", status: "cancelled", quantity: 3, price: 9.00, icon: "https://i.imgur.com/39A8n8A.png" },
 ];
 
 const statusOptions = [

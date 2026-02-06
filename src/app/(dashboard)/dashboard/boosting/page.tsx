@@ -15,24 +15,24 @@ import { cn } from "@/lib/utils";
 
 // Mock data for My Requests
 const myRequests = [
-    { id: "1", game: "Valorant", category: "Custom Request", date: "Jan 22, 2026, 3:03:49 AM", offers: 0, status: "cancelled", icon: "/images/placeholder.svg" },
-    { id: "2", game: "Rust", category: "Custom Request", date: "Jan 21, 2026, 3:21:37 AM", offers: 0, status: "cancelled", icon: "/images/placeholder.svg" },
-    { id: "3", game: "Rust", category: "Custom Request", date: "Jan 21, 2026, 1:34:21 AM", offers: 0, status: "cancelled", icon: "/images/placeholder.svg" },
-    { id: "4", game: "Valorant", category: "Rank Boost", date: "Jan 19, 2026, 4:14:32 AM", offers: 6, status: "completed", icon: "/images/placeholder.svg" },
-    { id: "5", game: "Roblox", category: "Custom Request", date: "Jan 18, 2026, 9:30:46 AM", offers: 0, status: "cancelled", icon: "/images/placeholder.svg" },
-    { id: "6", game: "Star Citizen", category: "Rank Boost", date: "Jan 17, 2026, 10:08:55 PM", offers: 7, status: "completed", icon: "/images/placeholder.svg" },
-    { id: "7", game: "Valorant", category: "Rank Boost", date: "Jan 17, 2026, 5:37:38 AM", offers: 6, status: "completed", icon: "/images/placeholder.svg" },
+    { id: "1", game: "Valorant", category: "Custom Request", date: "Jan 22, 2026, 3:03:49 AM", offers: 0, status: "cancelled", icon: "https://i.imgur.com/8N48l8b.png" },
+    { id: "2", game: "Rust", category: "Custom Request", date: "Jan 21, 2026, 3:21:37 AM", offers: 0, status: "cancelled", icon: "https://i.imgur.com/vHq8S9s.png" },
+    { id: "3", game: "Rust", category: "Custom Request", date: "Jan 21, 2026, 1:34:21 AM", offers: 0, status: "cancelled", icon: "https://i.imgur.com/vHq8S9s.png" },
+    { id: "4", game: "Valorant", category: "Rank Boost", date: "Jan 19, 2026, 4:14:32 AM", offers: 6, status: "completed", icon: "https://i.imgur.com/8N48l8b.png" },
+    { id: "5", game: "Roblox", category: "Custom Request", date: "Jan 18, 2026, 9:30:46 AM", offers: 0, status: "cancelled", icon: "https://i.imgur.com/39A8n8A.png" },
+    { id: "6", game: "Star Citizen", category: "Rank Boost", date: "Jan 17, 2026, 10:08:55 PM", offers: 7, status: "completed", icon: "https://i.imgur.com/u7FvX8B.png" },
+    { id: "7", game: "Valorant", category: "Rank Boost", date: "Jan 17, 2026, 5:37:38 AM", offers: 6, status: "completed", icon: "https://i.imgur.com/8N48l8b.png" },
 ];
 
 // Mock data for Received Requests
 const receivedRequests = [
-    { id: "r1", game: "Roblox", buyer: "SafeCalm-YRBW", category: "Adopt Me", date: "Feb 3, 2026, 5:12:47 PM", icon: "/images/placeholder.svg" },
-    { id: "r2", game: "Valorant", buyer: "CalmAnimist23...", category: "Net Wins", date: "Feb 3, 2026, 5:09:54 PM", icon: "/images/placeholder.svg" },
-    { id: "r3", game: "Bee Swarm Simulator", buyer: "FestinoH5", category: "Raid Services", date: "Feb 3, 2026, 5:09:35 PM", icon: "/images/placeholder.svg" },
-    { id: "r4", game: "Roblox", buyer: "CrispPear-EZP...", category: "Custom Request", date: "Feb 3, 2026, 5:09:02 PM", icon: "/images/placeholder.svg" },
-    { id: "r5", game: "Roblox", buyer: "BuBuL N", category: "Custom Request", date: "Feb 3, 2026, 5:07:51 PM", icon: "/images/placeholder.svg" },
-    { id: "r6", game: "Valorant", buyer: "zebuluche", category: "Rank Boost", date: "Feb 3, 2026, 5:06:55 PM", icon: "/images/placeholder.svg" },
-    { id: "r7", game: "Roblox", buyer: "LargeSteam-VZ...", category: "Custom Request", date: "Feb 3, 2026, 5:05:23 PM", icon: "/images/placeholder.svg" },
+    { id: "r1", game: "Roblox", buyer: "SafeCalm-YRBW", category: "Adopt Me", date: "Feb 3, 2026, 5:12:47 PM", icon: "https://i.imgur.com/39A8n8A.png" },
+    { id: "r2", game: "Valorant", buyer: "CalmAnimist23...", category: "Net Wins", date: "Feb 3, 2026, 5:09:54 PM", icon: "https://i.imgur.com/8N48l8b.png" },
+    { id: "r3", game: "Bee Swarm Simulator", buyer: "FestinoH5", category: "Raid Services", date: "Feb 3, 2026, 5:09:35 PM", icon: "https://i.imgur.com/pYVjL4z.png" },
+    { id: "r4", game: "Roblox", buyer: "CrispPear-EZP...", category: "Custom Request", date: "Feb 3, 2026, 5:09:02 PM", icon: "https://i.imgur.com/39A8n8A.png" },
+    { id: "r5", game: "Roblox", buyer: "BuBuL N", category: "Custom Request", date: "Feb 3, 2026, 5:07:51 PM", icon: "https://i.imgur.com/39A8n8A.png" },
+    { id: "r6", game: "Valorant", buyer: "zebuluche", category: "Rank Boost", date: "Feb 3, 2026, 5:06:55 PM", icon: "https://i.imgur.com/8N48l8b.png" },
+    { id: "r7", game: "Roblox", buyer: "LargeSteam-VZ...", category: "Custom Request", date: "Feb 3, 2026, 5:05:23 PM", icon: "https://i.imgur.com/39A8n8A.png" },
 ];
 
 function BoostingContent() {

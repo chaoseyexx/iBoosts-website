@@ -1,10 +1,8 @@
-import * as React from "react";
-import Link from "next/link";
 import { NavbarServer } from "@/components/layout/navbar-server";
 import { ShieldCheck, Zap, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
+export default async function AuthLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="min-h-screen bg-[#0d1117] flex flex-col">
             {/* 1. Global Navbar included (Fixed at top) */}

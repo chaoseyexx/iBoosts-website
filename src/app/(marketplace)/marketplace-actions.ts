@@ -39,7 +39,7 @@ export async function fetchMarketplaceData(categorySlug: string, gameSlug?: stri
         const listings = await prisma.listing.findMany({
             where: {
                 categoryId: category.id,
-                ...(game ? { gameId: game.id } : {}), // Assuming gameId exists in Listing model
+                ...(game ? { gameId: game.id } : {}), // Now that schema is synced, this will work
                 status: "ACTIVE",
             },
             include: {
@@ -62,6 +62,9 @@ export async function fetchMarketplaceData(categorySlug: string, gameSlug?: stri
                 createdAt: "desc"
             }
         });
+
+
+
 
         return { category, game, listings };
     } catch (error: any) {

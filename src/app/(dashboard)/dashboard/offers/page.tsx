@@ -42,7 +42,7 @@ function OffersContent() {
             status: "paused",
             expiresIn: "11d 8h",
             category: "items",
-            image: "/images/placeholder.svg",
+            image: "https://i.imgur.com/u7FvX8B.png",
         },
         {
             id: "2",
@@ -54,7 +54,7 @@ function OffersContent() {
             status: "active",
             expiresIn: "20d 7h",
             category: "items",
-            image: "/images/placeholder.svg",
+            image: "https://i.imgur.com/8N48l8b.png",
         },
         {
             id: "3",
@@ -66,7 +66,7 @@ function OffersContent() {
             status: "paused",
             expiresIn: "11d 8h",
             category: "currency",
-            image: "/images/placeholder.svg",
+            image: "https://i.imgur.com/39A8n8A.png",
         }
     ]);
 

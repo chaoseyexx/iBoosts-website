@@ -1,6 +1,24 @@
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, TransactionType } from "@prisma/client";
 
-const prisma = new PrismaClient();
+// Connection pool for PostgreSQL (same config as app)
+const connectionString = process.env.DATABASE_URL!;
+const finalConnectionString = connectionString.includes("uselibpqcompat")
+    ? connectionString
+    : connectionString.includes("?")
+        ? `${connectionString}&uselibpqcompat=true`
+        : `${connectionString}?uselibpqcompat=true`;
+
+const pool = new Pool({
+    connectionString: finalConnectionString,
+    max: 10,
+    ssl: { rejectUnauthorized: false },
+});
+
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
+
 
 async function main() {
     console.log("🌱 Seeding database...");
@@ -13,7 +31,6 @@ async function main() {
             id: "demo-user-001",
             email: "demo@iboosts.gg",
             username: "DEMO",
-            displayName: "Demo User",
             avatar: null,
             role: "SELLER",
             status: "ACTIVE",
