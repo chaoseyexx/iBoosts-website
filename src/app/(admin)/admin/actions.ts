@@ -932,3 +932,94 @@ export async function bulkCompleteOrders(orderIds: string[], adminId?: string) {
         return { error: error.message };
     }
 }
+
+export async function seedMarketplaceData() {
+    try {
+        // 1. Ensure "Currency" category exists
+        const currencyCategory = await prisma.category.upsert({
+            where: { slug: "currency" },
+            update: {},
+            create: {
+                name: "Currency",
+                slug: "currency",
+                icon: "💰",
+                isActive: true,
+                sortOrder: 1,
+            }
+        });
+
+        // 2. Ensure "Roblox" game exists
+        const robloxGame = await prisma.game.upsert({
+            where: { slug: "roblox" },
+            update: {},
+            create: {
+                name: "Roblox",
+                slug: "roblox",
+                icon: "https://upload.wikimedia.org/wikipedia/commons/3/3a/Roblox_player_icon_black_2022.svg",
+                isActive: true,
+                isPopular: true,
+                categories: { connect: { id: currencyCategory.id } }
+            }
+        });
+
+        // 3. Get or create a seller
+        let seller = await prisma.user.findFirst({
+            where: { role: "SELLER" }
+        });
+
+        if (!seller) {
+            // Find any user and make them a seller for seeding purposes
+            const anyUser = await prisma.user.findFirst();
+            if (!anyUser) return { error: "No users found to make a seller" };
+            seller = await prisma.user.update({
+                where: { id: anyUser.id },
+                data: { role: "SELLER", sellerRating: 4.9, totalSales: 1250 }
+            });
+        }
+
+        // 4. Create some listings
+        const seedListings = [
+            {
+                title: "Robux - Super Fast Delivery",
+                slug: "robux-fast-delivery",
+                price: 0.007, // $7 per 1k
+                stock: 500000,
+                minQuantity: 1000,
+                maxQuantity: 50000,
+                deliveryTime: 15,
+                status: "ACTIVE" as const,
+                categoryId: currencyCategory.id,
+                gameId: robloxGame.id,
+                sellerId: seller.id,
+                description: "Cheap and fast Robux. Verified seller with over 1000 successful trades."
+            },
+            {
+                title: "Robux - Bulk Discount",
+                slug: "robux-bulk-discount",
+                price: 0.0065, // $6.5 per 1k
+                stock: 1000000,
+                minQuantity: 10000,
+                maxQuantity: 100000,
+                deliveryTime: 30,
+                status: "ACTIVE" as const,
+                categoryId: currencyCategory.id,
+                gameId: robloxGame.id,
+                sellerId: seller.id,
+                description: "Best rates for bulk Robux purchases. Safe and secure transfer methods used."
+            }
+        ];
+
+        for (const l of seedListings) {
+            await prisma.listing.upsert({
+                where: { slug: l.slug },
+                update: l,
+                create: l
+            });
+        }
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error seeding marketplace data:", error);
+        return { error: error.message };
+    }
+}

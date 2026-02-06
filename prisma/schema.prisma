@@ -320,6 +320,7 @@ model Game {
   isPopular   Boolean    @default(false)
   isActive    Boolean    @default(true)
   categories  Category[] @relation("GameCategories")
+  listings    Listing[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
@@ -368,6 +369,8 @@ model Listing {
   reviews         Review[]
   offers          Offer[]
   reports         Report[]      @relation("ListingReports")
+  gameId          String?
+  game            Game?         @relation(fields: [gameId], references: [id])
 
   @@index([sellerId])
   @@index([categoryId])
