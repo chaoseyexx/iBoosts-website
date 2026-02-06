@@ -73,6 +73,21 @@ export async function createGame(data: {
     categoryIds: string[];
 }) {
     try {
+        // Check if game name or slug already exists
+        const existingGame = await prisma.game.findFirst({
+            where: {
+                OR: [
+                    { name: { equals: data.name, mode: 'insensitive' } },
+                    { slug: { equals: data.slug, mode: 'insensitive' } }
+                ]
+            }
+        });
+
+        if (existingGame) {
+            const field = existingGame.name.toLowerCase() === data.name.toLowerCase() ? "name" : "slug";
+            return { error: `A game with this ${field} already exists.` };
+        }
+
         const game = await prisma.game.create({
             data: {
                 name: data.name,
@@ -120,6 +135,22 @@ export async function updateGame(gameId: string, data: {
     categoryIds: string[];
 }) {
     try {
+        // Check if another game already has this name or slug
+        const duplicateGame = await prisma.game.findFirst({
+            where: {
+                OR: [
+                    { name: { equals: data.name, mode: 'insensitive' } },
+                    { slug: { equals: data.slug, mode: 'insensitive' } }
+                ],
+                NOT: { id: gameId }
+            }
+        });
+
+        if (duplicateGame) {
+            const field = duplicateGame.name.toLowerCase() === data.name.toLowerCase() ? "name" : "slug";
+            return { error: `Another game already exists with this ${field}.` };
+        }
+
         // First disconnect all categories
         await prisma.game.update({
             where: { id: gameId },
