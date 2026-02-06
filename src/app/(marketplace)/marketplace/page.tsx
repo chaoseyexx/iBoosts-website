@@ -17,6 +17,9 @@ import prisma from "@/lib/prisma/client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+// Prevent static generation - this page requires database access
+export const dynamic = "force-dynamic";
+
 export default async function MarketplacePage() {
     // 1. Fetch Categories from DB
     const dbCategories = await prisma.category.findMany({
@@ -34,7 +37,7 @@ export default async function MarketplacePage() {
     });
 
     const categories = [
-        { name: "All Categories", slug: "all", count: dbCategories.reduce((acc, cat) => acc + cat._count.listings, 0) },
+        { name: "All Categories", slug: "all", icon: null as string | null, count: dbCategories.reduce((acc, cat) => acc + cat._count.listings, 0) },
         ...dbCategories.map(cat => ({
             name: cat.name,
             slug: cat.slug,

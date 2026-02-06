@@ -117,8 +117,7 @@ export async function createGame(data: {
             }))
         });
 
-        const { revalidateTag } = await import("next/cache");
-        revalidateTag("navbar-data");
+        revalidatePath("/", "layout");
         revalidatePath("/admin/cms");
         revalidatePath("/"); // To update navbar if it's dynamic later
         return { success: true, game };
@@ -176,8 +175,7 @@ export async function updateGame(gameId: string, data: {
             }
         });
 
-        const { revalidateTag } = await import("next/cache");
-        revalidateTag("navbar-data");
+        revalidatePath("/", "layout");
         revalidatePath("/admin/cms");
         revalidatePath("/");
         // Revalidate category pages
@@ -225,8 +223,7 @@ export async function deleteGame(gameId: string) {
             where: { id: gameId }
         });
 
-        const { revalidateTag } = await import("next/cache");
-        revalidateTag("navbar-data");
+        revalidatePath("/", "layout");
         revalidatePath("/admin/cms");
         revalidatePath("/");
         return { success: true };
@@ -292,8 +289,7 @@ export async function uploadGameIcon(formData: FormData) {
                 where: { id: gameId },
                 data: { icon: publicUrl }
             });
-            const { revalidateTag } = await import("next/cache");
-            revalidateTag("navbar-data");
+            revalidatePath("/", "layout");
             revalidatePath("/admin/cms");
             revalidatePath("/");
         }
