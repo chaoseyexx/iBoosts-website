@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { MainNavbar } from "@/components/layout/main-navbar";
+
 import { Footer } from "@/components/layout/footer";
 import { RecommendedSellerCard } from "./recommended-seller-card";
 import { CurrencyListingsTable } from "./currency-listings-table";
@@ -45,7 +45,7 @@ export function CurrencyMarketplaceView({ category, game, listings }: CurrencyMa
 
     return (
         <div className="min-h-screen bg-[#050506]">
-            <MainNavbar />
+
 
             <main className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
                 {/* Breadcrumbs / Back */}

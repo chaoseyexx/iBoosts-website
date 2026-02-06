@@ -1,6 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
-import { MainNavbar } from "@/components/layout/main-navbar"; // Ensure this import is correct based on your file structure
+import { NavbarServer } from "@/components/layout/navbar-server";
 import { ShieldCheck, Zap, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -8,7 +8,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     return (
         <div className="min-h-screen bg-[#0d1117] flex flex-col">
             {/* 1. Global Navbar included (Fixed at top) */}
-            <MainNavbar variant="landing" />
+            <NavbarServer variant="landing" />
 
             {/* 2. Main Content Area: Split Layout */}
             {/* Added top padding to account for fixed navbar height (approx 80px) */}

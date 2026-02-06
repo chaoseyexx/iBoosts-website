@@ -15,7 +15,7 @@ const mockNotifications = [
         type: "Credit Farming",
         time: "23s ago",
         read: false,
-        icon: "https://i.imgur.com/u7FvX8B.png",
+        icon: "/images/placeholder.svg",
     },
     {
         id: "2",
@@ -24,7 +24,7 @@ const mockNotifications = [
         time: "27s ago",
         read: false,
         details: ["Platinum III", "Platinum II", "EU"],
-        icon: "https://i.imgur.com/8N48l8b.png",
+        icon: "/images/placeholder.svg",
     },
     {
         id: "3",
@@ -33,7 +33,7 @@ const mockNotifications = [
         time: "48s ago",
         read: false,
         details: ["Ascendant II", "Immortal I", "NA"],
-        icon: "https://i.imgur.com/8N48l8b.png",
+        icon: "/images/placeholder.svg",
     },
     {
         id: "4",
@@ -42,7 +42,7 @@ const mockNotifications = [
         time: "1min ago",
         read: false,
         details: ["I want the masterline rod"],
-        icon: "https://i.imgur.com/39A8n8A.png",
+        icon: "/images/placeholder.svg",
     },
     {
         id: "5",
@@ -51,7 +51,7 @@ const mockNotifications = [
         time: "4min ago",
         read: false,
         details: ["Bee Swarm Simulator"],
-        icon: "https://i.imgur.com/39A8n8A.png",
+        icon: "/images/placeholder.svg",
     },
     {
         id: "6",
@@ -60,7 +60,7 @@ const mockNotifications = [
         time: "4min ago",
         read: true,
         details: ["Ascendant III", "Ascendant III", "EU"],
-        icon: "https://i.imgur.com/8N48l8b.png",
+        icon: "/images/placeholder.svg",
     },
 ];
 
@@ -80,7 +80,7 @@ export default function NotificationsPage() {
             {/* Background Character Graphic */}
             <div className="absolute right-0 top-0 bottom-0 w-1/2 opacity-15 pointer-events-none z-0 overflow-hidden">
                 <Image
-                    src="https://i.imgur.com/39A8n8A.png" // Placeholder for the character graphic
+                    src="/images/placeholder.svg" // Placeholder for the character graphic
                     alt="Background Character"
                     fill
                     className="object-contain object-right"

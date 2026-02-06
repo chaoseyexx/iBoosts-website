@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma/client";
 import { createAdminClient } from "@/lib/supabase/server";
 
@@ -10,7 +10,7 @@ export async function updateUserStatus(userId: string, status: "ACTIVE" | "SUSPE
             where: { id: userId },
             data: { status }
         });
-        revalidatePath("/admin/users");
+        revalidatePath("/admin/users", "page");
         return { success: true };
     } catch (error: any) {
         return { error: error.message };
@@ -23,7 +23,7 @@ export async function updateUserRole(userId: string, role: "BUYER" | "SELLER" | 
             where: { id: userId },
             data: { role }
         });
-        revalidatePath("/admin/users");
+        revalidatePath("/admin/users", "page");
         return { success: true };
     } catch (error: any) {
         return { error: error.message };
@@ -36,7 +36,7 @@ export async function updateOrderStatus(orderId: string, status: "PENDING" | "AC
             where: { id: orderId },
             data: { status }
         });
-        revalidatePath("/admin/orders");
+        revalidatePath("/admin/orders", "page");
         return { success: true };
     } catch (error: any) {
         return { error: error.message };
@@ -57,7 +57,7 @@ export async function adminManageOrder(orderId: string, action: "FORCE_COMPLETE"
             });
             // In a real app, you would also trigger a refund in the wallet
         }
-        revalidatePath("/admin/orders");
+        revalidatePath("/admin/orders", "page");
         return { success: true };
     } catch (error: any) {
         return { error: error.message };
@@ -117,8 +117,9 @@ export async function createGame(data: {
             }))
         });
 
-        revalidatePath("/admin/cms");
-        revalidatePath("/"); // To update navbar if it's dynamic later
+        revalidatePath("/admin/cms", "page");
+        revalidatePath("/", "layout");
+        revalidateTag("navbar-data");
         return { success: true, game };
     } catch (error: any) {
         console.error("Error creating game:", error);
@@ -174,15 +175,16 @@ export async function updateGame(gameId: string, data: {
             }
         });
 
-        revalidatePath("/admin/cms");
-        revalidatePath("/");
+        revalidatePath("/admin/cms", "page");
+        revalidatePath("/", "layout");
+        revalidateTag("navbar-data");
         // Revalidate category pages
-        revalidatePath("/currency");
-        revalidatePath("/accounts");
-        revalidatePath("/boosting");
-        revalidatePath("/items");
-        revalidatePath("/top-ups");
-        revalidatePath("/gift-cards");
+        revalidatePath("/currency", "page");
+        revalidatePath("/accounts", "page");
+        revalidatePath("/boosting", "page");
+        revalidatePath("/items", "page");
+        revalidatePath("/top-ups", "page");
+        revalidatePath("/gift-cards", "page");
         return { success: true, game };
     } catch (error: any) {
         console.error("Error updating game:", error);
@@ -223,6 +225,7 @@ export async function deleteGame(gameId: string) {
 
         revalidatePath("/admin/cms");
         revalidatePath("/");
+        revalidateTag("navbar-data");
         return { success: true };
     } catch (error: any) {
         console.error("Error deleting game:", error);
@@ -286,8 +289,9 @@ export async function uploadGameIcon(formData: FormData) {
                 where: { id: gameId },
                 data: { icon: publicUrl }
             });
-            revalidatePath("/admin/cms");
-            revalidatePath("/");
+            revalidatePath("/admin/cms", "page");
+            revalidatePath("/", "layout");
+            revalidateTag("navbar-data");
         }
 
         return { success: true, url: publicUrl };
@@ -299,53 +303,58 @@ export async function uploadGameIcon(formData: FormData) {
 
 // Fetch games with categories for navbar (server-side)
 export async function fetchGamesForNavbar() {
-    // Force no caching to always get fresh data
-    const { unstable_noStore: noStore } = await import("next/cache");
-    noStore();
+    return unstable_cache(
+        async () => {
+            try {
+                const categories = await prisma.category.findMany({
+                    where: { isActive: true },
+                    orderBy: { sortOrder: "asc" },
+                    select: {
+                        id: true,
+                        name: true,
+                        slug: true,
+                        icon: true
+                    }
+                });
 
-    try {
-        const categories = await prisma.category.findMany({
-            where: { isActive: true },
-            orderBy: { sortOrder: "asc" },
-            select: {
-                id: true,
-                name: true,
-                slug: true,
-                icon: true
-            }
-        });
+                const games = await prisma.game.findMany({
+                    include: {
+                        categories: {
+                            select: { id: true, name: true, slug: true }
+                        }
+                    },
+                    orderBy: [
+                        { isPopular: "desc" },
+                        { name: "asc" }
+                    ]
+                });
 
-        const games = await prisma.game.findMany({
-            include: {
-                categories: {
-                    select: { id: true, name: true, slug: true }
+                // Group games by category
+                const gamesByCategory: Record<string, { popular: any[]; all: any[] }> = {};
+
+                for (const cat of categories) {
+                    const categoryGames = games.filter(g =>
+                        g.categories.some(c => c.id === cat.id)
+                    );
+
+                    gamesByCategory[cat.name] = {
+                        popular: categoryGames.filter(g => g.isPopular).slice(0, 12),
+                        all: categoryGames.filter(g => !g.isPopular)
+                    };
                 }
-            },
-            orderBy: [
-                { isPopular: "desc" },
-                { name: "asc" }
-            ]
-        });
 
-        // Group games by category
-        const gamesByCategory: Record<string, { popular: any[]; all: any[] }> = {};
-
-        for (const cat of categories) {
-            const categoryGames = games.filter(g =>
-                g.categories.some(c => c.id === cat.id)
-            );
-
-            gamesByCategory[cat.name] = {
-                popular: categoryGames.filter(g => g.isPopular).slice(0, 12),
-                all: categoryGames.filter(g => !g.isPopular)
-            };
+                return { categories, gamesByCategory };
+            } catch (error) {
+                console.error("Error fetching games for navbar:", error);
+                return { categories: [], gamesByCategory: {} };
+            }
+        },
+        ["navbar-data"],
+        {
+            tags: ["navbar-data"],
+            revalidate: 3600 // Cache for 1 hour, but we revalidateTag on changes
         }
-
-        return { categories, gamesByCategory };
-    } catch (error) {
-        console.error("Error fetching navbar data:", error);
-        return { categories: [], gamesByCategory: {} };
-    }
+    )();
 }
 
 export async function fetchCategories() {

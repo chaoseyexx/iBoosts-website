@@ -21,7 +21,7 @@ const mockPurchases: Purchase[] = [
         game: "Rust",
         amount: "$45.00",
         time: "2 minutes ago",
-        image: "https://i.imgur.com/u7FvX8B.png",
+        image: "/images/placeholder.png",
     },
     {
         id: "2",
@@ -29,7 +29,7 @@ const mockPurchases: Purchase[] = [
         game: "Bee Swarm Sim",
         amount: "$12.50",
         time: "5 minutes ago",
-        image: "https://i.imgur.com/8N48l8b.png",
+        image: "/images/placeholder.png",
     },
     {
         id: "3",
@@ -37,7 +37,7 @@ const mockPurchases: Purchase[] = [
         game: "Roblox",
         amount: "$120.00",
         time: "12 minutes ago",
-        image: "https://i.imgur.com/39A8n8A.png",
+        image: "/images/placeholder.png",
     },
     {
         id: "4",
@@ -45,7 +45,7 @@ const mockPurchases: Purchase[] = [
         game: "GTA 5",
         amount: "$25.00",
         time: "1 minute ago",
-        image: "https://i.imgur.com/gta5-icon.png", // Fallback handles this
+        image: "/images/placeholder.png",
     },
 ];
 
@@ -108,7 +108,7 @@ export function RecentPurchasePopup() {
                             height={40}
                             className="object-contain"
                             onError={(e: any) => {
-                                e.target.src = "https://i.imgur.com/u7FvX8B.png"; // Fallback to Rust icon
+                                e.target.src = "/images/placeholder.png"; // Fallback to Rust icon
                             }}
                         />
                         <div className="absolute -bottom-1 -right-1 rounded-full bg-[#f5a623] p-1 shadow-lg">

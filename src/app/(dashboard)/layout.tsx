@@ -2,7 +2,7 @@
 import * as React from "react";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
-import { MainNavbar } from "@/components/layout/main-navbar";
+import { NavbarServer } from "@/components/layout/navbar-server";
 import prisma from "@/lib/prisma/client";
 import "../dashboard.css";
 
@@ -41,7 +41,7 @@ export default async function DashboardLayout({
     return (
         <div data-dashboard className="dashboard-theme min-h-screen bg-[#0a0e13]">
             {/* Fixed Navbar */}
-            <MainNavbar variant="dashboard" user={userData ? {
+            <NavbarServer variant="dashboard" user={userData ? {
                 id: authUser?.id || '',
                 email: authUser?.email || '',
                 username: userData.username,

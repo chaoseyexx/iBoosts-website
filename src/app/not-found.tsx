@@ -1,15 +1,15 @@
-"use client";
+
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Home, ArrowLeft } from "lucide-react";
-import { MainNavbar } from "@/components/layout/main-navbar";
+import { NavbarServer } from "@/components/layout/navbar-server";
 import { Footer } from "@/components/layout/footer";
 
 export default function NotFound() {
     return (
         <div className="min-h-screen bg-[#0a0e13] flex flex-col pt-[60px]">
-            <MainNavbar />
+            <NavbarServer />
 
             <main className="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
                 {/* Background Decorations */}

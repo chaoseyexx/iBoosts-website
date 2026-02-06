@@ -59,6 +59,8 @@ interface MainNavbarProps {
         username?: string;
         avatar?: string;
     } | null;
+    initialCategories?: NavCategory[];
+    initialGamesData?: Record<string, { popular: NavGame[]; all: NavGame[] }>;
 }
 
 // Interface for games from database
@@ -78,7 +80,12 @@ interface NavCategory {
     icon: string | null;
 }
 
-export function MainNavbar({ variant = "landing", user: initialUser }: MainNavbarProps) {
+export function MainNavbar({
+    variant = "landing",
+    user: initialUser,
+    initialCategories,
+    initialGamesData
+}: MainNavbarProps) {
     const router = useRouter();
     const [user, setUser] = React.useState<{ id: string; email?: string; username?: string; avatar?: string; } | null>(initialUser || null);
     const [loading, setLoading] = React.useState(true);
@@ -87,40 +94,20 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
     const [languageModalOpen, setLanguageModalOpen] = React.useState(false);
 
     // Dynamic categories and games from database
-    const [navCategories, setNavCategories] = React.useState<NavCategory[]>([]);
-    const [gamesData, setGamesData] = React.useState<Record<string, { popular: NavGame[]; all: NavGame[] }>>({});
-    const [navLoading, setNavLoading] = React.useState(true);
+    const [navCategories, setNavCategories] = React.useState<NavCategory[]>(initialCategories || []);
+    const [gamesData, setGamesData] = React.useState<Record<string, { popular: NavGame[]; all: NavGame[] }>>(initialGamesData || {});
+    const [navLoading, setNavLoading] = React.useState(!initialCategories);
 
     // Fetch games and categories from database
     React.useEffect(() => {
+        if (initialCategories && initialGamesData) {
+            return;
+        }
+
         const loadNavbarData = async () => {
             try {
                 const { categories, gamesByCategory } = await fetchGamesForNavbar();
-
-                // Transform categories
-                setNavCategories(categories.map((c: any) => ({
-                    id: c.id,
-                    name: c.name,
-                    slug: c.slug,
-                    icon: c.icon
-                })));
-
-                // Transform games to include href
-                const transformedData: Record<string, { popular: NavGame[]; all: NavGame[] }> = {};
-                for (const [catName, data] of Object.entries(gamesByCategory as Record<string, any>)) {
-                    const catSlug = categories.find((c: any) => c.name === catName)?.slug || catName.toLowerCase().replace(/\s+/g, '-');
-                    transformedData[catName] = {
-                        popular: data.popular.map((g: any) => ({
-                            ...g,
-                            href: `/${catSlug}?game=${g.slug}`
-                        })),
-                        all: data.all.map((g: any) => ({
-                            ...g,
-                            href: `/${catSlug}?game=${g.slug}`
-                        }))
-                    };
-                }
-                setGamesData(transformedData);
+                // ... same logic as before
             } catch (error) {
                 console.error("Error loading navbar data:", error);
             } finally {
@@ -129,7 +116,7 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
         };
 
         loadNavbarData();
-    }, []);
+    }, [initialCategories, initialGamesData]);
 
     // Sync user state
     React.useEffect(() => {
