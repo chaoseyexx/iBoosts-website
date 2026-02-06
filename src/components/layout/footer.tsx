@@ -91,8 +91,8 @@ export function Footer() {
                     <div>
                         <h4 className="font-medium text-white mb-6">Account Warranty</h4>
                         <ul className="space-y-3 text-sm text-[#9ca3af]">
-                            <li><Link href="#" className="hover:text-white transition-colors">TradeShield (Buying)</Link></li>
-                            <li><Link href="#" className="hover:text-white transition-colors">TradeShield (Selling)</Link></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">iShield (Buying)</Link></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">iShield (Selling)</Link></li>
                             <li><Link href="#" className="hover:text-white transition-colors">Deposits</Link></li>
                             <li><Link href="#" className="hover:text-white transition-colors">Withdrawals</Link></li>
                         </ul>

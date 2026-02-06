@@ -3,9 +3,17 @@
 import * as React from "react";
 import Link from "next/link";
 import { Search, Gamepad2 } from "lucide-react";
-import { Game } from "@/lib/constants/games-data";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+// Flexible game interface that works with both hardcoded and database data
+interface Game {
+    id: string;
+    name: string;
+    icon?: string | null;
+    href: string;
+    isPopular?: boolean;
+}
 
 interface MegaMenuProps {
     category: string;
@@ -48,13 +56,13 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
                                 onClick={handleLinkClick}
                                 className="flex flex-col items-center gap-4 p-4 rounded-2xl bg-[#1c2128]/40 border border-[#30363d]/50 hover:border-[#f5a623]/40 hover:bg-[#1c2128]/80 hover:shadow-[0_0_20px_rgba(245,166,35,0.05)] transition-all duration-300 group text-center"
                             >
-                                <Avatar className="h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 rounded-lg bg-[#21262d] border border-[#30363d] shadow-sm transform group-hover:scale-105 transition-transform">
-                                    <AvatarImage src={game.icon} alt={game.name} />
-                                    <AvatarFallback className="text-[10px] sm:text-xs bg-[#21262d] text-[#8b949e]">
+                                <Avatar className="h-12 w-12 sm:h-14 sm:w-14 lg:h-16 lg:w-16 rounded-xl bg-[#21262d] border border-[#30363d] shadow-sm transform group-hover:scale-105 transition-transform mb-1">
+                                    <AvatarImage src={game.icon || undefined} alt={game.name} />
+                                    <AvatarFallback className="text-xl bg-[#21262d] text-[#8b949e]">
                                         {game.name.charAt(0)}
                                     </AvatarFallback>
                                 </Avatar>
-                                <span className="text-xs font-black tracking-tight group-hover:text-[#f5a623] transition-colors line-clamp-1">
+                                <span className="text-xs font-black tracking-tight group-hover:text-[#f5a623] transition-colors">
                                     {game.name}
                                 </span>
                             </Link>

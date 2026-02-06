@@ -3,7 +3,16 @@ import { UsersDataTable } from "../components/UsersDataTable";
 import { Users } from "lucide-react";
 
 export default async function AdminUsersPage() {
-    const { users, totalCount } = await fetchUsersWithStats({ limit: 25, offset: 0 });
+    const { users, totalCount } = await fetchUsersWithStats({ limit: 50, offset: 0 });
+
+    // Serialize Decimal objects for client component
+    const serializedUsers = users.map((user: any) => ({
+        ...user,
+        wallet: user.wallet ? {
+            balance: Number(user.wallet.balance),
+            pendingBalance: Number(user.wallet.pendingBalance)
+        } : null
+    }));
 
     return (
         <div className="space-y-6 max-w-full">
@@ -21,7 +30,7 @@ export default async function AdminUsersPage() {
             </div>
 
             {/* Data Table */}
-            <UsersDataTable initialUsers={users as any} initialTotal={totalCount} />
+            <UsersDataTable initialUsers={serializedUsers} initialTotal={totalCount} />
         </div>
     );
 }

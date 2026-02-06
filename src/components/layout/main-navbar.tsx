@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getProfile } from "@/app/(dashboard)/dashboard/settings/actions";
 import { MegaMenu } from "./mega-menu";
-import { GAMES_DATA } from "@/lib/constants/games-data";
+import { fetchGamesForNavbar } from "@/app/(admin)/admin/actions";
 import {
     NavigationMenu,
     NavigationMenuContent,
@@ -50,16 +50,6 @@ import {
     NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
-
-// Navigation categories
-const navCategories = [
-    { name: "Currency" },
-    { name: "Accounts" },
-    { name: "Top Ups" },
-    { name: "Items" },
-    { name: "Boosting" },
-    { name: "Gift Cards" },
-];
 
 interface MainNavbarProps {
     variant?: "landing" | "dashboard";
@@ -71,6 +61,23 @@ interface MainNavbarProps {
     } | null;
 }
 
+// Interface for games from database
+interface NavGame {
+    id: string;
+    name: string;
+    slug: string;
+    icon: string | null;
+    isPopular: boolean;
+    href: string;
+}
+
+interface NavCategory {
+    id: string;
+    name: string;
+    slug: string;
+    icon: string | null;
+}
+
 export function MainNavbar({ variant = "landing", user: initialUser }: MainNavbarProps) {
     const router = useRouter();
     const [user, setUser] = React.useState<{ id: string; email?: string; username?: string; avatar?: string; } | null>(initialUser || null);
@@ -78,6 +85,51 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
     const [userMenuOpen, setUserMenuOpen] = React.useState(false);
     const [languageModalOpen, setLanguageModalOpen] = React.useState(false);
+
+    // Dynamic categories and games from database
+    const [navCategories, setNavCategories] = React.useState<NavCategory[]>([]);
+    const [gamesData, setGamesData] = React.useState<Record<string, { popular: NavGame[]; all: NavGame[] }>>({});
+    const [navLoading, setNavLoading] = React.useState(true);
+
+    // Fetch games and categories from database
+    React.useEffect(() => {
+        const loadNavbarData = async () => {
+            try {
+                const { categories, gamesByCategory } = await fetchGamesForNavbar();
+
+                // Transform categories
+                setNavCategories(categories.map((c: any) => ({
+                    id: c.id,
+                    name: c.name,
+                    slug: c.slug,
+                    icon: c.icon
+                })));
+
+                // Transform games to include href
+                const transformedData: Record<string, { popular: NavGame[]; all: NavGame[] }> = {};
+                for (const [catName, data] of Object.entries(gamesByCategory as Record<string, any>)) {
+                    const catSlug = categories.find((c: any) => c.name === catName)?.slug || catName.toLowerCase().replace(/\s+/g, '-');
+                    transformedData[catName] = {
+                        popular: data.popular.map((g: any) => ({
+                            ...g,
+                            href: `/${catSlug}?game=${g.slug}`
+                        })),
+                        all: data.all.map((g: any) => ({
+                            ...g,
+                            href: `/${catSlug}?game=${g.slug}`
+                        }))
+                    };
+                }
+                setGamesData(transformedData);
+            } catch (error) {
+                console.error("Error loading navbar data:", error);
+            } finally {
+                setNavLoading(false);
+            }
+        };
+
+        loadNavbarData();
+    }, []);
 
     // Sync user state
     React.useEffect(() => {
@@ -173,39 +225,47 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                             <Logo className="h-[44px] w-auto" />
                         </Link>
 
-                        {/* Desktop Navigation */}
+                        {/* Desktop Navigation - Dynamic from Database */}
                         <div className="hidden lg:flex items-center gap-6">
-                            <NavigationMenu viewport={true} showViewport={false} className="relative !max-w-none">
-                                <NavigationMenuList className="gap-6">
-                                    {navCategories.map((cat) => (
-                                        <NavigationMenuItem key={cat.name}>
-                                            <NavigationMenuTrigger
-                                                className={cn(
-                                                    "bg-transparent text-[15px] font-bold hover:text-[#f5a623] data-[state=open]:text-[#f5a623] hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent transition-colors whitespace-nowrap p-0 h-auto gap-1",
-                                                    cat.name === "Boosting" ? "text-[#f5a623]" : "text-white"
-                                                )}
-                                            >
-                                                {cat.name}
-                                                {cat.name === "Boosting" && (
-                                                    <span className="flex h-1.5 w-1.5 rounded-full bg-[#f5a623] animate-pulse ml-0.5" />
-                                                )}
-                                            </NavigationMenuTrigger>
-                                            <NavigationMenuContent className="w-[1100px] xl:w-[1240px] 2xl:w-[1400px] max-w-[95vw] border-[#30363d] overflow-hidden rounded-xl shadow-2xl">
-                                                <MegaMenu
-                                                    category={cat.name}
-                                                    popularGames={GAMES_DATA[cat.name]?.popular || []}
-                                                    allGames={GAMES_DATA[cat.name]?.all || []}
-                                                />
-                                            </NavigationMenuContent>
-                                        </NavigationMenuItem>
+                            {navLoading ? (
+                                <div className="flex items-center gap-6">
+                                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                                        <div key={i} className="h-4 w-16 bg-[#1c2128] rounded animate-pulse" />
                                     ))}
-                                </NavigationMenuList>
-                                <div className="fixed top-[96px] left-0 right-0 flex justify-center pointer-events-none z-[100]">
-                                    <div className="w-[1100px] xl:w-[1240px] 2xl:w-[1400px] max-w-[95vw] pointer-events-auto">
-                                        <NavigationMenuViewport className="w-full border-[#30363d] overflow-hidden rounded-b-xl shadow-2xl bg-[#161b22]/95 backdrop-blur-md" />
-                                    </div>
                                 </div>
-                            </NavigationMenu>
+                            ) : navCategories.length > 0 ? (
+                                <NavigationMenu viewport={true} showViewport={false} className="relative !max-w-none">
+                                    <NavigationMenuList className="gap-6">
+                                        {navCategories.map((cat) => (
+                                            <NavigationMenuItem key={cat.id}>
+                                                <NavigationMenuTrigger
+                                                    className={cn(
+                                                        "bg-transparent text-[15px] font-bold hover:text-[#f5a623] data-[state=open]:text-[#f5a623] hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent transition-colors whitespace-nowrap p-0 h-auto gap-1",
+                                                        cat.name === "Boosting" ? "text-[#f5a623]" : "text-white"
+                                                    )}
+                                                >
+                                                    {cat.name}
+                                                    {cat.name === "Boosting" && (
+                                                        <span className="flex h-1.5 w-1.5 rounded-full bg-[#f5a623] animate-pulse ml-0.5" />
+                                                    )}
+                                                </NavigationMenuTrigger>
+                                                <NavigationMenuContent className="w-[1100px] xl:w-[1240px] 2xl:w-[1400px] max-w-[95vw] border-[#30363d] overflow-hidden rounded-xl shadow-2xl">
+                                                    <MegaMenu
+                                                        category={cat.name}
+                                                        popularGames={gamesData[cat.name]?.popular || []}
+                                                        allGames={gamesData[cat.name]?.all || []}
+                                                    />
+                                                </NavigationMenuContent>
+                                            </NavigationMenuItem>
+                                        ))}
+                                    </NavigationMenuList>
+                                    <div className="fixed top-[96px] left-0 right-0 flex justify-center pointer-events-none z-[100]">
+                                        <div className="w-[1100px] xl:w-[1240px] 2xl:w-[1400px] max-w-[95vw] pointer-events-auto">
+                                            <NavigationMenuViewport className="w-full border-[#30363d] overflow-hidden rounded-b-xl shadow-2xl bg-[#161b22]/95 backdrop-blur-md" />
+                                        </div>
+                                    </div>
+                                </NavigationMenu>
+                            ) : null}
                         </div>
                     </div>
 
@@ -398,22 +458,22 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                     </div>
                 </div>
 
-                {/* Mobile menu - Adjust top position */}
+                {/* Mobile menu - Dynamic */}
                 {mobileMenuOpen && (
                     <div className="lg:hidden border-t border-[#2d333b] bg-[#0d1117] absolute w-full left-0 top-[96px] shadow-2xl h-[calc(100vh-96px)] overflow-y-auto">
                         <div className="p-4 space-y-1">
                             {navCategories.map((cat) => (
                                 <div
-                                    key={cat.name}
+                                    key={cat.id}
                                     className="block px-4 py-3 text-base font-medium text-[#c9d1d9] hover:text-white hover:bg-[#1c2128] rounded-lg transition-colors cursor-default"
                                 >
-                                    {cat.name}
+                                    {cat.icon} {cat.name}
                                 </div>
                             ))}
                         </div>
                     </div>
                 )}
-            </nav >
+            </nav>
         </>
     );
 }

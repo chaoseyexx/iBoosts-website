@@ -111,6 +111,212 @@ export async function createGame(data: {
     }
 }
 
+export async function updateGame(gameId: string, data: {
+    name: string;
+    slug: string;
+    description?: string;
+    icon?: string;
+    isPopular?: boolean;
+    categoryIds: string[];
+}) {
+    try {
+        // First disconnect all categories
+        await prisma.game.update({
+            where: { id: gameId },
+            data: {
+                categories: { set: [] }
+            }
+        });
+
+        // Then update with new data
+        const game = await prisma.game.update({
+            where: { id: gameId },
+            data: {
+                name: data.name,
+                slug: data.slug,
+                description: data.description,
+                icon: data.icon,
+                isPopular: data.isPopular || false,
+                categories: {
+                    connect: data.categoryIds.map(id => ({ id }))
+                }
+            }
+        });
+
+        revalidatePath("/admin/cms");
+        revalidatePath("/");
+        // Revalidate category pages
+        revalidatePath("/currency");
+        revalidatePath("/accounts");
+        revalidatePath("/boosting");
+        revalidatePath("/items");
+        revalidatePath("/top-ups");
+        revalidatePath("/gift-cards");
+        return { success: true, game };
+    } catch (error: any) {
+        console.error("Error updating game:", error);
+        return { error: error.message };
+    }
+}
+
+export async function deleteGame(gameId: string) {
+    try {
+        // Get the game to check for icon
+        const game = await prisma.game.findUnique({
+            where: { id: gameId }
+        });
+
+        // Check if game has listings
+        const listingsCount = await prisma.listing.count({
+            where: { gameId }
+        });
+
+        if (listingsCount > 0) {
+            return { error: `Cannot delete: ${listingsCount} active listings exist for this game` };
+        }
+
+        // Delete icon from R2 if it exists
+        if (game?.icon && game.icon.includes("cdn.iboosts.gg")) {
+            try {
+                const { deleteFromR2 } = await import("@/lib/r2");
+                const key = game.icon.split("cdn.iboosts.gg/")[1];
+                if (key) await deleteFromR2(key);
+            } catch (e) {
+                console.error("Error deleting game icon:", e);
+            }
+        }
+
+        await prisma.game.delete({
+            where: { id: gameId }
+        });
+
+        revalidatePath("/admin/cms");
+        revalidatePath("/");
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error deleting game:", error);
+        return { error: error.message };
+    }
+}
+
+export async function uploadGameIcon(formData: FormData) {
+    try {
+        const file = formData.get("file") as File;
+        const gameId = formData.get("gameId") as string;
+
+        if (!file || file.size === 0) {
+            return { error: "No file provided" };
+        }
+
+        // Validate file type
+        const allowedTypes = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+        if (!allowedTypes.includes(file.type)) {
+            return { error: "Invalid file type. Only PNG, JPG, WebP, GIF allowed." };
+        }
+
+        // Max 2MB
+        if (file.size > 2 * 1024 * 1024) {
+            return { error: "File too large. Max 2MB." };
+        }
+
+        // Get current game to delete old icon
+        const currentGame = gameId ? await prisma.game.findUnique({
+            where: { id: gameId },
+            select: { icon: true }
+        }) : null;
+
+        // Delete old icon from R2 if exists
+        if (currentGame?.icon && currentGame.icon.includes("cdn.iboosts.gg")) {
+            try {
+                const { deleteFromR2 } = await import("@/lib/r2");
+                const oldKey = currentGame.icon.split("cdn.iboosts.gg/")[1];
+                if (oldKey) await deleteFromR2(oldKey);
+            } catch (e) {
+                console.error("Error deleting old game icon:", e);
+            }
+        }
+
+        // Convert file to buffer
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+
+        // Generate unique filename
+        const ext = file.name.split(".").pop() || "png";
+        const timestamp = Date.now();
+        const fileName = `games/${gameId || "temp"}-${timestamp}.${ext}`;
+
+        // Upload to R2
+        const { uploadToR2 } = await import("@/lib/r2");
+        const publicUrl = await uploadToR2(buffer, fileName, file.type);
+
+        // If gameId provided, update the game
+        if (gameId) {
+            await prisma.game.update({
+                where: { id: gameId },
+                data: { icon: publicUrl }
+            });
+            revalidatePath("/admin/cms");
+            revalidatePath("/");
+        }
+
+        return { success: true, url: publicUrl };
+    } catch (error: any) {
+        console.error("Error uploading game icon:", error);
+        return { error: error.message };
+    }
+}
+
+// Fetch games with categories for navbar (server-side)
+export async function fetchGamesForNavbar() {
+    // Force no caching to always get fresh data
+    const { unstable_noStore: noStore } = await import("next/cache");
+    noStore();
+
+    try {
+        const categories = await prisma.category.findMany({
+            where: { isActive: true },
+            orderBy: { sortOrder: "asc" },
+            select: {
+                id: true,
+                name: true,
+                slug: true,
+                icon: true
+            }
+        });
+
+        const games = await prisma.game.findMany({
+            include: {
+                categories: {
+                    select: { id: true, name: true, slug: true }
+                }
+            },
+            orderBy: [
+                { isPopular: "desc" },
+                { name: "asc" }
+            ]
+        });
+
+        // Group games by category
+        const gamesByCategory: Record<string, { popular: any[]; all: any[] }> = {};
+
+        for (const cat of categories) {
+            const categoryGames = games.filter(g =>
+                g.categories.some(c => c.id === cat.id)
+            );
+
+            gamesByCategory[cat.name] = {
+                popular: categoryGames.filter(g => g.isPopular).slice(0, 12),
+                all: categoryGames.filter(g => !g.isPopular)
+            };
+        }
+
+        return { categories, gamesByCategory };
+    } catch (error) {
+        console.error("Error fetching navbar data:", error);
+        return { categories: [], gamesByCategory: {} };
+    }
+}
+
 export async function fetchCategories() {
     try {
         return await prisma.category.findMany({
@@ -569,7 +775,17 @@ export async function fetchUsersWithStats(filters?: {
 
         const users = await prisma.user.findMany({
             where,
-            include: {
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                avatar: true,
+                role: true,
+                status: true,
+                kycStatus: true,
+                emailVerified: true,
+                phoneVerified: true,
+                createdAt: true,
                 wallet: { select: { balance: true, pendingBalance: true } },
                 _count: {
                     select: {
@@ -582,7 +798,7 @@ export async function fetchUsersWithStats(filters?: {
                 }
             },
             orderBy: { createdAt: "desc" },
-            take: filters?.limit || 25,
+            take: filters?.limit || 50,
             skip: filters?.offset || 0
         });
 
