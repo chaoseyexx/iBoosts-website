@@ -47,6 +47,7 @@ import {
     NavigationMenuItem,
     NavigationMenuList,
     NavigationMenuTrigger,
+    NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
 
 // Navigation categories
@@ -173,8 +174,8 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
 
                         {/* Desktop Navigation */}
                         <div className="hidden lg:flex items-center gap-6">
-                            <NavigationMenu viewport={false}>
-                                <NavigationMenuList className="gap-6 translate-y-[2px]">
+                            <NavigationMenu viewport={true} className="relative !max-w-none">
+                                <NavigationMenuList className="gap-6">
                                     {navCategories.map((cat) => (
                                         <NavigationMenuItem key={cat.name}>
                                             <NavigationMenuTrigger
@@ -182,7 +183,7 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                                             >
                                                 {cat.name}
                                             </NavigationMenuTrigger>
-                                            <NavigationMenuContent className="fixed top-[96px] left-1/2 -translate-x-1/2 w-[1100px] xl:w-[1300px] 2xl:w-[1500px] max-w-[95vw] border-[#30363d] overflow-hidden rounded-b-xl shadow-2xl z-[100]">
+                                            <NavigationMenuContent className="border-[#30363d] overflow-hidden rounded-xl shadow-2xl">
                                                 <MegaMenu
                                                     category={cat.name}
                                                     popularGames={GAMES_DATA[cat.name]?.popular || []}
@@ -192,6 +193,11 @@ export function MainNavbar({ variant = "landing", user: initialUser }: MainNavba
                                         </NavigationMenuItem>
                                     ))}
                                 </NavigationMenuList>
+                                <div className="!fixed !top-[96px] !left-0 !right-0 w-screen flex justify-center pointer-events-none z-[100]">
+                                    <div className="w-[1100px] xl:w-[1240px] 2xl:w-[1400px] max-w-[95vw] pointer-events-auto">
+                                        <NavigationMenuViewport className="!w-full border-[#30363d] overflow-hidden rounded-b-xl shadow-2xl bg-[#161b22] !left-0 !transform-none" />
+                                    </div>
+                                </div>
                             </NavigationMenu>
                         </div>
                     </div>
