@@ -64,8 +64,8 @@ export function HeroScene() {
         <div className="absolute inset-0 w-full h-full bg-[#0a0e13]">
             <Canvas
                 camera={{ position: [0, 1, 6], fov: 60 }}
-                gl={{ antialias: true, alpha: true }}
-                dpr={[1, 2]}
+                gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}
+                dpr={[1, 1.5]} // Reduced from [1, 2] for better performance
             >
                 {/* Dark Atmosphere */}
                 <color attach="background" args={['#0a0e13']} />
@@ -89,7 +89,7 @@ export function HeroScene() {
                 <Stars
                     radius={50}
                     depth={50}
-                    count={5000}
+                    count={2000} // Reduced from 5000
                     factor={4}
                     saturation={0}
                     fade
@@ -98,7 +98,7 @@ export function HeroScene() {
 
                 {/* Floating Particles - Magic Dust */}
                 <Sparkles
-                    count={150}
+                    count={80} // Reduced from 150
                     scale={[20, 10, 10]}
                     size={3}
                     speed={0.3}

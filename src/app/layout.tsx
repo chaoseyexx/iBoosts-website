@@ -63,6 +63,7 @@ import { RecentPurchasePopup } from "@/components/ui/recent-purchase-popup";
 import { DemoNoticeModal } from "@/components/modals/demo-notice-modal";
 import { fetchRecentActivity } from "@/app/(admin)/admin/actions";
 import { PageTransitionProvider } from "@/components/layout/page-transition-provider";
+import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 
 export default async function RootLayout({
@@ -83,6 +84,7 @@ export default async function RootLayout({
         </PageTransitionProvider>
         <RecentPurchasePopup initialActivities={initialActivities} />
         <DemoNoticeModal />
+        <Analytics />
         {cfToken && (
           <Script
             defer

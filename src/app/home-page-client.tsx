@@ -179,6 +179,7 @@ export function HomePageClient({ initialCategories = [], initialGamesData = {} }
                                 width={280}
                                 height={280}
                                 className="object-contain drop-shadow-[0_0_30px_rgba(37,99,235,0.15)] opacity-90"
+                                priority
                             />
                         </div>
                     </div>
@@ -192,6 +193,7 @@ export function HomePageClient({ initialCategories = [], initialGamesData = {} }
                                 width={280}
                                 height={280}
                                 className="object-contain drop-shadow-[0_0_30px_rgba(147,51,234,0.25)]"
+                                priority
                             />
                         </div>
                     </div>
