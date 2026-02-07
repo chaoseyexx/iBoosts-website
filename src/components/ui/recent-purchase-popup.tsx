@@ -4,6 +4,7 @@ import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, X } from "lucide-react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 interface Purchase {
     id: string;
@@ -23,7 +24,13 @@ interface RecentPurchasePopupProps {
 }
 
 export function RecentPurchasePopup({ initialActivities = [] }: RecentPurchasePopupProps) {
+    const pathname = usePathname();
     const [activePurchases, setActivePurchases] = React.useState<Purchase[]>([]);
+
+    // Don't show on dashboard or admin pages
+    if (pathname?.startsWith("/dashboard") || pathname?.startsWith("/admin")) {
+        return null;
+    }
 
     const removeNotification = React.useCallback((id: string) => {
         setActivePurchases((prev) => prev.filter((p) => p.id !== id));
