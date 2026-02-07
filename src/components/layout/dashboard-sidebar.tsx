@@ -186,12 +186,12 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
                         <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-[#f5a623] border-2 border-[#0d1117] shadow-[0_0_5px_rgba(245,166,35,0.5)] z-10" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <span className="block font-black text-white truncate text-[13px] tracking-tight uppercase leading-none mb-1">
+                        <span className="block font-semibold text-white truncate text-[13px] tracking-tight leading-none mb-1">
                             {user?.username || "Guest"}
                         </span>
                         <div className="flex items-center gap-1.5">
                             <span className={cn(
-                                "block text-[9px] font-black uppercase tracking-[0.2em] leading-none px-1.5 py-0.5 rounded border",
+                                "block text-[9px] font-semibold uppercase tracking-[0.2em] leading-none px-1.5 py-0.5 rounded border",
                                 badge.color,
                                 badge.border,
                                 badge.bg

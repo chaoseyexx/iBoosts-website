@@ -135,6 +135,7 @@ export function OffersClient({ initialOffers, categoryQuery = "all" }: OffersCli
 
                 <div className="relative flex-1 max-w-xs ml-2">
                     <Input
+                        id="offers-search"
                         placeholder="Search offers"
                         className="h-[40px] bg-[#13181e] border-[#2d333b] text-white focus:border-[#f5a623] pl-4 pr-10 rounded-lg placeholder:text-[#8b949e] border-opacity-50 text-[13px] font-medium"
                     />
