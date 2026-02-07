@@ -310,7 +310,6 @@ export default function AdminCMSPage() {
                                 : "text-[#8b949e] hover:text-white"
                         )}
                     >
-                        <span className="text-sm">{cat.icon}</span>
                         {cat.name}
                         <span className="text-[10px] text-[#4b5563] ml-1">
                             ({games.filter(g => g.categories.some((c: any) => c.id === cat.id)).length})
@@ -655,7 +654,7 @@ export default function AdminCMSPage() {
                                         )}>
                                             <Check className="h-2.5 w-2.5 stroke-[3]" />
                                         </div>
-                                        <span className="text-[11px] font-bold text-[#9ca3af]">{cat.icon} {cat.name}</span>
+                                        <span className="text-[11px] font-bold text-[#9ca3af]">{cat.name}</span>
                                     </div>
                                 ))}
                             </div>
