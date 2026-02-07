@@ -47,7 +47,7 @@ export default async function DashboardLayout({
             <NavbarServer variant="dashboard" />
 
             {/* Content area with sidebar - positioned below fixed navbar */}
-            <div className="flex flex-col lg:flex-row pt-[60px] lg:pt-[64px]">
+            <div className="flex flex-col lg:flex-row pt-[92px] lg:pt-[96px]">
                 {/* Mobile Sub-Nav (Horizontal Scroll) */}
                 <MobileDashboardNav />
 
@@ -58,7 +58,7 @@ export default async function DashboardLayout({
                 </React.Suspense>
 
                 {/* Main Content */}
-                <main className="flex-1 min-h-[calc(100vh-64px)] overflow-x-hidden bg-[var(--dashboard-bg)] p-4 sm:p-6 md:p-8">
+                <main className="flex-1 min-h-[calc(100vh-96px)] overflow-x-hidden bg-[var(--dashboard-bg)] p-6 sm:p-10 md:p-12">
                     {/* Max width container */}
                     <div className="max-w-[1200px] w-full mx-auto md:mx-0">
                         {children}
