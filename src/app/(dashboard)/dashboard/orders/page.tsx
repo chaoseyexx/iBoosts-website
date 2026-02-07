@@ -287,7 +287,7 @@ function OrdersContent() {
                                     <td className="py-2.5 px-4 text-[13px] text-white/80 whitespace-nowrap">{order.date}</td>
                                     <td className="py-2.5 px-4">
                                         <div className={cn(
-                                            "inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider",
+                                            "inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wider",
                                             order.status === "completed" ? "bg-[#14b8a6] text-[#0a0e13]" :
                                                 order.status === "cancelled" ? "bg-[#ef4444] text-white" :
                                                     "bg-[#3b82f6] text-white"

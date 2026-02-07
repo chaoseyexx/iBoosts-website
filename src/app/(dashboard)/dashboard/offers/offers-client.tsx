@@ -112,7 +112,7 @@ export function OffersClient({ initialOffers, categoryQuery = "all" }: OffersCli
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <ChevronsUp className="h-7 w-7 text-[#f5a623]" />
-                    <h1 className="text-3xl font-black text-white tracking-tighter uppercase">Offers</h1>
+                    <h1 className="text-3xl font-semibold text-white tracking-tighter uppercase">Offers</h1>
                 </div>
                 <Link href="/dashboard/listings/create">
                     <Button className="bg-[#f5a623] hover:bg-[#e09612] text-black font-bold h-[42px] px-8 rounded-lg transition-all shadow-lg hover:shadow-[#f5a623]/20">
@@ -177,7 +177,7 @@ export function OffersClient({ initialOffers, categoryQuery = "all" }: OffersCli
                                     <span className="text-[11px] text-[#8b949e] font-bold uppercase tracking-wider">Expires in {offer.expiresIn}</span>
                                     <Badge
                                         className={cn(
-                                            "capitalize border h-7 px-4 text-[10px] font-black rounded-full transition-transform hover:scale-105 cursor-default tracking-widest uppercase",
+                                            "capitalize border h-7 px-4 text-[10px] font-semibold rounded-full transition-transform hover:scale-105 cursor-default tracking-widest uppercase",
                                             offer.status === 'active'
                                                 ? "bg-[#f5a623]/5 text-[#f5a623] border-[#f5a623]/20 shadow-[0_0_10px_rgba(245,166,35,0.1)]"
                                                 : "bg-white/5 text-white/50 border-white/10"
@@ -236,17 +236,17 @@ export function OffersClient({ initialOffers, categoryQuery = "all" }: OffersCli
 
                                 {/* Description & Stats */}
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="text-[17px] font-black text-white truncate max-w-lg mb-2 group-hover:text-[#f5a623] transition-colors leading-tight tracking-tighter uppercase">
+                                    <h3 className="text-[17px] font-semibold text-white truncate max-w-lg mb-2 group-hover:text-[#f5a623] transition-colors leading-tight tracking-tighter uppercase">
                                         {offer.title}
                                     </h3>
                                     <div className="flex items-center gap-12 text-[12px]">
                                         <div className="flex flex-col">
-                                            <span className="text-[#8b949e] font-black mb-0.5 text-[10px] uppercase tracking-[0.2em]">Inventory:</span>
-                                            <span className="text-white font-black tracking-tight">{offer.quantity} UNIT</span>
+                                            <span className="text-[#8b949e] font-semibold mb-0.5 text-[10px] uppercase tracking-[0.2em]">Inventory:</span>
+                                            <span className="text-white font-semibold tracking-tight">{offer.quantity} UNIT</span>
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-[#8b949e] font-black mb-0.5 text-[10px] uppercase tracking-[0.2em]">Processing:</span>
-                                            <span className="text-white font-black tracking-tight">{offer.deliveryTime}</span>
+                                            <span className="text-[#8b949e] font-semibold mb-0.5 text-[10px] uppercase tracking-[0.2em]">Processing:</span>
+                                            <span className="text-white font-semibold tracking-tight">{offer.deliveryTime}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -258,9 +258,9 @@ export function OffersClient({ initialOffers, categoryQuery = "all" }: OffersCli
                                             type="text"
                                             value={offer.price}
                                             onChange={(e) => updatePrice(offer.id, e.target.value)}
-                                            className="w-10 bg-transparent text-white font-black text-[15px] focus:outline-none placeholder:text-[#8b949e] text-center"
+                                            className="w-10 bg-transparent text-white font-semibold text-[15px] focus:outline-none placeholder:text-[#8b949e] text-center"
                                         />
-                                        <span className="text-[11px] text-[#8b949e] ml-1 font-black whitespace-nowrap uppercase">
+                                        <span className="text-[11px] text-[#8b949e] ml-1 font-semibold whitespace-nowrap uppercase">
                                             $/unit
                                         </span>
                                     </div>

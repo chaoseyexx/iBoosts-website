@@ -110,8 +110,8 @@ export default function WalletPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-black text-white tracking-tighter uppercase">Wallet</h1>
-                    <p className="text-sm font-bold text-[#8b949e] uppercase tracking-[0.2em]">Manage your global earnings & payouts</p>
+                    <h1 className="text-2xl font-semibold text-white">Wallet</h1>
+                    <p className="text-sm text-[#8b949e]">Manage your global earnings & payouts</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
@@ -215,9 +215,9 @@ export default function WalletPage() {
                                         <CheckCircle2 className="h-10 w-10 text-[#f5a623]" />
                                     </div>
                                     <div className="space-y-2">
-                                        <h3 className="text-2xl font-black text-white tracking-tight uppercase">Request Submitted!</h3>
+                                        <h3 className="text-2xl font-semibold text-white tracking-tight uppercase">Request Submitted!</h3>
                                         <p className="text-sm font-bold text-[#8b949e] uppercase tracking-widest max-w-[280px]">
-                                            Your withdrawal of <span className="text-white font-black">${amount}</span> is being processed.
+                                            Your withdrawal of <span className="text-white font-semibold">${amount}</span> is being processed.
                                         </p>
                                     </div>
                                 </div>
@@ -245,11 +245,11 @@ export default function WalletPage() {
                     </div>
 
                     <div className="relative z-10">
-                        <p className="text-[10px] font-black text-[#f5a623] tracking-[0.2em] uppercase mb-1">Available Balance</p>
-                        <h2 className="text-3xl font-black text-white tracking-tighter">
+                        <p className="text-[10px] font-semibold text-[#f5a623] tracking-[0.2em] uppercase mb-1">Available Balance</p>
+                        <h2 className="text-3xl font-semibold text-white tracking-tighter">
                             {balanceHidden ? "****" : `$${availableBalance.toFixed(2)}`}
                         </h2>
-                        <div className="flex items-center gap-2 mt-4 text-[10px] font-black text-white bg-white/[0.04] w-fit px-3 py-1.5 rounded-full border border-white/[0.05] backdrop-blur-sm">
+                        <div className="flex items-center gap-2 mt-4 text-[10px] font-semibold text-white bg-white/[0.04] w-fit px-3 py-1.5 rounded-full border border-white/[0.05] backdrop-blur-sm">
                             <ArrowUpRight className="h-3.5 w-3.5 text-[#f5a623]" />
                             <span className="uppercase tracking-widest">+12.4% <span className="text-[#8b949e] ml-1">THIS MONTH</span></span>
                         </div>
@@ -265,11 +265,11 @@ export default function WalletPage() {
                     </div>
 
                     <div className="relative z-10">
-                        <p className="text-[10px] font-black text-[#8b949e] tracking-[0.2em] uppercase mb-1">Pending (Escrow)</p>
-                        <h2 className="text-3xl font-black text-white tracking-tighter">
+                        <p className="text-[10px] font-semibold text-[#8b949e] tracking-[0.2em] uppercase mb-1">Pending (Escrow)</p>
+                        <h2 className="text-3xl font-semibold text-white tracking-tighter">
                             {balanceHidden ? "****" : `$${pendingBalance.toFixed(2)}`}
                         </h2>
-                        <p className="text-[9px] font-black text-[#8b949e] mt-4 flex items-center gap-2 uppercase tracking-[0.2em]">
+                        <p className="text-[9px] font-semibold text-[#8b949e] mt-4 flex items-center gap-2 uppercase tracking-[0.2em]">
                             <AlertCircle className="h-3.5 w-3.5 text-[#f5a623]" />
                             Funds secured by iboosts
                         </p>
@@ -285,11 +285,11 @@ export default function WalletPage() {
                     </div>
 
                     <div className="relative z-10">
-                        <p className="text-[10px] font-black text-[#8b949e] tracking-[0.2em] uppercase mb-1">Lifetime Earnings</p>
-                        <h2 className="text-3xl font-black text-white tracking-tighter">
+                        <p className="text-[10px] font-semibold text-[#8b949e] tracking-[0.2em] uppercase mb-1">Lifetime Earnings</p>
+                        <h2 className="text-3xl font-semibold text-white tracking-tighter">
                             {balanceHidden ? "****" : `$4,892.50`}
                         </h2>
-                        <p className="text-[9px] font-black text-[#8b949e] mt-4 flex items-center gap-2 uppercase tracking-[0.2em]">
+                        <p className="text-[9px] font-semibold text-[#8b949e] mt-4 flex items-center gap-2 uppercase tracking-[0.2em]">
                             <ArrowUpRight className="h-3.5 w-3.5 text-[#f5a623]" />
                             Global platform total
                         </p>
@@ -300,11 +300,11 @@ export default function WalletPage() {
             {/* Transactions Section */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-black text-white tracking-tighter uppercase">Transaction History</h2>
+                    <h2 className="text-xl font-semibold text-white tracking-tighter uppercase">Transaction History</h2>
                     <div className="flex items-center gap-2">
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b949e]" />
-                            <Input placeholder="SEARCH TRANSACTION..." className="pl-9 h-11 w-[240px] bg-[#0d1117] border-white/[0.05] text-white text-[10px] font-black tracking-widest shadow-inner focus:border-[#f5a623]/50 focus:ring-0" />
+                            <Input placeholder="SEARCH TRANSACTION..." className="pl-9 h-11 w-[240px] bg-[#0d1117] border-white/[0.05] text-white text-[10px] font-semibold tracking-widest shadow-inner focus:border-[#f5a623]/50 focus:ring-0" />
                         </div>
                         <Button variant="outline" className="h-11 border-[#2d333b] bg-[#1c2128] text-[#9ca3af] hover:text-white hover:bg-[#212832] font-bold px-6 border-dashed">
                             <Download className="h-4 w-4 mr-2" />
@@ -317,11 +317,11 @@ export default function WalletPage() {
                     <table className="w-full text-left">
                         <thead>
                             <tr className="border-b border-[#2d333b] bg-white/[0.02]">
-                                <th className="p-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em]">Transaction Details</th>
-                                <th className="p-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em]">Type</th>
-                                <th className="p-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em]">Amount (USD)</th>
-                                <th className="p-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em]">Status</th>
-                                <th className="p-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em] text-right">Date & Time</th>
+                                <th className="p-4 text-[10px] font-semibold text-[#8b949e] uppercase tracking-[0.2em]">Transaction Details</th>
+                                <th className="p-4 text-[10px] font-semibold text-[#8b949e] uppercase tracking-[0.2em]">Type</th>
+                                <th className="p-4 text-[10px] font-semibold text-[#8b949e] uppercase tracking-[0.2em]">Amount (USD)</th>
+                                <th className="p-4 text-[10px] font-semibold text-[#8b949e] uppercase tracking-[0.2em]">Status</th>
+                                <th className="p-4 text-[10px] font-semibold text-[#8b949e] uppercase tracking-[0.2em] text-right">Date & Time</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#2d333b]/30">
@@ -340,19 +340,19 @@ export default function WalletPage() {
                                                 {trx.type === 'purchase' && <CreditCard className="h-5 w-5" />}
                                             </div>
                                             <div>
-                                                <div className="text-sm font-black text-white tracking-tight uppercase">{trx.description}</div>
-                                                <div className="text-[9px] font-black text-[#8b949e] uppercase tracking-[0.15em] mt-0.5">{trx.method} • <span className="text-white/20">{trx.id}</span></div>
+                                                <div className="text-sm font-semibold text-white tracking-tight uppercase">{trx.description}</div>
+                                                <div className="text-[9px] font-semibold text-[#8b949e] uppercase tracking-[0.15em] mt-0.5">{trx.method} • <span className="text-white/20">{trx.id}</span></div>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="p-4">
-                                        <Badge variant="outline" className="capitalize border-white/10 text-[#8b949e] font-black bg-white/[0.02] text-[9px] px-2.5 py-1 tracking-widest rounded-md uppercase">
+                                        <Badge variant="outline" className="capitalize border-white/10 text-[#8b949e] font-semibold bg-white/[0.02] text-[9px] px-2.5 py-1 tracking-widest rounded-md uppercase">
                                             {trx.type}
                                         </Badge>
                                     </td>
                                     <td className="p-4">
                                         <span className={cn(
-                                            "text-lg font-black tracking-tighter",
+                                            "text-lg font-semibold tracking-tighter",
                                             trx.amount > 0 ? "text-[#f5a623]" : "text-white"
                                         )}>
                                             {trx.amount > 0 ? "+" : ""}{trx.amount.toFixed(2)}
@@ -360,7 +360,7 @@ export default function WalletPage() {
                                     </td>
                                     <td className="p-4">
                                         <div className={cn(
-                                            "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.15em] border backdrop-blur-md shadow-lg",
+                                            "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[9px] font-semibold uppercase tracking-[0.15em] border backdrop-blur-md shadow-lg",
                                             trx.status === 'completed' || trx.status === 'available' ? "bg-[#f5a623]/5 text-[#f5a623] border-[#f5a623]/20" :
                                                 trx.status === 'pending' ? "bg-white/5 text-white/50 border-white/10" :
                                                     "bg-red-500/5 text-red-500 border-red-500/20"
@@ -369,7 +369,7 @@ export default function WalletPage() {
                                             {trx.status}
                                         </div>
                                     </td>
-                                    <td className="p-4 text-right text-[10px] font-black text-[#8b949e] uppercase tracking-wider">
+                                    <td className="p-4 text-right text-[10px] font-semibold text-[#8b949e] uppercase tracking-wider">
                                         {trx.date}
                                     </td>
                                 </tr>

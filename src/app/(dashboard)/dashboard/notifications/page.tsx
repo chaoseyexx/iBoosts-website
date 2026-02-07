@@ -141,7 +141,7 @@ export default function NotificationsPage() {
                         <Bell className="h-6 w-6 text-[#f5a623] fill-[#f5a623]" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-black text-white tracking-tight uppercase">Notifications</h1>
+                        <h1 className="text-3xl font-semibold text-white tracking-tight uppercase">Notifications</h1>
                         <p className="text-sm text-[#8b949e] font-bold uppercase tracking-wider">Stay updated with your activities</p>
                     </div>
                 </div>
@@ -153,7 +153,7 @@ export default function NotificationsPage() {
                             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#f5a623] opacity-75"></span>
                             <span className="relative inline-flex h-2 w-2 rounded-full bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.5)]"></span>
                         </span>
-                        <span className="text-[11px] font-black text-[#58a6ff] uppercase tracking-[0.2em]">Real-time Sync Active</span>
+                        <span className="text-[11px] font-semibold text-[#58a6ff] uppercase tracking-[0.2em]">Real-time Sync Active</span>
                     </div>
                     <button
                         onClick={handleMarkAllAsRead}
@@ -205,10 +205,10 @@ export default function NotificationsPage() {
                                     {/* Content */}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-[15px] font-black text-white tracking-tight uppercase">
+                                            <span className="text-[15px] font-semibold text-white tracking-tight uppercase">
                                                 {notification.title}
                                             </span>
-                                            <span className="text-[10px] font-black text-[#8b949e] uppercase tracking-widest bg-[#2d333b]/30 px-2 py-0.5 rounded">
+                                            <span className="text-[10px] font-semibold text-[#8b949e] uppercase tracking-widest bg-[#2d333b]/30 px-2 py-0.5 rounded">
                                                 {new Date(notification.createdAt).toLocaleDateString() === new Date().toLocaleDateString() ?
                                                     'Today' : new Date(notification.createdAt).toLocaleDateString()}
                                             </span>
@@ -217,11 +217,11 @@ export default function NotificationsPage() {
                                             {notification.content}
                                         </p>
                                         <div className="flex items-center gap-4 mt-2">
-                                            <span className="text-[9px] font-black text-[#58a6ff] uppercase tracking-[0.2em]">
+                                            <span className="text-[9px] font-semibold text-[#58a6ff] uppercase tracking-[0.2em]">
                                                 {new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                             {notification.isBoosting && (
-                                                <Badge variant="outline" className="text-[9px] border-[#f5a623] text-[#f5a623] font-black tracking-widest px-2 h-4">BOOSTING REQUEST</Badge>
+                                                <Badge variant="outline" className="text-[9px] border-[#f5a623] text-[#f5a623] font-semibold tracking-widest px-2 h-4">BOOSTING REQUEST</Badge>
                                             )}
                                         </div>
                                     </div>
@@ -254,7 +254,7 @@ export default function NotificationsPage() {
                                 <div className="h-16 w-16 rounded-full bg-[#1c2128] flex items-center justify-center mb-6">
                                     <Bell className="h-8 w-8 text-[#2d333b]" />
                                 </div>
-                                <h3 className="text-xl font-black text-white uppercase tracking-tight">No incoming notifications</h3>
+                                <h3 className="text-xl font-semibold text-white uppercase tracking-tight">No incoming notifications</h3>
                                 <p className="text-[#8b949e] text-sm font-bold uppercase tracking-[0.2em] mt-2">Your slate is clean.</p>
                             </div>
                         )

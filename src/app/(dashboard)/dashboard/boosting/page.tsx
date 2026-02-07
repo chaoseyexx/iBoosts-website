@@ -99,7 +99,7 @@ function BoostingContent() {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <ChevronsUp className="h-7 w-7 text-[#f5a623]" />
-                    <h1 className="text-3xl font-black text-white tracking-tighter uppercase">{title}</h1>
+                    <h1 className="text-2xl font-semibold text-white">{title}</h1>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -153,16 +153,16 @@ function BoostingContent() {
                             <th className="py-4 px-4 text-[10px] font-bold text-[#8b949e] uppercase tracking-[0.2em] first:rounded-tl-xl">Game</th>
                             {isMyRequests ? (
                                 <>
-                                    <th className="py-4 px-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em]">Category</th>
-                                    <th className="py-4 px-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em]">Created At</th>
-                                    <th className="py-4 px-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em]">Proposals</th>
-                                    <th className="py-4 px-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em] text-right last:rounded-tr-xl">Status</th>
+                                    <th className="py-4 px-4 text-[10px] font-semibold text-[#8b949e] uppercase tracking-[0.2em]">Category</th>
+                                    <th className="py-4 px-4 text-[10px] font-semibold text-[#8b949e] uppercase tracking-[0.2em]">Created At</th>
+                                    <th className="py-4 px-4 text-[10px] font-semibold text-[#8b949e] uppercase tracking-[0.2em]">Proposals</th>
+                                    <th className="py-4 px-4 text-[10px] font-semibold text-[#8b949e] uppercase tracking-[0.2em] text-right last:rounded-tr-xl">Status</th>
                                 </>
                             ) : (
                                 <>
-                                    <th className="py-4 px-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em]">Buyer Account</th>
-                                    <th className="py-4 px-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em]">Service Category</th>
-                                    <th className="py-4 px-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em] last:rounded-tr-xl text-right">Creation Date</th>
+                                    <th className="py-4 px-4 text-[10px] font-semibold text-[#8b949e] uppercase tracking-[0.2em]">Buyer Account</th>
+                                    <th className="py-4 px-4 text-[10px] font-semibold text-[#8b949e] uppercase tracking-[0.2em]">Service Category</th>
+                                    <th className="py-4 px-4 text-[10px] font-semibold text-[#8b949e] uppercase tracking-[0.2em] last:rounded-tr-xl text-right">Creation Date</th>
                                 </>
                             )}
                         </tr>
@@ -178,12 +178,12 @@ function BoostingContent() {
 
                                 {isMyRequests ? (
                                     <>
-                                        <td className="py-5 px-4 text-[13px] text-white font-black uppercase tracking-tight">{(req as any).category}</td>
-                                        <td className="py-5 px-4 text-[12px] text-[#8b949e] font-black uppercase tracking-[0.2em]">{req.date}</td>
-                                        <td className="py-5 px-4 text-[13px] text-white font-black truncate">{(req as any).offers} OFFERS</td>
+                                        <td className="py-5 px-4 text-[13px] text-white font-semibold uppercase tracking-tight">{(req as any).category}</td>
+                                        <td className="py-5 px-4 text-[12px] text-[#8b949e] font-semibold uppercase tracking-[0.2em]">{req.date}</td>
+                                        <td className="py-5 px-4 text-[13px] text-white font-semibold truncate">{(req as any).offers} OFFERS</td>
                                         <td className="py-5 px-4 text-right">
                                             <div className={cn(
-                                                "inline-flex items-center px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.15em] border backdrop-blur-md shadow-lg",
+                                                "inline-flex items-center px-3 py-1.5 rounded-full text-[9px] font-semibold uppercase tracking-[0.15em] border backdrop-blur-md shadow-lg",
                                                 (req as any).status === "completed" ? "bg-[#f5a623]/5 text-[#f5a623] border-[#f5a623]/20 shadow-[0_0_10px_rgba(245,166,35,0.1)]" : "bg-red-500/5 text-red-500 border-red-500/20"
                                             )}>
                                                 {(req as any).status}
@@ -192,9 +192,9 @@ function BoostingContent() {
                                     </>
                                 ) : (
                                     <>
-                                        <td className="py-5 px-4 text-[13px] text-[#f5a623] hover:text-[#ffb845] transition-colors cursor-pointer font-black uppercase tracking-tight">{(req as any).buyer}</td>
-                                        <td className="py-5 px-4 text-[13px] text-white font-black alphabet tracking-tighter uppercase">{(req as any).category}</td>
-                                        <td className="py-5 px-4 text-[12px] text-[#8b949e] font-black uppercase tracking-[0.2em]">{req.date}</td>
+                                        <td className="py-5 px-4 text-[13px] text-[#f5a623] hover:text-[#ffb845] transition-colors cursor-pointer font-semibold uppercase tracking-tight">{(req as any).buyer}</td>
+                                        <td className="py-5 px-4 text-[13px] text-white font-semibold alphabet tracking-tighter uppercase">{(req as any).category}</td>
+                                        <td className="py-5 px-4 text-[12px] text-[#8b949e] font-semibold uppercase tracking-[0.2em]">{req.date}</td>
                                     </>
                                 )}
                             </tr>

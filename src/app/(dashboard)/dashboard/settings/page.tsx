@@ -394,8 +394,8 @@ export default function SettingsPage() {
                                         <div>
                                             <div className="flex items-center gap-2">
                                                 <span className="text-sm font-bold text-white tracking-tight">{item.label}</span>
-                                                {(item as any).verified && <Badge className="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[10px] font-black uppercase tracking-widest shadow-[0_0_10px_rgba(34,211,238,0.1)]">Verified</Badge>}
-                                                {(item as any).warning && <Badge className="bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-black uppercase tracking-widest">Recommended</Badge>}
+                                                {(item as any).verified && <Badge className="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[10px] font-semibold uppercase tracking-widest shadow-[0_0_10px_rgba(34,211,238,0.1)]">Verified</Badge>}
+                                                {(item as any).warning && <Badge className="bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-semibold uppercase tracking-widest">Recommended</Badge>}
                                             </div>
                                             <p className="text-sm text-[#6b7280] mt-0.5">{item.value === "demo@iboosts.gg" && user?.email ? user.email : item.value}</p>
                                         </div>

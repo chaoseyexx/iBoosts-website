@@ -207,7 +207,7 @@ export default function MessagesPage() {
                                     </Avatar>
                                     <div>
                                         <span className="font-bold text-white tracking-tight">{selectedConversation.otherUser.username}</span>
-                                        <p className="text-[11px] text-[#f5a623] font-black uppercase tracking-widest">{selectedConversation.orderNumber}</p>
+                                        <p className="text-[11px] text-[#f5a623] font-semibold uppercase tracking-widest">{selectedConversation.orderNumber}</p>
                                     </div>
                                 </div>
                                 <Button variant="ghost" size="sm" className="text-[#8b949e] hover:text-white hover:bg-[#252b33]">
