@@ -81,19 +81,21 @@ export class iShieldClient {
             console.error('[iShield] Sentinel communication failed:', error);
             throw error;
         }
+    }
+
     /**
      * Fetches live telemetry and system health from the iShield Sentinel.
      */
-    async getSystemStatus(): Promise < any > {
-            try {
-                const response = await fetch(`${this.baseUrl}/system/status`);
-                return await response.json();
-            } catch(error) {
-                console.error('[iShield] Status fetch failed:', error);
-                return { status: 'OFFLINE', is_ready: false };
-            }
+    async getSystemStatus(): Promise<any> {
+        try {
+            const response = await fetch(`${this.baseUrl}/system/status`);
+            return await response.json();
+        } catch (error) {
+            console.error('[iShield] Status fetch failed:', error);
+            return { status: 'OFFLINE', is_ready: false };
         }
     }
+}
 
-    // Singleton instance for the project
-    export const iShield = new iShieldClient();
+// Singleton instance for the project
+export const iShield = new iShieldClient();
