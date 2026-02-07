@@ -20,7 +20,9 @@ import {
     Star,
     Moon,
     LayoutDashboard,
-    Tag
+    Tag,
+    ChevronRight,
+    ChevronUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/ui/notification-dropdown";
@@ -335,119 +337,105 @@ export function MainNavbar({
                                                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                    transition={{ duration: 0.15 }}
-                                                    className="absolute right-0 mt-2 w-72 rounded-xl border border-[#30363d] bg-[#1c2128] text-[#c9d1d9] shadow-2xl z-50 overflow-hidden"
+                                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                                    className="absolute right-0 mt-3 w-80 rounded-2xl border border-[#30363d] bg-[#0d1117]/80 backdrop-blur-xl text-[#c9d1d9] shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 overflow-hidden"
                                                 >
-                                                    {/* Header */}
-                                                    <div className="p-4 border-b border-[#30363d] flex items-center justify-between bg-[#161b22]">
-                                                        <div className="flex items-center gap-3">
-                                                            <Avatar className="h-10 w-10 border border-[#30363d]">
-                                                                <AvatarImage src={user.avatar || ""} alt={user.username} />
-                                                                <AvatarFallback className="bg-[#21262d] text-[#c9d1d9]">
-                                                                    {user.username?.[0]?.toUpperCase()}
-                                                                </AvatarFallback>
-                                                            </Avatar>
-                                                            <div className="flex flex-col">
-                                                                <span className="font-bold text-white text-sm">{user.username}</span>
-                                                                <span className="text-[#9ca3af] text-xs">$0.00</span>
+                                                    {/* Header - Premium Profile Segment */}
+                                                    <div className="relative p-5 overflow-hidden">
+                                                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#f5a623]/10 to-transparent pointer-events-none" />
+
+                                                        <div className="flex items-center gap-4 relative z-10">
+                                                            <div className="relative">
+                                                                <Avatar className="h-14 w-14 border-2 border-[#30363d] ring-2 ring-[#f5a623]/20 transition-transform hover:scale-105 duration-300">
+                                                                    <AvatarImage src={user.avatar || ""} alt={user.username} />
+                                                                    <AvatarFallback className="bg-[#1c2128] text-[#f5a623] text-xl font-bold">
+                                                                        {user.username?.[0]?.toUpperCase()}
+                                                                    </AvatarFallback>
+                                                                </Avatar>
+                                                                <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-green-500 border-2 border-[#0d1117] rounded-full" />
                                                             </div>
+
+                                                            <div className="flex-1 min-w-0">
+                                                                <p className="font-bold text-white text-base truncate group-hover:text-[#f5a623] transition-colors">
+                                                                    {user.username}
+                                                                </p>
+                                                                <div className="flex items-center gap-1.5 mt-0.5">
+                                                                    <span className="text-[#f5a623] font-black text-sm">$0.00</span>
+                                                                    <span className="text-[10px] text-[#8b949e] uppercase tracking-widest font-bold">Available</span>
+                                                                </div>
+                                                            </div>
+
+                                                            <Link href="/dashboard/listings/create" onClick={() => setUserMenuOpen(false)}>
+                                                                <Button className="bg-[#f5a623] hover:bg-[#ffb339] text-black font-black h-10 px-5 rounded-xl shadow-[0_4px_15px_rgba(245,166,35,0.3)] transition-all hover:scale-105 active:scale-95 text-xs uppercase tracking-wider">
+                                                                    Sell
+                                                                </Button>
+                                                            </Link>
                                                         </div>
-                                                        <Link href="/dashboard/listings/create" onClick={() => setUserMenuOpen(false)}>
-                                                            <Button className="bg-[#f5a623] hover:bg-[#e09612] text-black font-bold h-8 px-4 text-xs">
-                                                                Sell
-                                                            </Button>
-                                                        </Link>
                                                     </div>
 
-                                                    {/* Marketplace Group */}
-                                                    <div className="p-2 space-y-1">
-                                                        <button
-                                                            onClick={() => { router.push('/dashboard'); setUserMenuOpen(false); }}
-                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
-                                                        >
-                                                            <LayoutDashboard className="h-4 w-4" />
-                                                            <span>Dashboard</span>
-                                                        </button>
-                                                        <button
-                                                            onClick={() => { router.push('/dashboard/orders'); setUserMenuOpen(false); }}
-                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
-                                                        >
-                                                            <ShoppingCart className="h-4 w-4" />
-                                                            <span>Orders</span>
-                                                        </button>
-                                                        <button
-                                                            onClick={() => { router.push('/dashboard/offers'); setUserMenuOpen(false); }}
-                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
-                                                        >
-                                                            <Tag className="h-4 w-4" />
-                                                            <span>Offers</span>
-                                                        </button>
-                                                        <button
-                                                            onClick={() => { router.push('/dashboard/boosting'); setUserMenuOpen(false); }}
-                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
-                                                        >
-                                                            <ChevronsUp className="h-4 w-4" />
-                                                            <span>Boosting</span>
-                                                        </button>
-                                                    </div>
-
-                                                    {/* Account Group */}
-                                                    <div className="p-2 border-t border-[#30363d] space-y-1">
-                                                        <button
-                                                            onClick={() => { router.push('/dashboard/wallet'); setUserMenuOpen(false); }}
-                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
-                                                        >
-                                                            <Wallet className="h-4 w-4" />
-                                                            <span>Wallet</span>
-                                                        </button>
-                                                        <button
-                                                            onClick={() => { router.push('/dashboard/messages'); setUserMenuOpen(false); }}
-                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
-                                                        >
-                                                            <MessageCircle className="h-4 w-4" />
-                                                            <span>Messages</span>
-                                                        </button>
-                                                        <button
-                                                            onClick={() => { router.push('/dashboard/notifications'); setUserMenuOpen(false); }}
-                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
-                                                        >
-                                                            <Bell className="h-4 w-4" />
-                                                            <span>Notifications</span>
-                                                        </button>
-                                                        <button
-                                                            onClick={() => { router.push('/dashboard/feedback'); setUserMenuOpen(false); }}
-                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
-                                                        >
-                                                            <Star className="h-4 w-4" />
-                                                            <span>Feedback</span>
-                                                        </button>
-                                                        <button
-                                                            onClick={() => { router.push('/dashboard/settings'); setUserMenuOpen(false); }}
-                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white"
-                                                        >
-                                                            <Settings className="h-4 w-4" />
-                                                            <span>Account settings</span>
-                                                        </button>
-                                                    </div>
-
-                                                    {/* App Group */}
-                                                    <div className="p-2 border-t border-[#30363d] space-y-1">
-                                                        <div className="w-full flex items-center justify-between rounded-lg px-3 py-2 text-sm text-[#8b949e] transition-colors hover:bg-[#30363d] hover:text-white cursor-pointer">
-                                                            <div className="flex items-center gap-3">
-                                                                <Moon className="h-4 w-4" />
-                                                                <span>Offline mode</span>
-                                                            </div>
-                                                            <div className="w-8 h-4 rounded-full bg-[#30363d] relative">
-                                                                <div className="absolute left-1 top-1 h-2 w-2 rounded-full bg-[#8b949e]" />
-                                                            </div>
+                                                    <div className="px-3 pb-3 space-y-4">
+                                                        {/* Primary Navigation */}
+                                                        <div className="grid grid-cols-2 gap-2">
+                                                            {[
+                                                                { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+                                                                { label: 'Orders', icon: ShoppingCart, path: '/dashboard/orders' },
+                                                                { label: 'Offers', icon: Tag, path: '/dashboard/offers' },
+                                                                { label: 'Boosting', icon: ChevronsUp, path: '/dashboard/boosting' },
+                                                            ].map((item) => (
+                                                                <button
+                                                                    key={item.path}
+                                                                    onClick={() => { router.push(item.path); setUserMenuOpen(false); }}
+                                                                    className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[#1c2128]/50 border border-[#30363d]/50 hover:border-[#f5a623]/30 hover:bg-[#f5a623]/5 transition-all group"
+                                                                >
+                                                                    <item.icon className="h-5 w-5 text-[#8b949e] group-hover:text-[#f5a623] transition-colors" />
+                                                                    <span className="text-[11px] font-bold text-[#8b949e] group-hover:text-white uppercase tracking-wider">{item.label}</span>
+                                                                </button>
+                                                            ))}
                                                         </div>
-                                                        <button
-                                                            onClick={handleLogout}
-                                                            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#f85149] transition-colors hover:bg-[#f85149]/10"
-                                                        >
-                                                            <LogOut className="h-4 w-4" />
-                                                            <span>Log out</span>
-                                                        </button>
+
+                                                        {/* Secondary Actions */}
+                                                        <div className="space-y-1">
+                                                            {[
+                                                                { label: 'Wallet', icon: Wallet, path: '/dashboard/wallet' },
+                                                                { label: 'Messages', icon: MessageCircle, path: '/dashboard/messages' },
+                                                                { label: 'Notifications', icon: Bell, path: '/dashboard/notifications' },
+                                                                { label: 'Feedback', icon: Star, path: '/dashboard/feedback' },
+                                                                { label: 'Settings', icon: Settings, path: '/dashboard/settings' },
+                                                            ].map((item) => (
+                                                                <button
+                                                                    key={item.path}
+                                                                    onClick={() => { router.push(item.path); setUserMenuOpen(false); }}
+                                                                    className="w-full flex items-center justify-between group px-4 py-2.5 rounded-xl hover:bg-[#f5a623]/5 transition-colors"
+                                                                >
+                                                                    <div className="flex items-center gap-3">
+                                                                        <item.icon className="h-4 w-4 text-[#8b949e] group-hover:text-[#f5a623] transition-colors" />
+                                                                        <span className="text-sm font-semibold text-[#8b949e] group-hover:text-white">{item.label}</span>
+                                                                    </div>
+                                                                    <ChevronRight className="h-3 w-3 text-[#30363d] group-hover:text-[#f5a623] transition-transform group-hover:translate-x-0.5" />
+                                                                </button>
+                                                            ))}
+                                                        </div>
+
+                                                        {/* Bottom Section */}
+                                                        <div className="pt-2 border-t border-[#30363d]/50 space-y-1">
+                                                            <div className="flex items-center justify-between px-4 py-2.5 rounded-xl hover:bg-[#1c2128]/50 transition-colors group cursor-pointer">
+                                                                <div className="flex items-center gap-3">
+                                                                    <Moon className="h-4 w-4 text-[#8b949e] group-hover:text-white" />
+                                                                    <span className="text-sm font-semibold text-[#8b949e] group-hover:text-white">Offline mode</span>
+                                                                </div>
+                                                                <div className="w-9 h-5 rounded-full bg-[#1c2128] border border-[#30363d] p-0.5 transition-colors group-hover:border-[#f5a623]/30">
+                                                                    <div className="h-full aspect-square rounded-full bg-[#30363d] group-hover:bg-[#f5a623]" />
+                                                                </div>
+                                                            </div>
+
+                                                            <button
+                                                                onClick={handleLogout}
+                                                                className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-[#f85149] hover:bg-[#f85149]/10 transition-colors group"
+                                                            >
+                                                                <LogOut className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+                                                                <span className="text-sm font-bold">Log out</span>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </motion.div>
                                             </>
@@ -590,7 +578,7 @@ export function MainNavbar({
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </nav>
+            </nav >
         </>
     );
 }

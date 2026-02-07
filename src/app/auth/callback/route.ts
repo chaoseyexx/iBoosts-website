@@ -12,11 +12,17 @@ export async function GET(request: NextRequest) {
         const supabase = await createClient();
         const { error } = await supabase.auth.exchangeCodeForSession(code);
 
+        if (error) {
+            console.error("Supabase auth error in callback:", error);
+            return NextResponse.redirect(new URL(`/auth/auth-code-error?error=${error.message}`, request.url));
+        }
+
         if (!error) {
             // Check for Discord metadata and ensure profile exists
             const { data: { user } } = await supabase.auth.getUser();
 
             if (user) {
+                console.log("Supabase user found in callback:", user.id);
                 try {
                     // Start of Sync Logic
                     const existingUser = await prisma.user.findUnique({
@@ -24,6 +30,7 @@ export async function GET(request: NextRequest) {
                     });
 
                     if (!existingUser) {
+                        console.log("Creating new user in Prisma for Supabase ID:", user.id);
                         await prisma.user.create({
                             data: {
                                 id: generateId("User"),
@@ -53,6 +60,7 @@ export async function GET(request: NextRequest) {
         }
     }
 
+    console.warn("No code found in auth callback");
     // return the user to an error page with instructions
     return NextResponse.redirect(new URL('/auth/auth-code-error', request.url));
 }
