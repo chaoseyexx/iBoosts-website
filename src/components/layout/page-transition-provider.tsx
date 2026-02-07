@@ -23,8 +23,8 @@ function TransitionContent({ pathname, children }: { pathname: string, children:
     const [isPending, setIsPending] = useState(true);
 
     useEffect(() => {
-        // Snappy 400ms duration
-        const timer = setTimeout(() => setIsPending(false), 400);
+        // Super snappy 50ms duration - just enough to prevent FOUC
+        const timer = setTimeout(() => setIsPending(false), 50);
         return () => clearTimeout(timer);
     }, []);
 
@@ -33,7 +33,7 @@ function TransitionContent({ pathname, children }: { pathname: string, children:
             initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
             className="col-start-1 row-start-1 w-full h-full"
         >
             {/* 1. Branded Entrance Overlay - Instant mount at opacity 1 */}
@@ -41,7 +41,7 @@ function TransitionContent({ pathname, children }: { pathname: string, children:
                 className="fixed inset-0 z-[10000] pointer-events-none flex items-center justify-center bg-[#0a0e13] overflow-hidden"
                 initial={{ opacity: 1 }}
                 animate={{ opacity: 0 }}
-                transition={{ duration: 0.4, delay: 0.3, ease: "easeInOut" }}
+                transition={{ duration: 0.3, delay: 0.1, ease: "easeOut" }}
             >
                 {/* Branded Spinning Logo Hub */}
                 <div className="relative flex flex-col items-center gap-6">
@@ -49,9 +49,9 @@ function TransitionContent({ pathname, children }: { pathname: string, children:
                         initial={{ scale: 0.8, opacity: 0, rotate: -90 }}
                         animate={{ scale: 1, opacity: 1, rotate: 0 }}
                         transition={{
-                            duration: 0.3,
+                            duration: 0.2,
                             ease: "easeOut",
-                            delay: 0.05
+                            delay: 0
                         }}
                     >
                         <Logo className="w-20 h-20 text-[#f5a623]" iconOnly={true} />
