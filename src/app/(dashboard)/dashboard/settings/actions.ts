@@ -21,23 +21,36 @@ export async function getProfile() {
             where: { supabaseId: authUser.id }
         });
 
-        // Self-healing: Create Prisma record if missing but Auth exists
+        // Self-healing: Create or Link Prisma record if missing but Auth exists
         if (!user) {
             const email = authUser.email || "";
             const username = authUser.user_metadata.username || email.split("@")[0];
 
             try {
-                user = await prisma.user.create({
-                    data: {
-                        supabaseId: authUser.id,
-                        email: email,
-                        username: username,
-                        role: "BUYER",
-                        status: "ACTIVE"
-                    }
+                // Check if user exists by email primarily
+                const existingUserByEmail = await prisma.user.findUnique({
+                    where: { email: email }
                 });
+
+                if (existingUserByEmail) {
+                    // Link the existing user to the Supabase ID
+                    user = await prisma.user.update({
+                        where: { id: existingUserByEmail.id },
+                        data: { supabaseId: authUser.id }
+                    });
+                } else {
+                    user = await prisma.user.create({
+                        data: {
+                            supabaseId: authUser.id,
+                            email: email,
+                            username: username,
+                            role: "BUYER",
+                            status: "ACTIVE"
+                        }
+                    });
+                }
             } catch (createError) {
-                console.error("Auto-creation of user failed:", createError);
+                console.error("Auto-creation/linking of user failed:", createError);
             }
         }
         return user;

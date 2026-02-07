@@ -18,6 +18,29 @@ export async function getNotifications(userId: string) {
     }
 }
 
+export async function getBoostingRequests() {
+    try {
+        return await prisma.boostingRequest.findMany({
+            where: { status: "available" },
+            include: {
+                game: true,
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        avatar: true,
+                    }
+                }
+            },
+            orderBy: { createdAt: "desc" },
+            take: 10
+        });
+    } catch (error) {
+        console.error("Error fetching boosting requests:", error);
+        return [];
+    }
+}
+
 export async function markNotificationAsRead(notificationId: string) {
     try {
         await prisma.notification.update({

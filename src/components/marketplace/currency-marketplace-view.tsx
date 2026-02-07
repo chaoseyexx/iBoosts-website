@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { RecommendedSellerCard } from "./recommended-seller-card";
-import { RobuxListingHero } from "./robux-listing-hero";
+import { CurrencyListingHero } from "./currency-listing-hero";
 import { CurrencyListingsTable } from "./currency-listings-table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -102,10 +101,12 @@ export function CurrencyMarketplaceView({ category, game, listings }: CurrencyMa
                             )}
                             <div>
                                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight mb-2 uppercase drop-shadow-lg leading-tight">
-                                    {game?.name} {category.name}
+                                    {game?.name.toLowerCase().endsWith(category.name.toLowerCase())
+                                        ? game.name
+                                        : `${game?.name} ${category.name}`}
                                 </h1>
                                 <p className="text-[#d0d7de] max-w-xl text-xs sm:text-sm leading-relaxed drop-shadow-md font-medium">
-                                    Buy {game?.name} {category.name} safely from <span className="text-[#22c55e]">verified</span> pros. Instant delivery, best rates, and 24/7 support.
+                                    {game?.description || category?.description || `Explore the best marketplace for ${game?.name} ${category.name}. Instant delivery, verified sellers, and the most competitive rates.`}
                                 </p>
                             </div>
                         </div>
@@ -136,11 +137,11 @@ export function CurrencyMarketplaceView({ category, game, listings }: CurrencyMa
                                 <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-[#30363d]" />
                             </div>
                             <div className="relative z-10">
-                                {game?.slug === 'roblox-robux' ? (
-                                    <RobuxListingHero listing={recommendedListing} />
-                                ) : (
-                                    <RecommendedSellerCard listing={recommendedListing} />
-                                )}
+                                <CurrencyListingHero
+                                    listing={recommendedListing}
+                                    gameSlug={game?.slug}
+                                    gameName={game?.name}
+                                />
                             </div>
                         </div>
                     )}

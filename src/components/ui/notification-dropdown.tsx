@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { X, Bell, ShoppingBag, TrendingUp, PackageCheck, AlertTriangle, MessageCircle, Shield, Info, Loader2, Tag } from "lucide-react";
+import { X, Bell, ShoppingBag, TrendingUp, PackageCheck, AlertTriangle, MessageCircle, Shield, Info, Loader2, Tag, Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from "@/app/(dashboard)/dashboard/notifications/actions";
+import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead, getBoostingRequests } from "@/app/(dashboard)/dashboard/notifications/actions";
+import { getSupabaseClient } from "@/lib/supabase/client";
 
 // Notification types with icons
 const notificationIcons: Record<string, any> = {
@@ -15,23 +16,25 @@ const notificationIcons: Record<string, any> = {
     ORDER_DISPUTED: AlertTriangle,
     MESSAGE_NEW: MessageCircle,
     OFFER_RECEIVED: Tag,
+    BOOSTING_REQUEST: Flame,
     SYSTEM: Bell,
     default: Bell,
 };
 
 // Notification type colors
 const notificationColors: Record<string, string> = {
-    order: "#22c55e",
-    boosting: "#5c9eff",
-    delivered: "#22c55e",
-    dispute: "#ef4444",
-    message: "#f5a623",
-    security: "#f59e0b",
+    ORDER_NEW: "#22c55e",
+    ORDER_DELIVERED: "#22c55e",
+    ORDER_COMPLETED: "#22c55e",
+    ORDER_CANCELLED: "#ef4444",
+    ORDER_DISPUTED: "#ef4444",
+    MESSAGE_NEW: "#f5a623",
+    BOOSTING_REQUEST: "#f5a623",
     SYSTEM: "#3b82f6",
     default: "#6b7280",
 };
 
-export interface Notification {
+export interface UnifiedNotification {
     id: string;
     type: string;
     title: string;
@@ -39,50 +42,18 @@ export interface Notification {
     isRead: boolean;
     link?: string | null;
     createdAt: Date | string;
+    isBoosting?: boolean;
 }
 
-// Mock notifications
-const mockNotifications: Notification[] = [
-    {
-        id: "1",
-        type: "ORDER_NEW",
-        title: "Marvel Rivals (Hero proficiency)",
-        content: "Adam Warlock Hero proficiency order received.",
-        isRead: false,
-        createdAt: new Date().toISOString(),
-    },
-    {
-        id: "2",
-        type: "MESSAGE_NEW",
-        title: "New message from Seller",
-        content: "Hello, I can start your order now.",
-        isRead: true,
-        createdAt: new Date().toISOString(),
-    },
-];
-
-// Notification sound hook
+// Notification sound hook (simplified)
 function useNotificationSound() {
-    const audioRef = React.useRef<HTMLAudioElement | null>(null);
-
-    React.useEffect(() => {
-        // Create audio element for notification sound
-        audioRef.current = new Audio("/sounds/notification.mp3");
-        audioRef.current.volume = 0.5;
-        return () => {
-            audioRef.current = null;
-        };
-    }, []);
-
     const playSound = React.useCallback(() => {
-        if (audioRef.current) {
-            audioRef.current.currentTime = 0;
-            audioRef.current.play().catch(() => {
-                // Autoplay might be blocked
-            });
-        }
+        try {
+            const audio = new Audio("/sounds/notification.mp3");
+            audio.volume = 0.5;
+            audio.play().catch(() => { });
+        } catch (e) { }
     }, []);
-
     return playSound;
 }
 
@@ -100,10 +71,84 @@ export function NotificationDropdown({
     onCountChange,
 }: NotificationDropdownProps) {
     const [isConnected, setIsConnected] = React.useState(true);
-    const [localNotifications, setLocalNotifications] = React.useState<any[]>([]);
+    const [localNotifications, setLocalNotifications] = React.useState<UnifiedNotification[]>([]);
     const [loading, setLoading] = React.useState(false);
     const playSound = useNotificationSound();
     const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+    // Fetch unified notifications
+    const fetchAll = React.useCallback(async () => {
+        if (!userId) return;
+        setLoading(true);
+
+        try {
+            const [notifications, boosting] = await Promise.all([
+                getNotifications(userId),
+                getBoostingRequests()
+            ]);
+
+            const transformedBoosting: UnifiedNotification[] = boosting.map((b: any) => ({
+                id: b.id,
+                type: "BOOSTING_REQUEST",
+                title: `🔥 New ${b.game.name} Boosting Request!`,
+                content: b.description,
+                isRead: false,
+                link: `/dashboard/notifications`, // Or specific link if exists
+                createdAt: b.createdAt,
+                isBoosting: true
+            }));
+
+            const combined = [
+                ...(notifications || []),
+                ...transformedBoosting
+            ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+            setLocalNotifications(combined);
+            if (onCountChange) {
+                onCountChange(combined.filter(n => !n.isRead).length);
+            }
+        } catch (error) {
+            console.error("Error fetching notifications:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [userId, onCountChange]);
+
+    React.useEffect(() => {
+        if (isOpen && userId) {
+            fetchAll();
+        }
+    }, [isOpen, userId, fetchAll]);
+
+    // Real-time listener
+    React.useEffect(() => {
+        if (!userId) return;
+
+        const supabase = getSupabaseClient();
+        const channel = supabase.channel(`notifications-${userId}`)
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'Notification',
+                filter: `userId=eq.${userId}`
+            }, () => {
+                playSound();
+                fetchAll();
+            })
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'BoostingRequest'
+            }, () => {
+                playSound();
+                fetchAll();
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [userId, fetchAll, playSound]);
 
     // Close on click outside
     React.useEffect(() => {
@@ -112,7 +157,6 @@ export function NotificationDropdown({
                 onClose();
             }
         }
-
         if (isOpen) {
             document.addEventListener("mousedown", handleClickOutside);
         }
@@ -121,57 +165,21 @@ export function NotificationDropdown({
         };
     }, [isOpen, onClose]);
 
-    // Simulate real-time notifications (for demo)
-    React.useEffect(() => {
-        if (!isOpen) return;
-
-        const interval = setInterval(() => {
-            // Simulate connection status
-            setIsConnected(Math.random() > 0.1);
-        }, 5000);
-
-        return () => clearInterval(interval);
-    }, [isOpen]);
-
-    const fetchNotifications = React.useCallback(async () => {
-        if (!userId) return;
-        setLoading(true);
-        const data = await getNotifications(userId);
-        setLocalNotifications(data || []);
-        if (onCountChange) {
-            onCountChange(data?.filter((n: any) => !n.isRead).length || 0);
-        }
-        setLoading(false);
-    }, [userId, onCountChange]);
-
-    React.useEffect(() => {
-        if (isOpen && userId) {
-            fetchNotifications();
-        }
-    }, [isOpen, userId, fetchNotifications]);
-
-    // Initial count fetch
-    React.useEffect(() => {
-        if (userId) {
-            fetchNotifications();
-        }
-    }, [userId]);
-
     const markAllAsRead = async () => {
         if (!userId) return;
         await markAllNotificationsAsRead(userId);
-        setLocalNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+        setLocalNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
         if (onCountChange) onCountChange(0);
     };
 
-    const handleMarkAsRead = async (id: string) => {
-        await markNotificationAsRead(id);
-        setLocalNotifications((prev) => prev.map((n) => n.id === id ? { ...n, isRead: true } : n));
-        const newUnreadCount = localNotifications.filter(n => !n.isRead && n.id !== id).length;
-        if (onCountChange) onCountChange(newUnreadCount);
+    const handleMarkAsRead = async (id: string, isBoosting?: boolean) => {
+        if (!isBoosting) {
+            await markNotificationAsRead(id);
+        }
+        setLocalNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+        const newCount = localNotifications.filter(n => !n.isRead && n.id !== id).length;
+        if (onCountChange) onCountChange(newCount);
     };
-
-    const unreadCount = localNotifications.filter((n) => !n.isRead).length;
 
     if (!isOpen) return null;
 
@@ -180,18 +188,12 @@ export function NotificationDropdown({
             ref={dropdownRef}
             className="absolute right-0 top-full mt-2 w-96 bg-[#1c2128] border border-[#2d333b] rounded-lg shadow-xl z-50 overflow-hidden animate-fade-in"
         >
-            {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-[#2d333b]">
                 <div>
-                    <h3 className="font-semibold text-white">Notifications</h3>
+                    <h3 className="font-semibold text-white uppercase tracking-tight">Notifications</h3>
                     <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className={cn(
-                            "h-2 w-2 rounded-full",
-                            isConnected ? "bg-green-500" : "bg-yellow-500"
-                        )} />
-                        <span className="text-xs text-[#6b7280]">
-                            {isConnected ? "Connected" : "Reconnecting..."}
-                        </span>
+                        <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.5)]" />
+                        <span className="text-[10px] font-black text-[#5c9eff] uppercase tracking-widest">Live Connection</span>
                     </div>
                 </div>
                 <button
@@ -202,20 +204,15 @@ export function NotificationDropdown({
                 </button>
             </div>
 
-            {/* Mark all as read */}
-            <div className="px-4 py-2 border-b border-[#2d333b]">
-                <button
-                    onClick={markAllAsRead}
-                    className="text-sm text-[#5c9eff] hover:underline"
-                >
+            <div className="px-4 py-2 border-b border-[#2d333b] flex justify-between items-center bg-[#13181e]">
+                <button onClick={markAllAsRead} className="text-[11px] font-black text-[#5c9eff] hover:underline uppercase tracking-wider">
                     Mark all as Read
                 </button>
             </div>
 
-            {/* Notifications list */}
-            <div className="max-h-[400px] overflow-y-auto">
-                {loading ? (
-                    <div className="p-8 text-center bg-[#1c2128]">
+            <div className="max-h-[400px] overflow-y-auto bg-[#0a0e13]/50">
+                {loading && localNotifications.length === 0 ? (
+                    <div className="p-8 text-center">
                         <Loader2 className="h-6 w-6 animate-spin text-[#f5a623] mx-auto" />
                     </div>
                 ) : localNotifications.length > 0 ? (
@@ -227,37 +224,33 @@ export function NotificationDropdown({
                             <Link
                                 key={notification.id}
                                 href={notification.link || "/dashboard/notifications"}
-                                onClick={() => handleMarkAsRead(notification.id)}
+                                onClick={() => handleMarkAsRead(notification.id, notification.isBoosting)}
                                 className={cn(
                                     "flex items-start gap-3 p-4 hover:bg-[#252b33] transition-colors border-b border-[#2d333b] last:border-b-0",
-                                    !notification.isRead && "bg-[#f5a623]/5"
+                                    !notification.isRead && "bg-[#f5a623]/10 border-l-2 border-[#f5a623]"
                                 )}
                             >
-                                {/* Icon */}
                                 <div className="flex-shrink-0">
-                                    <div
-                                        className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#21262d] border border-[#30363d]"
-                                    >
+                                    <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#21262d] border border-[#30363d] shadow-sm">
                                         <Icon className="h-5 w-5" style={{ color }} />
                                     </div>
                                 </div>
 
-                                {/* Content */}
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-start justify-between gap-2">
                                         <div>
-                                            <p className="text-sm font-medium text-white">
+                                            <p className="text-[13px] font-bold text-white tracking-tight leading-snug">
                                                 {notification.title}
-                                                <span className="ml-2 text-[10px] text-[#6b7280] font-normal">
-                                                    {new Date(notification.createdAt).toLocaleDateString()}
-                                                </span>
                                             </p>
-                                            <p className="text-xs text-[#8b949e] mt-1 line-clamp-2">
+                                            <p className="text-[11px] text-[#8b949e] mt-1 line-clamp-2 leading-relaxed">
                                                 {notification.content}
+                                            </p>
+                                            <p className="text-[9px] text-[#5c9eff] font-black uppercase mt-1 tracking-widest">
+                                                {new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </p>
                                         </div>
                                         {!notification.isRead && (
-                                            <div className="h-2 w-2 rounded-full bg-[#f5a623] shrink-0 mt-1.5" />
+                                            <div className="h-2 w-2 rounded-full bg-[#f5a623] shrink-0 mt-1.5 shadow-[0_0_8px_rgba(245,166,35,0.8)]" />
                                         )}
                                     </div>
                                 </div>
@@ -265,20 +258,18 @@ export function NotificationDropdown({
                         );
                     })
                 ) : (
-                    <div className="p-8 text-center">
-                        <Bell className="h-10 w-10 text-[#6b7280] mx-auto mb-3 opacity-20" />
-                        <p className="text-[#6b7280] text-sm font-medium">No notifications yet</p>
-                        <p className="text-[#8b949e] text-xs mt-1">We'll alert you when something happens.</p>
+                    <div className="p-12 text-center opacity-50">
+                        <Bell className="h-10 w-10 text-[#6b7280] mx-auto mb-3" />
+                        <p className="text-white text-xs font-bold uppercase tracking-widest">No notifications</p>
                     </div>
                 )}
             </div>
 
-            {/* Footer */}
-            <div className="p-3 border-t border-[#2d333b]">
+            <div className="p-3 border-t border-[#2d333b] bg-[#13181e]">
                 <Link
                     href="/dashboard/notifications"
                     onClick={onClose}
-                    className="block w-full py-2 px-4 text-center text-sm bg-[#252b33] hover:bg-[#2d333b] text-white rounded-lg transition-colors"
+                    className="block w-full py-2.5 px-4 text-center text-[11px] font-black bg-[#252b33] hover:bg-[#f5a623] hover:text-black text-white rounded-lg transition-all uppercase tracking-widest"
                 >
                     View all notifications
                 </Link>
@@ -287,7 +278,6 @@ export function NotificationDropdown({
     );
 }
 
-// Notification bell button with dropdown
 interface NotificationBellProps {
     userId?: string;
 }
@@ -301,10 +291,11 @@ export function NotificationBell({ userId }: NotificationBellProps) {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="relative text-[#9ca3af] hover:text-white transition-colors"
+                title="Notifications"
             >
                 <Bell className="h-5 w-5" />
                 {count > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#f5a623] text-[10px] font-bold text-black">
+                    <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#f5a623] text-[9px] font-black text-black shadow-[0_0_10px_rgba(245,166,35,0.4)]">
                         {count > 99 ? "99+" : count}
                     </span>
                 )}

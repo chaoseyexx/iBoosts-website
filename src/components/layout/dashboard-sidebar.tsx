@@ -43,6 +43,8 @@ interface DashboardSidebarProps {
         avatar?: string | null;
         registeredAt?: string;
         verified?: boolean;
+        role?: string;
+        sellerLevel?: number;
     };
 }
 
@@ -149,6 +151,25 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
         return section.children?.some((child) => isActive(child.href));
     };
 
+    // Helper to determine role badge
+    const getRoleBadge = () => {
+        const role = user?.role || "BUYER";
+        const level = user?.sellerLevel || 0;
+
+        if (role === "ADMIN") return { text: "ADMIN", color: "text-[#ff4d4f]", border: "border-[#ff4d4f]/20", bg: "bg-[#ff4d4f]/10" };
+        if (role === "SUPPORT") return { text: "SUPPORT", color: "text-[#1890ff]", border: "border-[#1890ff]/20", bg: "bg-[#1890ff]/10" };
+        if (role === "MODERATOR") return { text: "MODERATOR", color: "text-[#722ed1]", border: "border-[#722ed1]/20", bg: "bg-[#722ed1]/10" };
+
+        if (role === "SELLER") {
+            if (level >= 10) return { text: "ELITE SELLER", color: "text-[#f5a623]", border: "border-[#f5a623]/20", bg: "bg-[#f5a623]/10" };
+            return { text: `SELLER LVL ${level}`, color: "text-[#52c41a]", border: "border-[#52c41a]/20", bg: "bg-[#52c41a]/10" };
+        }
+
+        return { text: "MEMBER", color: "text-[#8b949e]", border: "border-[#8b949e]/20", bg: "bg-[#8b949e]/10" };
+    };
+
+    const badge = getRoleBadge();
+
     return (
         <aside className="hidden lg:flex sticky top-[96px] h-[calc(100vh-96px)] w-64 flex-col border-r border-white/[0.05] bg-[#0d1117] flex-shrink-0 z-20">
             <div className="border-b border-[#2d333b]/40 p-5 bg-white/[0.01]">
@@ -169,8 +190,13 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
                             {user?.username || "Guest"}
                         </span>
                         <div className="flex items-center gap-1.5">
-                            <span className="block text-[9px] font-black text-[#f5a623] uppercase tracking-[0.2em] leading-none">
-                                Premium Member
+                            <span className={cn(
+                                "block text-[9px] font-black uppercase tracking-[0.2em] leading-none px-1.5 py-0.5 rounded border",
+                                badge.color,
+                                badge.border,
+                                badge.bg
+                            )}>
+                                {badge.text}
                             </span>
                             {user?.verified && <Shield className="h-3 w-3 text-[#f5a623] fill-[#f5a623]" />}
                         </div>

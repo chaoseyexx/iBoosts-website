@@ -12,6 +12,7 @@ function serializeListings(listings: any[]) {
         updatedAt: listing.updatedAt?.toISOString() || null,
         deletedAt: listing.deletedAt?.toISOString() || null,
         publishedAt: listing.publishedAt?.toISOString() || null,
+        description: listing.description || "",
         promotedUntil: listing.promotedUntil?.toISOString() || null,
         seller: listing.seller ? {
             ...listing.seller,

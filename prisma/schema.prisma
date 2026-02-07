@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id              String           @id @default(cuid())
+  id              String           @id
   email           String           @unique
   username        String           @unique
   avatar          String?
@@ -69,7 +69,7 @@ model User {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           String   @id
   userId       String
   token        String   @unique
   ipAddress    String?
@@ -87,7 +87,7 @@ model Session {
 }
 
 model Device {
-  id          String    @id @default(cuid())
+  id          String    @id
   userId      String
   fingerprint String
   deviceType  String?
@@ -106,7 +106,7 @@ model Device {
 }
 
 model KycDocument {
-  id           String    @id @default(cuid())
+  id           String    @id
   userId       String
   documentType String
   fileName     String
@@ -127,7 +127,7 @@ model KycDocument {
 }
 
 model Category {
-  id          String     @id @default(cuid())
+  id          String     @id
   name        String     @unique
   slug        String     @unique
   description String?
@@ -149,7 +149,7 @@ model Category {
 }
 
 model Game {
-  id          String     @id @default(cuid())
+  id          String     @id
   name        String     @unique
   slug        String     @unique
   description String?
@@ -167,7 +167,7 @@ model Game {
 }
 
 model BoostingRequest {
-  id              String        @id @default(cuid())
+  id              String        @id
   gameId          String
   userId          String
   title           String
@@ -185,7 +185,7 @@ model BoostingRequest {
 }
 
 model Listing {
-  id               String         @id @default(cuid())
+  id               String         @id
   sellerId         String
   categoryId       String
   title            String
@@ -229,7 +229,7 @@ model Listing {
 }
 
 model ListingImage {
-  id        String   @id @default(cuid())
+  id        String   @id
   listingId String
   url       String
   path      String
@@ -243,7 +243,7 @@ model ListingImage {
 }
 
 model Order {
-  id                    String          @id @default(cuid())
+  id                    String          @id
   orderNumber           String          @unique
   buyerId               String
   sellerId              String
@@ -288,7 +288,7 @@ model Order {
 }
 
 model OrderMessage {
-  id          String    @id @default(cuid())
+  id          String    @id
   orderId     String
   senderId    String
   content     String
@@ -305,7 +305,7 @@ model OrderMessage {
 }
 
 model OrderTimeline {
-  id          String   @id @default(cuid())
+  id          String   @id
   orderId     String
   event       String
   description String?
@@ -318,7 +318,7 @@ model OrderTimeline {
 }
 
 model Offer {
-  id          String      @id @default(cuid())
+  id          String      @id
   listingId   String
   buyerId     String
   sellerId    String
@@ -341,7 +341,7 @@ model Offer {
 }
 
 model Dispute {
-  id                 String             @id @default(cuid())
+  id                 String             @id
   orderId            String             @unique
   buyerId            String
   sellerId           String
@@ -371,7 +371,7 @@ model Dispute {
 }
 
 model DisputeMessage {
-  id         String   @id @default(cuid())
+  id         String   @id
   disputeId  String
   senderId   String
   content    String
@@ -384,7 +384,7 @@ model DisputeMessage {
 }
 
 model DisputeEvidence {
-  id          String   @id @default(cuid())
+  id          String   @id
   disputeId   String
   uploadedBy  String
   type        String
@@ -400,7 +400,7 @@ model DisputeEvidence {
 }
 
 model Review {
-  id          String    @id @default(cuid())
+  id          String    @id
   orderId     String    @unique
   listingId   String
   authorId    String
@@ -426,7 +426,7 @@ model Review {
 }
 
 model Wallet {
-  id             String              @id @default(cuid())
+  id             String              @id
   userId         String              @unique
   balance        Decimal             @default(0) @db.Decimal(10, 2)
   pendingBalance Decimal             @default(0) @db.Decimal(10, 2)
@@ -442,7 +442,7 @@ model Wallet {
 }
 
 model WalletTransaction {
-  id            String          @id @default(cuid())
+  id            String          @id
   walletId      String
   type          TransactionType
   amount        Decimal         @db.Decimal(10, 2)
@@ -462,7 +462,7 @@ model WalletTransaction {
 }
 
 model Withdrawal {
-  id              String           @id @default(cuid())
+  id              String           @id
   userId          String
   amount          Decimal          @db.Decimal(10, 2)
   fee             Decimal          @default(0) @db.Decimal(10, 2)
@@ -484,7 +484,7 @@ model Withdrawal {
 }
 
 model Fee {
-  id          String   @id @default(cuid())
+  id          String   @id
   name        String   @unique
   description String?
   type        String
@@ -501,7 +501,7 @@ model Fee {
 }
 
 model Coupon {
-  id             String        @id @default(cuid())
+  id             String        @id
   code           String        @unique
   description    String?
   type           String
@@ -526,7 +526,7 @@ model Coupon {
 }
 
 model CouponUsage {
-  id       String   @id @default(cuid())
+  id       String   @id
   couponId String
   userId   String
   usedAt   DateTime @default(now())
@@ -539,7 +539,7 @@ model CouponUsage {
 }
 
 model Notification {
-  id        String           @id @default(cuid())
+  id        String           @id
   userId    String
   type      NotificationType
   title     String
@@ -557,7 +557,7 @@ model Notification {
 }
 
 model Report {
-  id              String       @id @default(cuid())
+  id              String       @id
   type            ReportType
   reporterId      String
   targetUserId    String?
@@ -582,7 +582,7 @@ model Report {
 }
 
 model Badge {
-  id          String      @id @default(cuid())
+  id          String      @id
   name        String      @unique
   slug        String      @unique
   description String
@@ -598,7 +598,7 @@ model Badge {
 }
 
 model UserBadge {
-  id       String   @id @default(cuid())
+  id       String   @id
   userId   String
   badgeId  String
   earnedAt DateTime @default(now())
@@ -610,7 +610,7 @@ model UserBadge {
 }
 
 model AuditLog {
-  id         String   @id @default(cuid())
+  id         String   @id
   userId     String?
   action     String
   entityType String
@@ -630,7 +630,7 @@ model AuditLog {
 }
 
 model Config {
-  id          String   @id @default(cuid())
+  id          String   @id
   key         String   @unique
   value       Json
   description String?
@@ -643,7 +643,7 @@ model Config {
 }
 
 model Terms {
-  id          String    @id @default(cuid())
+  id          String    @id
   type        String
   version     String
   title       String
@@ -658,7 +658,7 @@ model Terms {
 }
 
 model ScheduledJob {
-  id          String    @id @default(cuid())
+  id          String    @id
   type        String
   targetId    String
   targetType  String
@@ -674,7 +674,7 @@ model ScheduledJob {
 }
 
 model AdminLog {
-  id         String   @id @default(cuid())
+  id         String   @id
   adminId    String
   action     String
   targetId   String

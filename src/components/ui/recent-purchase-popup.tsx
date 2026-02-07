@@ -97,12 +97,14 @@ export function RecentPurchasePopup({ initialActivities = [] }: RecentPurchasePo
                         {/* Icon/Image Wrapper */}
                         <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-[#0d1117]">
                             <Image
-                                src={purchase.image}
+                                src={(purchase.image && (purchase.image.startsWith('http') || purchase.image.startsWith('/')))
+                                    ? purchase.image
+                                    : "https://i.imgur.com/u7FvX8B.png"}
                                 alt={purchase.game}
                                 fill
                                 className="object-cover"
                                 onError={(e: any) => {
-                                    e.target.src = "https://i.imgur.com/u7FvX8B.png";
+                                    e.target.style.display = 'none'; // Fallback behavior for error
                                 }}
                             />
                             <div className="absolute bottom-1 right-1 z-10 rounded-full bg-[#f5a623] p-1 shadow-lg">

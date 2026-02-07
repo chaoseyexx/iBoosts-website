@@ -36,6 +36,8 @@ export default async function DashboardLayout({
             avatar: (profile?.avatar && profile.avatar !== "null") ? profile.avatar : (authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture || null),
             registeredAt: registeredDate,
             verified: true,
+            role: profile?.role || "BUYER",
+            sellerLevel: profile?.sellerLevel || 0,
         };
     }
 

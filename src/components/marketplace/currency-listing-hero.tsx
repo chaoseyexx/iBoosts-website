@@ -21,15 +21,77 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
-interface RobuxListingHeroProps {
+interface CurrencyListingHeroProps {
     listing: any;
+    gameSlug?: string;
+    gameName?: string;
 }
 
-export function RobuxListingHero({ listing }: RobuxListingHeroProps) {
+// Game-specific configuration
+const GAME_CONFIG: Record<string, any> = {
+    'roblox-robux': {
+        currencyName: "Robux",
+        warnings: [
+            "30% Tax IS NOT COVERED",
+            "NO GIFT IN GAME",
+            "ROBUX WILL BE PENDING FOR 5-7 DAYS.",
+            "*DON'T ENABLE REGIONAL PRICING*"
+        ],
+        steps: [
+            "Select the amount of Robux you want.",
+            "Make a gamepass and send us the link.",
+            "Robux will be credited to your account and you should be able to see it pending in the transaction page."
+        ]
+    },
+    'poe2-currency': {
+        currencyName: "Chaos Orb",
+        warnings: [
+            "Face-to-Face Trade Only",
+            "Do not talk in-game about RMT",
+            "Put a rare item in trade window for safety"
+        ],
+        steps: [
+            "Select the amount you want to buy.",
+            "Provide your character name.",
+            "We will invite you to a party and trade the currency."
+        ]
+    },
+    'throne-and-liberty-lucent': {
+        currencyName: "Lucent",
+        warnings: [
+            "Auction House Method",
+            "List an item for the amount you bought",
+            "We cover the 20% AH Tax"
+        ],
+        steps: [
+            "List an item on the Auction House.",
+            "Send us a screenshot of your listing.",
+            "We will purchase your item."
+        ]
+    },
+    'default': {
+        currencyName: "Currency",
+        warnings: [
+            "Ensure your inventory has space",
+            "Do not mention real money in-game",
+            "Verify character name before purchase"
+        ],
+        steps: [
+            "Select the amount you want to purchase.",
+            "Enter your character name or ID.",
+            "Wait for our delivery agent to contact you in-game."
+        ]
+    }
+};
+
+export function CurrencyListingHero({ listing, gameSlug = 'default', gameName = 'Game' }: CurrencyListingHeroProps) {
     const [quantity, setQuantity] = useState(1000);
-    const [isExpanded, setIsExpanded] = useState(true); // Default to expanded/visible as per reference
-    const minQty = 1000;
+    const [isExpanded, setIsExpanded] = useState(true);
+    const minQty = listing?.minQuantity || 1000;
     const unitPrice = listing?.price || 0.0056;
+
+    const config = GAME_CONFIG[gameSlug] || GAME_CONFIG['default'];
+    const currencyName = config.currencyName;
 
     const handleIncrement = () => {
         setQuantity(prev => Math.min(prev + 1000, listing?.stock || 1000000));
@@ -86,70 +148,75 @@ export function RobuxListingHero({ listing }: RobuxListingHeroProps) {
                                     READ BEFORE PURCHASE !
                                 </h4>
                                 <div className="space-y-3">
-                                    <div className="flex items-center gap-3 group">
-                                        <Star className="h-4 w-4 text-[#f5a623] fill-[#f5a623]" />
-                                        <span className="text-sm text-[#d0d7de] font-bold">30% Tax IS NOT COVERED</span>
-                                    </div>
-                                    <div className="flex items-center gap-3 group">
-                                        <Star className="h-4 w-4 text-[#f5a623] fill-[#f5a623]" />
-                                        <span className="text-sm text-[#d0d7de] font-bold">NO GIFT IN GAME</span>
-                                    </div>
-                                    <div className="flex items-center gap-3 group">
-                                        <Star className="h-4 w-4 text-[#f5a623] fill-[#f5a623]" />
-                                        <span className="text-sm text-[#d0d7de] font-bold">ROBUX WILL BE PENDING FOR 5-7 DAYS.</span>
-                                    </div>
-                                    <div className="flex items-center gap-3 group">
-                                        <Star className="h-4 w-4 text-[#f5a623] fill-[#f5a623]" />
-                                        <span className="text-sm text-[#d0d7de] font-bold">*DON'T ENABLE REGIONAL PRICING*</span>
-                                    </div>
+                                    {config.warnings.map((warning: string, i: number) => (
+                                        <div key={i} className="flex items-center gap-3 group">
+                                            <Star className="h-4 w-4 text-[#f5a623] fill-[#f5a623]" />
+                                            <span className="text-sm text-[#d0d7de] font-bold">{warning}</span>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 
-                            {/* Purchase Steps & Warranty - Conditional on isExpanded */}
-                            {isExpanded && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: 'auto' }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className="space-y-8"
-                                >
-                                    {/* Purchase Steps */}
-                                    <div className="space-y-4">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xl">🚀</span>
-                                            <h4 className="text-white font-bold text-sm">How to purchase <span className="text-[#f85149]">?</span></h4>
-                                        </div>
-                                        <div className="space-y-3">
-                                            <div className="flex items-start gap-3">
-                                                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-[#58a6ff] text-white text-[10px] font-black">1</span>
-                                                <p className="text-sm text-[#d0d7de]">Select the amount of Robux you want.</p>
-                                            </div>
-                                            <div className="flex items-start gap-3">
-                                                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-[#58a6ff] text-white text-[10px] font-black">2</span>
-                                                <p className="text-sm text-[#d0d7de]">Make a gamepass and send us the link.</p>
-                                            </div>
-                                            <div className="flex items-start gap-3">
-                                                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-[#58a6ff] text-white text-[10px] font-black">3</span>
-                                                <p className="text-sm text-[#d0d7de]">Robux will be credited to your account and you should be able to see it pending in the transaction page.</p>
-                                            </div>
-                                        </div>
+                            {/* Seller Description (Rich Text) */}
+                            {listing.description && (
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 px-1">
+                                        <Info className="h-4 w-4 text-[#58a6ff]" />
+                                        <h4 className="text-white font-bold text-xs uppercase tracking-wider">Offer Details</h4>
                                     </div>
-
-                                    {/* Warranty */}
-                                    <div className="flex items-start gap-3 p-4 rounded-xl bg-[#f85149]/5 border border-[#f85149]/20">
-                                        <Zap className="h-4 w-4 text-[#f85149] shrink-0 mt-0.5" />
-                                        <p className="text-xs text-[#d0d7de] font-medium leading-relaxed">
-                                            We do not offer any warranty due to RMT (Real Money Trade - Buy&Sell Robux) reasons.
-                                        </p>
+                                    <div
+                                        className="prose prose-invert prose-sm max-w-none text-xs text-[#d0d7de] bg-[#0d1117]/50 p-5 rounded-xl border border-[#30363d] relative overflow-hidden"
+                                    >
+                                        <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-[#58a6ff] to-transparent opacity-50" />
+                                        <div
+                                            className="relative z-10 leading-relaxed"
+                                            dangerouslySetInnerHTML={{ __html: listing.description }}
+                                        />
                                     </div>
-                                </motion.div>
+                                </div>
                             )}
+                        </div>
 
+                        {/* Purchase Steps & Warranty - Conditional on isExpanded */}
+                        {isExpanded && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="space-y-8 pt-6 border-t border-[#30363d]"
+                            >
+                                {/* Purchase Steps */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xl">🚀</span>
+                                        <h4 className="text-white font-bold text-sm">How to purchase <span className="text-[#f85149]">?</span></h4>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {config.steps.map((step: string, i: number) => (
+                                            <div key={i} className="flex items-start gap-3">
+                                                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-[#58a6ff] text-white text-[10px] font-black">{i + 1}</span>
+                                                <p className="text-sm text-[#d0d7de]">{step}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Warranty */}
+                                <div className="flex items-start gap-3 p-4 rounded-xl bg-[#f85149]/5 border border-[#f85149]/20">
+                                    <Zap className="h-4 w-4 text-[#f85149] shrink-0 mt-0.5" />
+                                    <p className="text-xs text-[#d0d7de] font-medium leading-relaxed">
+                                        We do not offer any warranty due to RMT (Real Money Trade) reasons.
+                                    </p>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        <div className="pt-6 border-t border-[#30363d]">
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => setIsExpanded(!isExpanded)}
-                                className="bg-[#1c2128] border-[#30363d] text-[#8b949e] font-extrabold hover:text-white"
+                                className="bg-[#1c2128] border-[#30363d] text-[#8b949e] font-extrabold hover:text-white w-full"
                             >
                                 {isExpanded ? "Read less" : "Read more"}
                             </Button>

@@ -3,47 +3,115 @@
 import * as React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Search, Send, Paperclip, MoreVertical } from "lucide-react";
+import { MessageCircle, Search, Send, Paperclip, MoreVertical, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-// Mock conversations
-const mockConversations = [
-    {
-        id: "1",
-        user: { username: "GameDeals", avatar: null },
-        lastMessage: "Thanks for your order! The code has been sent.",
-        orderId: "ORD-2026-001234",
-        timestamp: "2 mins ago",
-        unread: true,
-    },
-    {
-        id: "2",
-        user: { username: "ProPlayer", avatar: null },
-        lastMessage: "Is the account still available?",
-        orderId: "ORD-2026-001236",
-        timestamp: "1 hour ago",
-        unread: true,
-    },
-    {
-        id: "3",
-        user: { username: "GamerX", avatar: null },
-        lastMessage: "Perfect, received the items. Great seller!",
-        orderId: "ORD-2026-001235",
-        timestamp: "Yesterday",
-        unread: false,
-    },
-];
-
-const mockMessages = [
-    { id: "1", senderId: "other", content: "Hi! I've placed an order for the Valorant Points.", timestamp: "10:30 AM" },
-    { id: "2", senderId: "me", content: "Great! I'll prepare your order right away.", timestamp: "10:32 AM" },
-    { id: "3", senderId: "me", content: "The code has been delivered. Please check your order details.", timestamp: "10:35 AM" },
-    { id: "4", senderId: "other", content: "Thanks for your order! The code has been sent.", timestamp: "10:36 AM" },
-];
+import { getConversations, getChatMessages } from "./actions";
+import { sendOrderMessage } from "../orders/orders-actions";
+import { getSupabaseClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 
 export default function MessagesPage() {
-    const [selectedConversation, setSelectedConversation] = React.useState(mockConversations[0]);
-    const [message, setMessage] = React.useState("");
+    const [conversations, setConversations] = React.useState<any[]>([]);
+    const [selectedConversation, setSelectedConversation] = React.useState<any>(null);
+    const [messages, setMessages] = React.useState<any[]>([]);
+    const [messageInput, setMessageInput] = React.useState("");
+    const [loading, setLoading] = React.useState(true);
+    const [messagesLoading, setMessagesLoading] = React.useState(false);
+    const [userId, setUserId] = React.useState<string | null>(null);
+    const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    const fetchConvs = React.useCallback(async () => {
+        setLoading(true);
+        const data = await getConversations();
+        setConversations(data);
+        if (data.length > 0 && !selectedConversation) {
+            setSelectedConversation(data[0]);
+        }
+        setLoading(false);
+    }, [selectedConversation]);
+
+    React.useEffect(() => {
+        const init = async () => {
+            const supabase = getSupabaseClient();
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data: profile } = await supabase.from('User').select('id').eq('supabaseId', user.id).single();
+                if (profile) setUserId(profile.id);
+            }
+            fetchConvs();
+        };
+        init();
+    }, [fetchConvs]);
+
+    const fetchMessages = React.useCallback(async (orderId: string) => {
+        setMessagesLoading(true);
+        const data = await getChatMessages(orderId);
+        setMessages(data);
+        setMessagesLoading(false);
+        setTimeout(scrollToBottom, 50);
+    }, []);
+
+    React.useEffect(() => {
+        if (selectedConversation) {
+            fetchMessages(selectedConversation.id);
+        }
+    }, [selectedConversation, fetchMessages]);
+
+    // Real-time listener for current conversation
+    React.useEffect(() => {
+        if (!selectedConversation) return;
+
+        const supabase = getSupabaseClient();
+        const channel = supabase.channel(`order-chat-${selectedConversation.id}`)
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'OrderMessage',
+                filter: `orderId=eq.${selectedConversation.id}`
+            }, (payload) => {
+                // If the message isn't already in our list (optimistic update handle)
+                setMessages(prev => {
+                    if (prev.find(m => m.id === payload.new.id)) return prev;
+                    return [...prev, payload.new];
+                });
+                setTimeout(scrollToBottom, 50);
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [selectedConversation]);
+
+    const handleSendMessage = async () => {
+        if (!messageInput.trim() || !selectedConversation) return;
+
+        const content = messageInput.trim();
+        setMessageInput("");
+
+        // Optimistic update
+        const tempId = Math.random().toString();
+        const optimisticMsg = {
+            id: tempId,
+            content,
+            senderId: userId,
+            createdAt: new Date().toISOString(),
+            sender: { username: "You" } // Simplified
+        };
+        setMessages(prev => [...prev, optimisticMsg]);
+        setTimeout(scrollToBottom, 50);
+
+        try {
+            await sendOrderMessage(selectedConversation.id, content);
+        } catch (error) {
+            console.error("Failed to send message:", error);
+            // Optionally remove optimistic message and show error
+        }
+    };
 
     return (
         <div className="h-[calc(100vh-8rem)]">
@@ -72,89 +140,132 @@ export default function MessagesPage() {
                         </div>
                     </div>
                     <div className="flex-1 overflow-y-auto">
-                        {mockConversations.map((conv) => (
-                            <button
-                                key={conv.id}
-                                onClick={() => setSelectedConversation(conv)}
-                                className={`w-full p-4 text-left border-b border-[#2d333b] hover:bg-[#252b33] transition-colors ${selectedConversation?.id === conv.id ? "bg-[#252b33]" : ""
-                                    }`}
-                            >
-                                <div className="flex items-start gap-3">
-                                    <Avatar className="h-8 w-8">
-                                        <AvatarImage src={conv.user.avatar || undefined} alt={conv.user.username} />
-                                        <AvatarFallback>
-                                            {conv.user.username.charAt(0).toUpperCase()}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center justify-between mb-0.5">
-                                            <span className="font-bold text-white text-sm tracking-tight">{conv.user.username}</span>
-                                            <span className="text-[10px] font-bold text-[#8b949e] uppercase tracking-wider">{conv.timestamp}</span>
+                        {loading ? (
+                            <div className="flex justify-center p-8">
+                                <Loader2 className="h-6 w-6 animate-spin text-[#f5a623]" />
+                            </div>
+                        ) : conversations.length > 0 ? (
+                            conversations.map((conv) => (
+                                <button
+                                    key={conv.id}
+                                    onClick={() => setSelectedConversation(conv)}
+                                    className={cn(
+                                        "w-full p-4 text-left border-b border-[#2d333b] hover:bg-[#252b33] transition-colors relative",
+                                        selectedConversation?.id === conv.id ? "bg-[#252b33] border-l-2 border-l-[#f5a623]" : ""
+                                    )}
+                                >
+                                    <div className="flex items-start gap-3">
+                                        <Avatar className="h-8 w-8">
+                                            <AvatarImage src={conv.otherUser.avatar || undefined} />
+                                            <AvatarFallback>
+                                                {conv.otherUser.username.charAt(0).toUpperCase()}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between mb-0.5">
+                                                <span className="font-bold text-white text-sm tracking-tight">{conv.otherUser.username}</span>
+                                                <span className="text-[10px] font-bold text-[#8b949e] uppercase tracking-wider">
+                                                    {new Date(conv.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                            </div>
+                                            <p className="text-[12px] text-[#9ca3af] truncate font-medium">
+                                                {conv.lastMessage?.content || "No messages yet"}
+                                            </p>
+                                            <span className="text-[11px] text-[#f5a623] font-bold mt-1 inline-block tracking-tight uppercase">
+                                                {conv.orderNumber}
+                                            </span>
                                         </div>
-                                        <p className="text-[12px] text-[#9ca3af] truncate font-medium">{conv.lastMessage}</p>
-                                        <span className="text-[11px] text-[#f5a623] font-bold mt-1 inline-block tracking-tight">{conv.orderId}</span>
                                     </div>
-                                    {conv.unread && <span className="h-2 w-2 rounded-full bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.5)] flex-shrink-0 mt-2" />}
-                                </div>
-                            </button>
-                        ))}
+                                </button>
+                            ))
+                        ) : (
+                            <div className="p-8 text-center opacity-40">
+                                <MessageCircle className="h-8 w-8 mx-auto mb-2" />
+                                <p className="text-xs font-bold uppercase">No conversations found</p>
+                            </div>
+                        )}
                     </div>
                 </Card>
 
                 {/* Chat Area */}
                 <Card className="col-span-2 border-[#2d333b] bg-[#1c2128] flex flex-col overflow-hidden">
-                    {/* Chat Header */}
-                    <div className="p-4 border-b border-[#2d333b] flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8">
-                                <AvatarImage src={selectedConversation?.user.avatar || undefined} alt={selectedConversation?.user.username} />
-                                <AvatarFallback>
-                                    {(selectedConversation?.user.username || "U").charAt(0).toUpperCase()}
-                                </AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <span className="font-bold text-white tracking-tight">{selectedConversation?.user.username}</span>
-                                <p className="text-[11px] text-[#f5a623] font-black uppercase tracking-widest">{selectedConversation?.orderId}</p>
-                            </div>
+                    {!selectedConversation ? (
+                        <div className="flex-1 flex flex-col items-center justify-center opacity-20">
+                            <MessageCircle className="h-16 w-16 mb-4" />
+                            <p className="text-lg font-bold uppercase tracking-widest">Select a conversation</p>
                         </div>
-                        <Button variant="ghost" size="sm" className="text-[#8b949e] hover:text-white hover:bg-[#252b33]">
-                            <MoreVertical className="h-4 w-4" />
-                        </Button>
-                    </div>
+                    ) : (
+                        <>
+                            {/* Chat Header */}
+                            <div className="p-4 border-b border-[#2d333b] flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <Avatar className="h-8 w-8">
+                                        <AvatarImage src={selectedConversation.otherUser.avatar || undefined} />
+                                        <AvatarFallback>
+                                            {selectedConversation.otherUser.username.charAt(0).toUpperCase()}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <span className="font-bold text-white tracking-tight">{selectedConversation.otherUser.username}</span>
+                                        <p className="text-[11px] text-[#f5a623] font-black uppercase tracking-widest">{selectedConversation.orderNumber}</p>
+                                    </div>
+                                </div>
+                                <Button variant="ghost" size="sm" className="text-[#8b949e] hover:text-white hover:bg-[#252b33]">
+                                    <MoreVertical className="h-4 w-4" />
+                                </Button>
+                            </div>
 
-                    {/* Messages */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                        {mockMessages.map((msg) => (
-                            <div key={msg.id} className={`flex ${msg.senderId === "me" ? "justify-end" : "justify-start"}`}>
-                                <div className={`max-w-[70%] rounded-lg px-4 py-2.5 ${msg.senderId === "me" ? "bg-[#f5a623] text-black" : "bg-[#252b33] text-white"
-                                    }`}>
-                                    <p className="text-sm leading-relaxed">{msg.content}</p>
-                                    <p className={`text-[9px] mt-1 font-bold uppercase tracking-widest ${msg.senderId === "me" ? "text-black/40" : "text-[#8b949e]"}`}>
-                                        {msg.timestamp}
-                                    </p>
+                            {/* Messages */}
+                            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                                {messagesLoading ? (
+                                    <div className="flex justify-center p-8">
+                                        <Loader2 className="h-6 w-6 animate-spin text-[#f5a623]" />
+                                    </div>
+                                ) : (
+                                    messages.map((msg) => (
+                                        <div key={msg.id} className={cn("flex", msg.senderId === userId ? "justify-end" : "justify-start")}>
+                                            <div className={cn(
+                                                "max-w-[70%] rounded-lg px-4 py-2.5",
+                                                msg.senderId === userId ? "bg-[#f5a623] text-black" : "bg-[#252b33] text-white"
+                                            )}>
+                                                <p className="text-sm leading-relaxed">{msg.content}</p>
+                                                <p className={cn(
+                                                    "text-[9px] mt-1 font-bold uppercase tracking-widest",
+                                                    msg.senderId === userId ? "text-black/40" : "text-[#8b949e]"
+                                                )}>
+                                                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                                <div ref={messagesEndRef} />
+                            </div>
+
+                            {/* Message Input */}
+                            <div className="p-4 border-t border-[#2d333b]">
+                                <div className="flex items-center gap-3">
+                                    <Button variant="ghost" size="sm" className="text-white/70 hover:text-white hover:bg-[#252b33] h-10 w-10 p-0">
+                                        <Paperclip className="h-5 w-5" />
+                                    </Button>
+                                    <input
+                                        type="text"
+                                        value={messageInput}
+                                        onChange={(e) => setMessageInput(e.target.value)}
+                                        onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                                        placeholder="Type a message..."
+                                        className="flex-1 h-11 rounded-xl border border-[#2d333b] bg-[#0a0e13] px-4 text-sm text-white placeholder:text-[#8b949e] focus:border-[#f5a623] focus:outline-none transition-all"
+                                    />
+                                    <Button
+                                        onClick={handleSendMessage}
+                                        className="bg-[#f5a623] hover:bg-[#e69512] text-black h-11 w-11 p-0 rounded-xl shadow-lg"
+                                    >
+                                        <Send className="h-5 w-5" />
+                                    </Button>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-
-                    {/* Message Input */}
-                    <div className="p-4 border-t border-[#2d333b]">
-                        <div className="flex items-center gap-3">
-                            <Button variant="ghost" size="sm" className="text-white/70 hover:text-white hover:bg-[#252b33] h-10 w-10 p-0">
-                                <Paperclip className="h-5 w-5" />
-                            </Button>
-                            <input
-                                type="text"
-                                value={message}
-                                onChange={(e) => setMessage(e.target.value)}
-                                placeholder="Type a message..."
-                                className="flex-1 h-11 rounded-xl border border-[#2d333b] bg-[#0a0e13] px-4 text-sm text-white placeholder:text-[#8b949e] focus:border-cyan-500 focus:outline-none transition-all"
-                            />
-                            <Button className="bg-cyan-500 hover:bg-cyan-600 text-white h-11 w-11 p-0 rounded-xl shadow-lg">
-                                <Send className="h-5 w-5" />
-                            </Button>
-                        </div>
-                    </div>
+                        </>
+                    )}
                 </Card>
             </div>
         </div>

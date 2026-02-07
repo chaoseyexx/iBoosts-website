@@ -8,9 +8,12 @@ import {
     Download,
     Search,
     ShoppingBag,
-    Check
+    Check,
+    Database
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getOrders, seedDemoOrders } from "./orders-actions";
+import { toast } from "sonner";
 
 interface Order {
     id: string;
@@ -25,26 +28,6 @@ interface Order {
     discount?: number;
     icon: string;
 }
-
-const mockPurchased: Order[] = [
-    { id: "1", game: "Valorant", productName: "Boosting", type: "Boosting", user: "Ned6", date: "Jan 19, 2026, 4:16:18 AM", status: "completed", quantity: 1, price: 1.00, discount: 0.00, icon: "https://i.imgur.com/8N48l8b.png" },
-    { id: "2", game: "Marvel Rivals", productName: "Boosting", type: "Boosting", user: "FerchasBOOSTING", date: "Jan 17, 2026, 10:11:14 PM", status: "completed", quantity: 1, price: 5.00, discount: 0.00, icon: "https://i.imgur.com/vHq8S9s.png" },
-    { id: "3", game: "Valorant", productName: "Boosting", type: "Boosting", user: "kittyBoosting", date: "Jan 17, 2026, 5:40:28 AM", status: "completed", quantity: 1, price: 4.00, discount: 0.00, icon: "https://i.imgur.com/8N48l8b.png" },
-    { id: "4", game: "Valorant", productName: "Boosting", type: "Boosting", user: "remmyuh", date: "Jan 17, 2026, 3:29:43 AM", status: "completed", quantity: 1, price: 6.00, discount: 0.00, icon: "https://i.imgur.com/8N48l8b.png" },
-    { id: "5", game: "Rocket League", productName: "Boosting", type: "Boosting", user: "Lagumixu", date: "Jan 15, 2026, 7:51:17 PM", status: "completed", quantity: 1, price: 1.00, discount: 0.00, icon: "https://i.imgur.com/h9v9s8B.png" },
-    { id: "6", game: "Star Citizen", productName: "Currency", type: "Currency", user: "Retroshooter94", date: "Jan 15, 2026, 5:01:46 AM", status: "cancelled", quantity: "1,000 M", price: 0.50, discount: 0.00, icon: "https://i.imgur.com/u7FvX8B.png" },
-    { id: "7", game: "Valorant", productName: "Boosting", type: "Boosting", user: "TrimCoin-NoMz", date: "Jan 14, 2026, 7:41:09 PM", status: "completed", quantity: 1, price: 1.00, discount: 0.00, icon: "https://i.imgur.com/8N48l8b.png" },
-];
-
-const mockSold: Order[] = [
-    { id: "s1", game: "Roblox", productName: "TAXI BOSS - $10 Million", type: "Items", user: "24apricot", date: "Feb 1, 2026, 3:24:04 PM", status: "cancelled", quantity: 1, price: 3.00, icon: "https://i.imgur.com/39A8n8A.png" },
-    { id: "s2", game: "Roblox", productName: "TAXI BOSS - $10 Million", type: "Items", user: "24apricot", date: "Feb 1, 2026, 2:54:17 PM", status: "cancelled", quantity: 1, price: 3.00, icon: "https://i.imgur.com/39A8n8A.png" },
-    { id: "s3", game: "Bee Swarm Simulator", productName: "Boost, 20 bees & Starter Hive | Honey, Quests & Badges Grind", type: "Items", user: "ApthyQuiz-6mYK", date: "Jan 31, 2026, 5:37:25 PM", status: "cancelled", quantity: 1, price: 22.00, icon: "https://i.imgur.com/pYVjL4z.png" },
-    { id: "s4", game: "Roblox", productName: "Boosting", type: "Boosting", user: "Luvvz", date: "Jan 30, 2026, 9:07:51 PM", status: "cancelled", quantity: 1, price: 4.25, icon: "https://i.imgur.com/39A8n8A.png" },
-    { id: "s5", game: "Roblox", productName: "TAXI BOSS - $10 Million", type: "Items", user: "KindPlum-11aO", date: "Jan 30, 2026, 5:26:21 AM", status: "cancelled", quantity: 1, price: 3.00, icon: "https://i.imgur.com/39A8n8A.png" },
-    { id: "s6", game: "Roblox", productName: "TAXI BOSS - $10 Million", type: "Items", user: "PrimeEcho-ught", date: "Jan 29, 2026, 7:54:11 PM", status: "completed", quantity: 3, price: 9.00, icon: "https://i.imgur.com/39A8n8A.png" },
-    { id: "s7", game: "Roblox", productName: "TAXI BOSS - $10 Million", type: "Items", user: "PrimeEcho-ught", date: "Jan 29, 2026, 6:25:02 PM", status: "cancelled", quantity: 3, price: 9.00, icon: "https://i.imgur.com/39A8n8A.png" },
-];
 
 const statusOptions = [
     { label: "All statuses", value: "all", count: null },
@@ -63,18 +46,57 @@ const timeOptions = [
 
 function OrdersContent() {
     const searchParams = useSearchParams();
-    const type = searchParams.get("type") || "purchased";
-    const orders = type === "purchased" ? mockPurchased : mockSold;
+    const type = (searchParams.get("type") as 'purchased' | 'sold') || "purchased";
     const title = type === "purchased" ? "Purchased orders" : "Sold orders";
 
+    const [orders, setOrders] = React.useState<Order[]>([]);
+    const [isLoading, setIsLoading] = React.useState(true);
     const [statusFilter, setStatusFilter] = React.useState("all");
     const [statusOpen, setStatusOpen] = React.useState(false);
     const [timeFilter, setTimeFilter] = React.useState("recent");
     const [timeOpen, setTimeOpen] = React.useState(false);
+    const [isSeeding, setIsSeeding] = React.useState(false);
 
     // Refs for clicking outside
     const statusRef = React.useRef<HTMLDivElement>(null);
     const timeRef = React.useRef<HTMLDivElement>(null);
+
+    const loadOrders = React.useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const result = await getOrders(type);
+            if (result.orders) {
+                setOrders(result.orders);
+            } else if (result.error) {
+                toast.error(result.error);
+            }
+        } catch (error) {
+            toast.error("Failed to load orders");
+        } finally {
+            setIsLoading(false);
+        }
+    }, [type]);
+
+    React.useEffect(() => {
+        loadOrders();
+    }, [loadOrders]);
+
+    const handleSeed = async () => {
+        setIsSeeding(true);
+        try {
+            const result = await seedDemoOrders();
+            if (result.success) {
+                toast.success("Demo data seeded successfully!");
+                loadOrders();
+            } else {
+                toast.error(result.error || "Failed to seed demo data");
+            }
+        } catch (error) {
+            toast.error("Error seeding demo data");
+        } finally {
+            setIsSeeding(false);
+        }
+    };
 
     React.useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -92,12 +114,34 @@ function OrdersContent() {
     const activeStatusLabel = statusOptions.find(o => o.value === statusFilter)?.label || "All statuses";
     const activeTimeLabel = timeOptions.find(o => o.value === timeFilter)?.label || "Recent";
 
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center p-24 space-y-4">
+                <div className="h-10 w-10 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
+                <p className="text-white/60 font-bold uppercase tracking-widest text-xs">Fetching your orders...</p>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-8">
             {/* Page Header */}
-            <div className="flex items-center gap-3">
-                <ChevronDown className="h-6 w-6 text-[#f5a623] rotate-[-90deg]" />
-                <h1 className="text-2xl font-bold text-white tracking-tight">{title}</h1>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <ChevronDown className="h-6 w-6 text-[#f5a623] rotate-[-90deg]" />
+                    <h1 className="text-2xl font-bold text-white tracking-tight">{title}</h1>
+                </div>
+
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSeed}
+                    disabled={isSeeding}
+                    className="border-[#f5a623]/20 bg-[#f5a623]/5 text-[#f5a623] hover:bg-[#f5a623]/10 h-8 gap-2 font-bold text-[10px] uppercase tracking-wider"
+                >
+                    <Database className={cn("h-3 w-3", isSeeding && "animate-pulse")} />
+                    {isSeeding ? "Seeding..." : "Seed Demo Data"}
+                </Button>
             </div>
 
             {/* Filters Row */}
@@ -192,67 +236,75 @@ function OrdersContent() {
             </div>
 
             {/* Orders Table */}
-            <div className="overflow-x-auto">
-                <table className="w-full border-separate border-spacing-0">
-                    <thead>
-                        <tr className="text-left border-b border-[#2d333b]">
-                            <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">
-                                <div className="flex items-center gap-1">
-                                    Order name
-                                    <ChevronDown className="h-3 w-3 text-[#f5a623]" />
-                                </div>
-                            </th>
-                            <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">Type</th>
-                            <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">{type === "purchased" ? "Seller" : "Buyer"}</th>
-                            <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">Ordered date</th>
-                            <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">Order status</th>
-                            <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">Quantity</th>
-                            <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">Price ($)</th>
-                            {type === "purchased" && (
-                                <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">Discount</th>
-                            )}
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#2d333b]/50">
-                        {orders.map((order) => (
-                            <tr
-                                key={order.id}
-                                onClick={() => window.location.href = `/dashboard/orders/${order.id}`}
-                                className="group hover:bg-white/[0.02] transition-colors cursor-pointer"
-                            >
-                                <td className="py-2.5 px-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="h-8 w-8 rounded bg-[#0a0e13] flex-shrink-0 relative overflow-hidden flex items-center justify-center p-1.5 border border-[#2d333b]/40">
-                                            <img src={order.icon} alt={order.game} className="object-contain" />
-                                        </div>
-                                        <div className="min-w-0">
-                                            <div className="text-[10px] font-bold text-[#6b7280] uppercase leading-none mb-1">{order.game}</div>
-                                            <div className="text-[13px] text-white font-medium truncate max-w-[200px]">{order.productName}</div>
-                                        </div>
+            <div className="overflow-x-auto min-h-[400px]">
+                {orders.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center p-20 bg-black/10 rounded-2xl border border-dashed border-[#2d333b]">
+                        <ShoppingBag className="h-10 w-10 text-[#2d333b] mb-4" />
+                        <h3 className="text-white font-bold uppercase tracking-widest text-sm mb-1">No orders found</h3>
+                        <p className="text-[#6b7280] text-xs">Try seeding demo data to see it in action.</p>
+                    </div>
+                ) : (
+                    <table className="w-full border-separate border-spacing-0">
+                        <thead>
+                            <tr className="text-left border-b border-[#2d333b]">
+                                <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">
+                                    <div className="flex items-center gap-1">
+                                        Order name
+                                        <ChevronDown className="h-3 w-3 text-[#f5a623]" />
                                     </div>
-                                </td>
-                                <td className="py-2.5 px-4 text-[13px] text-white/80">{order.type}</td>
-                                <td className="py-2.5 px-4 text-[13px] text-[#5c9eff] hover:underline cursor-pointer" onClick={(e) => e.stopPropagation()}>{order.user}</td>
-                                <td className="py-2.5 px-4 text-[13px] text-white/80 whitespace-nowrap">{order.date}</td>
-                                <td className="py-2.5 px-4">
-                                    <div className={cn(
-                                        "inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider",
-                                        order.status === "completed" ? "bg-[#14b8a6] text-[#0a0e13]" :
-                                            order.status === "cancelled" ? "bg-[#ef4444] text-white" :
-                                                "bg-[#3b82f6] text-white"
-                                    )}>
-                                        {order.status === "cancelled" ? "Canceled" : order.status}
-                                    </div>
-                                </td>
-                                <td className="py-2.5 px-4 text-[13px] text-white/80">{order.quantity}</td>
-                                <td className="py-2.5 px-4 text-[13px] text-white font-bold">${order.price.toFixed(2)}</td>
+                                </th>
+                                <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">Type</th>
+                                <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">{type === "purchased" ? "Seller" : "Buyer"}</th>
+                                <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">Ordered date</th>
+                                <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">Order status</th>
+                                <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">Quantity</th>
+                                <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">Price ($)</th>
                                 {type === "purchased" && (
-                                    <td className="py-2.5 px-4 text-[13px] text-white/80">${order.discount?.toFixed(2)}</td>
+                                    <th className="pb-4 px-4 text-[11px] font-bold text-white/60 uppercase tracking-tight">Discount</th>
                                 )}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-[#2d333b]/50">
+                            {orders.map((order) => (
+                                <tr
+                                    key={order.id}
+                                    onClick={() => window.location.href = `/dashboard/orders/${order.id}`}
+                                    className="group hover:bg-white/[0.02] transition-colors cursor-pointer"
+                                >
+                                    <td className="py-2.5 px-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-8 w-8 rounded bg-[#0a0e13] flex-shrink-0 relative overflow-hidden flex items-center justify-center p-1.5 border border-[#2d333b]/40">
+                                                <img src={order.icon} alt={order.game} className="object-contain" />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <div className="text-[10px] font-bold text-[#6b7280] uppercase leading-none mb-1">{order.game}</div>
+                                                <div className="text-[13px] text-white font-medium truncate max-w-[200px]">{order.productName}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="py-2.5 px-4 text-[13px] text-white/80">{order.type}</td>
+                                    <td className="py-2.5 px-4 text-[13px] text-[#5c9eff] hover:underline cursor-pointer" onClick={(e) => e.stopPropagation()}>{order.user}</td>
+                                    <td className="py-2.5 px-4 text-[13px] text-white/80 whitespace-nowrap">{order.date}</td>
+                                    <td className="py-2.5 px-4">
+                                        <div className={cn(
+                                            "inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider",
+                                            order.status === "completed" ? "bg-[#14b8a6] text-[#0a0e13]" :
+                                                order.status === "cancelled" ? "bg-[#ef4444] text-white" :
+                                                    "bg-[#3b82f6] text-white"
+                                        )}>
+                                            {order.status === "cancelled" ? "Canceled" : order.status}
+                                        </div>
+                                    </td>
+                                    <td className="py-2.5 px-4 text-[13px] text-white/80">{order.quantity}</td>
+                                    <td className="py-2.5 px-4 text-[13px] text-white font-bold">${order.price.toFixed(2)}</td>
+                                    {type === "purchased" && (
+                                        <td className="py-2.5 px-4 text-[13px] text-white/80">${order.discount?.toFixed(2)}</td>
+                                    )}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
             </div>
         </div>
     );
@@ -261,8 +313,9 @@ function OrdersContent() {
 export default function OrdersPage() {
     return (
         <React.Suspense fallback={
-            <div className="flex items-center justify-center p-12">
-                <div className="h-8 w-8 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
+            <div className="flex flex-col items-center justify-center p-24 space-y-4">
+                <div className="h-10 w-10 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
+                <p className="text-white/60 font-bold uppercase tracking-widest text-xs">Loading orders view...</p>
             </div>
         }>
             <OrdersContent />
