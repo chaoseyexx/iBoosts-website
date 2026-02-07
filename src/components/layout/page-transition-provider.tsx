@@ -58,8 +58,8 @@ function TransitionContent({ pathname, children }: { pathname: string, children:
                     </motion.div>
 
                     <motion.div
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
                         transition={{ delay: 0.15, duration: 0.2 }}
                         className="text-[#f5a623] font-black uppercase tracking-[0.3em] text-[10px]"
                     >
@@ -70,12 +70,12 @@ function TransitionContent({ pathname, children }: { pathname: string, children:
 
             {/* 2. Page Content - Instant state awareness through keyed mounting */}
             <motion.div
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: isPending ? 0 : 1, y: isPending ? 5 : 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: isPending ? 0 : 1 }}
                 transition={{
-                    duration: 0.4,
-                    delay: 0.05,
-                    ease: "easeOut"
+                    duration: 0.3,
+                    delay: 0,
+                    ease: "linear"
                 }}
                 style={{ visibility: isPending ? 'hidden' : 'visible' }}
             >
