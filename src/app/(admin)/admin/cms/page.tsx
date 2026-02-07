@@ -11,7 +11,9 @@ import {
     Trash2,
     X,
     Upload,
-    ImageIcon
+    ImageIcon,
+    PauseCircle,
+    PlayCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -25,7 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchCategories, fetchGames, createGame, seedCMSData, updateGame, deleteGame, uploadGameIcon, uploadGameBanner } from "@/app/(admin)/admin/actions";
+import { fetchCategories, fetchGames, createGame, seedCMSData, updateGame, deleteGame, uploadGameIcon, uploadGameBanner, toggleGameStatus } from "@/app/(admin)/admin/actions";
 import { toast } from "sonner";
 import slugify from "slugify";
 import Image from "next/image";
@@ -119,6 +121,18 @@ export default function AdminCMSPage() {
                 ? prev.categoryIds.filter(i => i !== id)
                 : [...prev.categoryIds, id]
         }));
+    };
+
+    const handleToggleStatus = async (gameId: string, currentStatus: boolean, gameName: string) => {
+        const newStatus = !currentStatus;
+        const res = await toggleGameStatus(gameId, newStatus);
+
+        if (res.success) {
+            toast.success(`${gameName} is now ${newStatus ? "Active" : "Paused"}`);
+            loadData();
+        } else {
+            toast.error(res.error || "Failed to update status");
+        }
     };
 
     const handleOpenEdit = (game: any) => {
@@ -343,6 +357,14 @@ export default function AdminCMSPage() {
                                             {game.isPopular && (
                                                 <span className="text-[8px] font-black text-[#f5a623] bg-[#f5a623]/10 px-1.5 py-0.5 rounded border border-[#f5a623]/20 uppercase tracking-wider">Trending</span>
                                             )}
+                                            <span className={cn(
+                                                "text-[8px] font-black px-1.5 py-0.5 rounded border uppercase tracking-wider",
+                                                game.isActive
+                                                    ? "text-emerald-400 bg-emerald-400/10 border-emerald-400/20"
+                                                    : "text-rose-400 bg-rose-400/10 border-rose-400/20"
+                                            )}>
+                                                {game.isActive ? "Active" : "Paused"}
+                                            </span>
                                         </div>
                                         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
                                             <p className="text-[#4b5563]">{game.slug}</p>
@@ -359,6 +381,20 @@ export default function AdminCMSPage() {
                                 </div>
 
                                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleToggleStatus(game.id, game.isActive, game.name)}
+                                        className={cn(
+                                            "h-8 w-8 p-0",
+                                            game.isActive
+                                                ? "text-rose-400 hover:text-rose-300 hover:bg-rose-500/10"
+                                                : "text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10"
+                                        )}
+                                        title={game.isActive ? "Pause Game" : "Activate Game"}
+                                    >
+                                        {game.isActive ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}
+                                    </Button>
                                     <Button
                                         variant="ghost"
                                         size="sm"

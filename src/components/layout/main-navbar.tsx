@@ -92,6 +92,12 @@ export function MainNavbar({
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
     const [userMenuOpen, setUserMenuOpen] = React.useState(false);
     const [languageModalOpen, setLanguageModalOpen] = React.useState(false);
+    const [mounted, setMounted] = React.useState(false); // Add mounted state
+
+    // Handle mounting
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Dynamic categories and games from database
     const [navCategories, setNavCategories] = React.useState<NavCategory[]>(initialCategories || []);
@@ -245,7 +251,7 @@ export function MainNavbar({
                                         <div key={i} className="h-4 w-16 bg-[#1c2128] rounded animate-pulse" />
                                     ))}
                                 </div>
-                            ) : navCategories.length > 0 ? (
+                            ) : navCategories.length > 0 && mounted ? (
                                 <NavigationMenu viewport={true} showViewport={false} className="relative !max-w-none">
                                     <NavigationMenuList className="gap-6">
                                         {navCategories.map((cat) => (

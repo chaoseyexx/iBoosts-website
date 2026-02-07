@@ -62,6 +62,7 @@ export const metadata: Metadata = {
 import { RecentPurchasePopup } from "@/components/ui/recent-purchase-popup";
 import { DemoNoticeModal } from "@/components/modals/demo-notice-modal";
 import { fetchRecentActivity } from "@/app/(admin)/admin/actions";
+import { PageTransitionProvider } from "@/components/layout/page-transition-provider";
 import Script from "next/script";
 
 export default async function RootLayout({
@@ -75,9 +76,11 @@ export default async function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-[var(--bg-primary)]`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-[var(--bg-primary)] overflow-x-hidden`}
       >
-        {children}
+        <PageTransitionProvider>
+          {children}
+        </PageTransitionProvider>
         <RecentPurchasePopup initialActivities={initialActivities} />
         <DemoNoticeModal />
         {cfToken && (

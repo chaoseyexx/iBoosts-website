@@ -25,47 +25,30 @@ const HeroScene = dynamic(
 
 // Popular items data
 const popularItems = [
-    { icon: "🎮", name: "Steal a Brainrot", game: "Garena and Madundsong", price: 11.99, link: "/items/brainrot" },
-    { icon: "🌊", name: "Escape Tsunami For Brainrots", game: "Strawberry Elephant", price: 8.00, link: "/items/tsunami" },
-    { icon: "🔴", name: "Roblox", game: "Steal a Brainrot", price: 0.50, link: "/items/roblox" },
-    { icon: "🚀", name: "Arc Raiders", game: "Blueprint", price: 3.90, link: "/items/arc" },
+    { icon: "https://cdn.iboosts.gg/images/games/brainrot.png", name: "Steal a Brainrot", game: "Garena and Madundsong", price: 11.99, link: "/items/brainrot" },
+    { icon: "https://cdn.iboosts.gg/images/games/tsunami.png", name: "Escape Tsunami For Brainrots", game: "Strawberry Elephant", price: 8.00, link: "/items/tsunami" },
+    { icon: "https://cdn.iboosts.gg/images/games/roblox.png", name: "Roblox", game: "Steal a Brainrot", price: 0.50, link: "/items/roblox" },
+    { icon: "https://cdn.iboosts.gg/images/games/arc-raiders.png", name: "Arc Raiders", game: "Blueprint", price: 3.90, link: "/items/arc" },
 ];
 
-const popularAccounts = [
-    { icon: "🎮", name: "GTA 5", details: "Pure Cash", price: 49.90, link: "/accounts/gta5" },
-    { icon: "🎯", name: "Fortnite", details: "IKONIK", price: 249.99, link: "/accounts/fortnite" },
-    { icon: "❤️", name: "Valorant", details: "Level 20", price: 4.90, link: "/accounts/valorant" },
-    { icon: "🎖️", name: "Rainbow Six Siege X", details: "Ranked Ready", price: 3.99, link: "/accounts/r6" },
-];
+interface NavGame {
+    id: string;
+    name: string;
+    slug: string;
+    icon: string | null;
+}
 
-const popularCurrencies = [
-    { icon: "⚔️", name: "OSRS", details: "Gold", price: "0.18/M", link: "/currency/osrs" },
-    { icon: "⚽", name: "EA Sports FC", details: "FC Coins", price: "0.0215/K", link: "/currency/fc" },
-    { icon: "🔴", name: "Roblox", details: "Robux", price: "0.00479/unit", link: "/currency/roblox" },
-    { icon: "🌍", name: "WoW Classic", details: "Gold", price: "0.05664/unit", link: "/currency/wow" },
-];
+interface NavCategory {
+    id: string;
+    name: string;
+    slug: string;
+    icon: string | null;
+}
 
-const popularTopUps = [
-    { icon: "⚽", name: "EA Sports FC", details: "12000 Points", price: 56.88, link: "/topups/fc" },
-];
-
-const popularBoosting = [
-    { icon: "❤️", name: "Valorant", details: "Rank Boost", price: 7.00, link: "/boosting/valorant" },
-];
-
-const popularGiftCards = [
-    { icon: "🔴", name: "Roblox", details: "10 USD", price: 9.59, link: "/giftcards/roblox" },
-];
-
-// Navigation categories
-const navCategories = [
-    { name: "Currency", href: "/currency" },
-    { name: "Accounts", href: "/accounts" },
-    { name: "Top Ups", href: "/top-ups" },
-    { name: "Items", href: "/items" },
-    { name: "Boosting", href: "/boosting" },
-    { name: "Gift Cards", href: "/gift-cards" },
-];
+interface HomePageClientProps {
+    initialCategories?: NavCategory[];
+    initialGamesData?: Record<string, { popular: NavGame[]; all: NavGame[] }>;
+}
 
 // Feature cards
 const features = [
@@ -76,11 +59,9 @@ const features = [
 
 // Product row component
 function ProductRow({
-    items,
-    showPrice = true
+    items
 }: {
-    items: Array<{ icon: string; name: string; game?: string; details?: string; price: number | string; link: string }>;
-    showPrice?: boolean;
+    items: Array<{ icon: string; name: string; details?: string; price: number | string; link: string }>;
 }) {
     return (
         <div className="space-y-2">
@@ -88,20 +69,30 @@ function ProductRow({
                 <Link key={i} href={item.link}>
                     <div className="flex items-center justify-between p-3 rounded-lg bg-[#1c2128] hover:bg-[#252b33] transition-all border border-[#2d333b] hover:border-[#f5a623]/50 group">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-[#252b33] flex items-center justify-center text-xl">
-                                {item.icon}
+                            <div className="w-10 h-10 rounded-lg bg-[#252b33] flex items-center justify-center overflow-hidden shrink-0 border border-[#2d333b]">
+                                {item.icon.startsWith("http") ? (
+                                    <Image
+                                        src={item.icon}
+                                        alt={item.name}
+                                        width={40}
+                                        height={40}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <span className="text-xl">{item.icon}</span>
+                                )}
                             </div>
                             <div>
                                 <p className="text-white font-medium group-hover:text-[#f5a623] transition-colors text-sm">
                                     {item.name}
                                 </p>
-                                <p className="text-[#6b7280] text-xs">{item.game || item.details}</p>
+                                <p className="text-[#6b7280] text-xs">{item.details}</p>
                             </div>
                         </div>
                         <div className="text-right">
                             <p className="text-[#6b7280] text-xs">from</p>
                             <p className="text-[#f5a623] font-bold">
-                                ${typeof item.price === "number" ? item.price.toFixed(2) : item.price}
+                                {typeof item.price === "number" ? `$${item.price.toFixed(2)}` : item.price.startsWith("$") ? item.price : `$${item.price}`}
                             </p>
                         </div>
                     </div>
@@ -111,7 +102,55 @@ function ProductRow({
     );
 }
 
-export function HomePageClient() {
+export function HomePageClient({ initialCategories = [], initialGamesData = {} }: HomePageClientProps) {
+
+    // Helper to get games for a section
+    const getSectionItems = (categoryName: string, categorySlug: string, defaultPrices: Record<string, number | string>) => {
+        const games = initialGamesData[categoryName]?.popular || [];
+        return games.slice(0, 4).map(game => ({
+            icon: game.icon || "🎮",
+            name: game.name,
+            details: categoryName === "Currency" ? "Market Rates" : "Verified Listings",
+            price: defaultPrices[game.slug] || (categoryName === "Currency" ? "0.01/unit" : 9.99),
+            link: `/${categorySlug}/${game.slug}`
+        }));
+    };
+
+    // Sections data derived from props
+    const popularItems = getSectionItems("Items", "items", {
+        "brainrot": 11.99,
+        "tsunami": 8.00,
+        "roblox": 0.50,
+        "arc": 3.90
+    });
+
+    const popularAccounts = getSectionItems("Accounts", "accounts", {
+        "fortnite": 149.99,
+        "gta-v": 49.90, // Note: Slug is gta-v in DB seed
+        "r6-siege": 39.99,
+        "roblox": 19.99,
+        "valorant": 89.90
+    });
+
+    const popularCurrencies = getSectionItems("Currency", "currency", {
+        "osrs": "0.18/M",
+        "fc": "0.0215/K",
+        "roblox": "0.00479/unit",
+        "wow": "0.05664/unit"
+    });
+
+    const popularTopUps = getSectionItems("Top Ups", "top-ups", {
+        "fc": 56.88
+    });
+
+    const popularBoosting = getSectionItems("Boosting", "boosting", {
+        "valorant": 7.00
+    });
+
+    const popularGiftCards = getSectionItems("Gift Cards", "gift-cards", {
+        "roblox": 9.59
+    });
+
     return (
         <div className="min-h-screen bg-[#0a0e13]">
             {/* Hero Section with Three.js */}

@@ -164,7 +164,25 @@ export async function updateGame(gameId: string, data: {
         revalidatePath("/gift-cards");
         return { success: true, game };
     } catch (error: any) {
-        console.error("Error updating game:", error);
+        return { error: error.message };
+    }
+}
+
+export async function toggleGameStatus(gameId: string, isActive: boolean) {
+    try {
+        const game = await prisma.game.update({
+            where: { id: gameId },
+            data: { isActive }
+        });
+
+        // Revalidate all necessary paths
+        revalidateTag("navbar-data", {});
+        revalidatePath("/admin/cms");
+        revalidatePath("/");
+
+        return { success: true, game };
+    } catch (error: any) {
+        console.error("Error toggling game status:", error);
         return { error: error.message };
     }
 }

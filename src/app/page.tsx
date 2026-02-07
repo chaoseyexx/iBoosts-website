@@ -1,13 +1,18 @@
 import { NavbarServer } from "@/components/layout/navbar-server";
 import { HomePageClient } from "./home-page-client";
-import { Footer } from "@/components/layout/footer";
+import { fetchGamesForNavbar } from "@/app/(admin)/admin/actions";
 
-export default function HomePage() {
+export default async function HomePage() {
+    // Re-use fetchGamesForNavbar since it already groups popular games by category
+    const { categories, gamesByCategory } = await fetchGamesForNavbar();
+
     return (
         <>
             <NavbarServer variant="landing" />
-            <HomePageClient />
-            {/* Note: Footer is inside HomePageClient to maintain layout structure from original */}
+            <HomePageClient
+                initialCategories={categories}
+                initialGamesData={gamesByCategory}
+            />
         </>
     );
 }
