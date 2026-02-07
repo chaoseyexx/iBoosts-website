@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma/client";
+import { generateId } from "@/lib/utils/ids";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { redirect } from "next/navigation";
@@ -67,6 +68,7 @@ export async function createListing(prevState: any, formData: FormData) {
 
         await prisma.listing.create({
             data: {
+                id: generateId("Listing"),
                 sellerId: dbUser.id,
                 categoryId,
                 gameId,

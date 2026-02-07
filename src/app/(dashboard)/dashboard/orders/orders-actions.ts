@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma/client";
 import { createClient } from "@/lib/supabase/server";
+import { generateId } from "@/lib/utils/ids";
 import { OrderStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
@@ -109,6 +110,7 @@ export async function seedDemoOrders(providedSupabaseId?: string) {
             where: { email: 'chaoseyex@gmail.com' },
             update: { username: 'ChaoseyeX' },
             create: {
+                id: generateId("User"),
                 email: 'chaoseyex@gmail.com',
                 username: 'ChaoseyeX',
                 role: 'SELLER'
@@ -119,6 +121,7 @@ export async function seedDemoOrders(providedSupabaseId?: string) {
             where: { email: 'bouncestacks@gmail.com' },
             update: { username: 'BounceStacks' },
             create: {
+                id: generateId("User"),
                 email: 'bouncestacks@gmail.com',
                 username: 'BounceStacks',
                 role: 'BUYER'
@@ -168,6 +171,7 @@ export async function seedDemoOrders(providedSupabaseId?: string) {
         // 3. Create sample listings
         const listingPurchased = await prisma.listing.create({
             data: {
+                id: generateId("Listing"),
                 sellerId: user1.id,
                 categoryId: categories[0].id,
                 gameId: games[0].id,
@@ -182,6 +186,7 @@ export async function seedDemoOrders(providedSupabaseId?: string) {
 
         const listingSold = await prisma.listing.create({
             data: {
+                id: generateId("Listing"),
                 sellerId: demoUser.id,
                 categoryId: categories[1].id,
                 gameId: games[1].id,
@@ -197,6 +202,7 @@ export async function seedDemoOrders(providedSupabaseId?: string) {
         // 4. Create Orders
         await prisma.order.create({
             data: {
+                id: generateId("Order"),
                 orderNumber: `ORD-P-${Math.floor(Math.random() * 100000)}`,
                 buyerId: demoUser.id,
                 sellerId: user1.id,
@@ -214,6 +220,7 @@ export async function seedDemoOrders(providedSupabaseId?: string) {
 
         await prisma.order.create({
             data: {
+                id: generateId("Order"),
                 orderNumber: `ORD-S-${Math.floor(Math.random() * 100000)}`,
                 buyerId: user2.id,
                 sellerId: demoUser.id,
@@ -331,6 +338,7 @@ export async function sendOrderMessage(orderId: string, content: string) {
 
         const message = await prisma.orderMessage.create({
             data: {
+                id: generateId("OrderMessage"),
                 orderId,
                 senderId: profile.id,
                 content
@@ -377,6 +385,7 @@ export async function confirmOrder(orderId: string) {
 
         await prisma.orderTimeline.create({
             data: {
+                id: generateId("OrderTimeline"),
                 orderId,
                 event: "ORDER_COMPLETED",
                 description: `Order confirmed by ${profile.username}`
@@ -416,6 +425,7 @@ export async function submitReview(orderId: string, rating: number, content: str
 
         const review = await prisma.review.create({
             data: {
+                id: generateId("Review"),
                 orderId,
                 listingId: order.listingId,
                 authorId: profile.id,

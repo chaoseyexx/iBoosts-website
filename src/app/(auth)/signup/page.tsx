@@ -30,7 +30,10 @@ export default function SignupPage() {
         setUsername(val);
         setIsUsernameAvailable(null);
 
-        if (val.length < 3) return;
+        if (val.length < 5) return;
+
+        const usernameRegex = /^[a-zA-Z0-9]+$/;
+        if (!usernameRegex.test(val)) return;
 
         setIsCheckingUsername(true);
         // Simple distinct timeout implementation for debounce
@@ -83,7 +86,12 @@ export default function SignupPage() {
     // Username Check Effect
     useEffect(() => {
         const check = async () => {
-            if (username.length < 3) {
+            if (username.length < 5) {
+                setIsUsernameAvailable(null);
+                return;
+            }
+            const usernameRegex = /^[a-zA-Z0-9]+$/;
+            if (!usernameRegex.test(username)) {
                 setIsUsernameAvailable(null);
                 return;
             }
@@ -118,11 +126,13 @@ export default function SignupPage() {
                                 isUsernameAvailable === false ? "border-red-500" : ""
                                 }`}
                         />
-                        {(username.length >= 3 || isCheckingUsername) && (
-                            <div className="flex items-center gap-2 text-xs mt-1 animate-in fade-in slide-in-from-top-1 duration-200">
-                                {isCheckingUsername && <span className="text-gray-500 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Checking...</span>}
-                                {!isCheckingUsername && isUsernameAvailable === true && <span className="text-green-500 flex items-center gap-1"><Check className="w-3 h-3" /> Available</span>}
-                                {!isCheckingUsername && isUsernameAvailable === false && <span className="text-red-500 flex items-center gap-1"><X className="w-3 h-3" /> Username taken</span>}
+                        {(username.length >= 1 || isCheckingUsername) && (
+                            <div className="flex flex-col gap-1 text-xs mt-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                                {username.length > 0 && username.length < 5 && <span className="text-red-500">Must be at least 5 characters</span>}
+                                {username.length >= 1 && !/^[a-zA-Z0-9]+$/.test(username) && <span className="text-red-500">Only letters and numbers allowed (no symbols)</span>}
+                                {isCheckingUsername && <span className="text-gray-500 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Checking availability...</span>}
+                                {!isCheckingUsername && isUsernameAvailable === true && username.length >= 5 && /^[a-zA-Z0-9]+$/.test(username) && <span className="text-green-500 flex items-center gap-1"><Check className="w-3 h-3" /> Available</span>}
+                                {!isCheckingUsername && isUsernameAvailable === false && username.length >= 5 && /^[a-zA-Z0-9]+$/.test(username) && <span className="text-red-500 flex items-center gap-1"><X className="w-3 h-3" /> Username taken</span>}
                             </div>
                         )}
                     </div>

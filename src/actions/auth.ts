@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma/client";
 
+import { generateId } from "@/lib/utils/ids";
+
 export async function signUp(formData: FormData) {
     const supabase = await createClient();
 
@@ -21,8 +23,13 @@ export async function signUp(formData: FormData) {
         return { error: "Password must be at least 8 characters" };
     }
 
-    if (username.length < 3 || username.length > 20) {
-        return { error: "Username must be between 3 and 20 characters" };
+    if (username.length < 5 || username.length > 20) {
+        return { error: "Username must be between 5 and 20 characters" };
+    }
+
+    const usernameRegex = /^[a-zA-Z0-9]+$/;
+    if (!usernameRegex.test(username)) {
+        return { error: "Username must only contain letters and numbers" };
     }
 
     // Check if username is taken
@@ -53,22 +60,24 @@ export async function signUp(formData: FormData) {
     if (data.user) {
         // Create user in database
         try {
+            const userId = generateId("User");
             await prisma.user.create({
                 data: {
+                    id: userId,
                     email: email.toLowerCase(),
                     username: username.toLowerCase(),
                     supabaseId: data.user.id,
                     role: "BUYER",
                     emailVerified: false,
+                    status: "ACTIVE"
                 },
             });
 
             // Create wallet for user
             await prisma.wallet.create({
                 data: {
-                    userId: (await prisma.user.findUnique({
-                        where: { supabaseId: data.user.id },
-                    }))!.id,
+                    id: generateId("Wallet"),
+                    userId: userId,
                     balance: 0,
                     currency: "USD",
                 },

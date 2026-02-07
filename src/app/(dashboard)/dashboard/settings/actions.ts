@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma/client";
+import { generateId } from "@/lib/utils/ids";
 
 export type State = {
     error?: string | null;
@@ -41,6 +42,7 @@ export async function getProfile() {
                 } else {
                     user = await prisma.user.create({
                         data: {
+                            id: generateId("User"),
                             supabaseId: authUser.id,
                             email: email,
                             username: username,
@@ -77,6 +79,7 @@ export async function updateProfile(prevState: State | null, formData: FormData)
             where: { supabaseId: authUser.id },
             update: updates,
             create: {
+                id: generateId("User"),
                 supabaseId: authUser.id,
                 email: authUser.email || "",
                 username: (formData.get("username") as string) || authUser.user_metadata.username || authUser.email?.split("@")[0] || "user",
@@ -136,6 +139,7 @@ export async function uploadAvatarAction(formData: FormData): Promise<State> {
             where: { supabaseId: authUser.id },
             update: { avatar: publicUrl },
             create: {
+                id: generateId("User"),
                 supabaseId: authUser.id,
                 email: authUser.email || "",
                 username: authUser.user_metadata.username || authUser.email?.split("@")[0] || "user",

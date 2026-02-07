@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma/client";
 import slugify from "slugify";
+import { generateId } from "@/lib/utils/ids";
 
 export type CreateListingState = {
     error?: string | null;
@@ -80,6 +81,7 @@ export async function createListing(prevState: CreateListingState | null, formDa
         // 5. Create Listing
         const listing = await prisma.listing.create({
             data: {
+                id: generateId("Listing"),
                 sellerId: seller.id,
                 categoryId: categoryId,
                 gameId: game.id,

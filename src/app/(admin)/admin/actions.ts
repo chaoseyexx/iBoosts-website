@@ -2,6 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma/client";
+import { generateId } from "@/lib/utils/ids";
 import { createAdminClient } from "@/lib/supabase/server";
 
 export async function updateUserStatus(userId: string, status: "ACTIVE" | "SUSPENDED" | "BANNED" | "FROZEN") {
@@ -78,6 +79,7 @@ export async function createGame(data: {
 
         const game = await prisma.game.create({
             data: {
+                id: generateId("Game"),
                 name: data.name,
                 slug: data.slug,
                 description: data.description,
@@ -98,6 +100,7 @@ export async function createGame(data: {
 
         await prisma.notification.createMany({
             data: users.map(user => ({
+                id: generateId("Notification"),
                 userId: user.id,
                 type: "SYSTEM",
                 title: `🔥 New ${data.name} Game Added! 🔥`,
@@ -491,6 +494,7 @@ export async function seedCMSData() {
                 where: { slug: game.slug },
                 update: {},
                 create: {
+                    id: generateId("Game"),
                     name: game.name,
                     slug: game.slug,
                     isPopular: game.isPopular,
@@ -633,7 +637,7 @@ export async function addUserBalance(userId: string, amount: number, reason: str
 
         if (!wallet) {
             wallet = await prisma.wallet.create({
-                data: { userId, balance: 0, pendingBalance: 0 }
+                data: { id: generateId("Wallet"), userId, balance: 0, pendingBalance: 0 }
             });
         }
 
@@ -649,6 +653,7 @@ export async function addUserBalance(userId: string, amount: number, reason: str
         // Create transaction record
         await prisma.walletTransaction.create({
             data: {
+                id: generateId("WalletTransaction"),
                 walletId: wallet.id,
                 type: "CREDIT",
                 amount,
@@ -694,6 +699,7 @@ export async function subtractUserBalance(userId: string, amount: number, reason
 
         await prisma.walletTransaction.create({
             data: {
+                id: generateId("WalletTransaction"),
                 walletId: wallet.id,
                 type: "DEBIT",
                 amount,
@@ -815,6 +821,7 @@ export async function logAdminAction(
     try {
         await prisma.adminLog.create({
             data: {
+                id: generateId("AdminLog"),
                 adminId,
                 action,
                 targetId,
@@ -1034,6 +1041,7 @@ export async function seedMarketplaceData() {
             where: { slug: "roblox" },
             update: {},
             create: {
+                id: generateId("Game"),
                 name: "Roblox",
                 slug: "roblox",
                 icon: "https://upload.wikimedia.org/wikipedia/commons/3/3a/Roblox_player_icon_black_2022.svg",
@@ -1061,6 +1069,7 @@ export async function seedMarketplaceData() {
         // 4. Create some listings
         const seedListings = [
             {
+                id: generateId("Listing"),
                 title: "Robux - Super Fast Delivery",
                 slug: "robux-fast-delivery",
                 price: 0.007, // $7 per 1k
@@ -1075,6 +1084,7 @@ export async function seedMarketplaceData() {
                 description: "Cheap and fast Robux. Verified seller with over 1000 successful trades."
             },
             {
+                id: generateId("Listing"),
                 title: "Robux - Bulk Discount",
                 slug: "robux-bulk-discount",
                 price: 0.0065, // $6.5 per 1k

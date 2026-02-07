@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { sendWelcomeEmail } from "@/lib/resend";
 import prisma from "@/lib/prisma/client";
+import { generateId } from "@/lib/utils/ids";
 
 export async function login(formData: FormData) {
     const supabase = await createClient();
@@ -31,6 +32,15 @@ export async function signup(formData: FormData) {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const username = formData.get("username") as string;
+
+    // Validate username
+    if (username.length < 5) {
+        return { error: "Username must be at least 5 characters" };
+    }
+    const usernameRegex = /^[a-zA-Z0-9]+$/;
+    if (!usernameRegex.test(username)) {
+        return { error: "Username must only contain letters and numbers" };
+    }
 
     // 1. Sign Up with Supabase
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -60,6 +70,7 @@ export async function signup(formData: FormData) {
         try {
             await prisma.user.create({
                 data: {
+                    id: generateId("User"),
                     supabaseId: authData.user.id,
                     username: username,
                     email: email,
@@ -105,16 +116,23 @@ export async function signInWithProvider(provider: "google" | "discord") {
 }
 
 export async function checkUsernameAvailability(username: string) {
+    if (!username || username.length < 5) return false;
+
+    const usernameRegex = /^[a-zA-Z0-9]+$/;
+    if (!usernameRegex.test(username)) return false;
+
     // Check against Prisma User table
-    const user = await prisma.user.findUnique({
-        where: { username: username },
-        select: { username: true }
+    const user = await prisma.user.findFirst({
+        where: {
+            username: {
+                equals: username,
+                mode: 'insensitive'
+            }
+        },
+        select: { id: true }
     });
 
-    if (user) {
-        return true; // Exists
-    }
-    return false; // Available
+    return !user; // Returns true if available (no user found)
 }
 
 export async function forgotPasswordAction(formData: FormData) {

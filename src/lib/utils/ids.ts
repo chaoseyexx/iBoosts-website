@@ -33,6 +33,10 @@ export const MODEL_PREFIXES = {
     UserBadge: 'BDG',
     Report: 'RPT',
     Notification: 'NTF',
+    AdminLog: 'ALOG',
+    Config: 'CFG',
+    Terms: 'TRM',
+    ScheduledJob: 'JOB',
 } as const;
 
 export type ModelName = keyof typeof MODEL_PREFIXES;

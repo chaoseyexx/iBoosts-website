@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import prisma from "@/lib/prisma/client";
+import { generateId } from "@/lib/utils/ids";
 
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
@@ -25,6 +26,7 @@ export async function GET(request: NextRequest) {
                     if (!existingUser) {
                         await prisma.user.create({
                             data: {
+                                id: generateId("User"),
                                 supabaseId: user.id,
                                 email: user.email!,
                                 username: user.user_metadata.full_name || user.user_metadata.name || user.email?.split('@')[0] || `User${Date.now()}`,
