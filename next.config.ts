@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'www.iboosts.com',
       },
+
       {
         protocol: 'https',
         hostname: 'cdn.discordapp.com',

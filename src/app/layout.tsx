@@ -60,6 +60,7 @@ export const metadata: Metadata = {
 };
 
 import { RecentPurchasePopup } from "@/components/ui/recent-purchase-popup";
+import { DemoNoticeModal } from "@/components/modals/demo-notice-modal";
 import { fetchRecentActivity } from "@/app/(admin)/admin/actions";
 import Script from "next/script";
 
@@ -78,6 +79,7 @@ export default async function RootLayout({
       >
         {children}
         <RecentPurchasePopup initialActivities={initialActivities} />
+        <DemoNoticeModal />
         {cfToken && (
           <Script
             defer

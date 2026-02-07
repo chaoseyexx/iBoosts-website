@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchCategories, fetchGames, createGame, seedCMSData, updateGame, deleteGame, uploadGameIcon } from "@/app/(admin)/admin/actions";
+import { fetchCategories, fetchGames, createGame, seedCMSData, updateGame, deleteGame, uploadGameIcon, uploadGameBanner } from "@/app/(admin)/admin/actions";
 import { toast } from "sonner";
 import slugify from "slugify";
 import Image from "next/image";
@@ -41,7 +41,9 @@ export default function AdminCMSPage() {
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
     const [editingGame, setEditingGame] = React.useState<any | null>(null);
     const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
+
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const bannerInputRef = React.useRef<HTMLInputElement>(null);
 
     // Form state
     const [formData, setFormData] = React.useState({
@@ -49,6 +51,7 @@ export default function AdminCMSPage() {
         slug: "",
         description: "",
         icon: "",
+        banner: "",
         isPopular: false,
         categoryIds: [] as string[]
     });
@@ -94,6 +97,7 @@ export default function AdminCMSPage() {
             slug: "",
             description: "",
             icon: "",
+            banner: "",
             isPopular: false,
             categoryIds: []
         });
@@ -124,6 +128,7 @@ export default function AdminCMSPage() {
             slug: game.slug,
             description: game.description || "",
             icon: game.icon || "",
+            banner: game.banner || "",
             isPopular: game.isPopular || false,
             categoryIds: game.categories?.map((c: any) => c.id) || []
         });
@@ -164,6 +169,39 @@ export default function AdminCMSPage() {
             setUploading(false);
             if (fileInputRef.current) {
                 fileInputRef.current.value = "";
+            }
+        }
+    };
+
+    const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        try {
+            const formDataUpload = new FormData();
+            formDataUpload.append("file", file);
+            if (editingGame) {
+                formDataUpload.append("gameId", editingGame.id);
+            }
+
+            const result = await uploadGameBanner(formDataUpload);
+
+            if (result.success && result.url) {
+                setFormData(prev => ({ ...prev, banner: result.url }));
+                toast.success("Banner uploaded");
+                if (editingGame) {
+                    loadData();
+                }
+            } else {
+                toast.error(result.error || "Upload failed");
+            }
+        } catch (error) {
+            toast.error("Upload failed");
+        } finally {
+            setUploading(false);
+            if (bannerInputRef.current) {
+                bannerInputRef.current.value = "";
             }
         }
     };
@@ -382,12 +420,18 @@ export default function AdminCMSPage() {
                 )}
             </div>
 
-            {/* Hidden file input */}
             <input
                 ref={fileInputRef}
                 type="file"
                 accept="image/png,image/jpeg,image/webp,image/gif"
                 onChange={handleFileUpload}
+                className="hidden"
+            />
+            <input
+                ref={bannerInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                onChange={handleBannerUpload}
                 className="hidden"
             />
 
@@ -457,6 +501,70 @@ export default function AdminCMSPage() {
                                     </Button>
                                     <p className="text-[9px] text-[#4b5563] text-center">PNG, JPG, WebP, GIF • Max 2MB</p>
                                 </div>
+                            </div>
+                            <div className="mt-2 text-[10px] text-[#8b949e]">
+                                Or manual URL:
+                                <input
+                                    type="text"
+                                    placeholder="https://..."
+                                    value={formData.icon}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, icon: e.target.value }))}
+                                    className="w-full bg-[#0a0e13] border border-[#2d333b] text-[#8b949e] focus:border-[#f5a623] focus:text-white h-7 text-xs rounded-md px-2 mt-1 focus:outline-none"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Banner Upload */}
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-[#8b949e] uppercase tracking-wider">Game Banner</label>
+                            <div className="flex gap-3 items-center">
+                                {/* Preview */}
+                                <div className="h-16 w-32 rounded-xl border border-[#2d333b] bg-[#0a0e13] flex items-center justify-center overflow-hidden shrink-0 relative">
+                                    {formData.banner ? (
+                                        <Image
+                                            src={formData.banner}
+                                            alt="Banner Preview"
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    ) : (
+                                        <ImageIcon className="h-6 w-6 text-[#4b5563]" />
+                                    )}
+                                </div>
+
+                                {/* Upload Button */}
+                                <div className="flex-1 space-y-2">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => bannerInputRef.current?.click()}
+                                        disabled={uploading}
+                                        className="w-full h-10 border-[#2d333b] hover:border-[#f5a623] hover:bg-[#f5a623]/10 text-white text-xs font-bold"
+                                    >
+                                        {uploading ? (
+                                            <>
+                                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                                Uploading...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Upload className="h-4 w-4 mr-2" />
+                                                Upload Banner
+                                            </>
+                                        )}
+                                    </Button>
+                                    <p className="text-[9px] text-[#4b5563] text-center">PNG, JPG, WebP, GIF • Max 5MB</p>
+                                </div>
+                            </div>
+                            <div className="mt-2 text-[10px] text-[#8b949e]">
+                                Or manual URL:
+                                <input
+                                    type="text"
+                                    placeholder="https://..."
+                                    value={formData.banner}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, banner: e.target.value }))}
+                                    className="w-full bg-[#0a0e13] border border-[#2d333b] text-[#8b949e] focus:border-[#f5a623] focus:text-white h-7 text-xs rounded-md px-2 mt-1 focus:outline-none"
+                                />
                             </div>
                         </div>
 

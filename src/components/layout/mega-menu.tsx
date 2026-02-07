@@ -6,6 +6,8 @@ import { Search, Gamepad2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
+import Image from "next/image";
+
 // Flexible game interface that works with both hardcoded and database data
 interface Game {
     id: string;
@@ -105,8 +107,17 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
                                     onClick={handleLinkClick}
                                     className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1c2128] border border-transparent hover:border-[#30363d] transition-colors group"
                                 >
-                                    <div className="h-8 w-8 rounded-md bg-[#1c2128] border border-[#30363d] flex items-center justify-center shrink-0 group-hover:border-[#f5a623]/30 transition-colors">
-                                        <Gamepad2 className="h-4 w-4 text-[#8b949e] group-hover:text-[#f5a623]" />
+                                    <div className="h-8 w-8 rounded-md bg-[#1c2128] border border-[#30363d] flex items-center justify-center shrink-0 group-hover:border-[#f5a623]/30 transition-colors overflow-hidden relative">
+                                        {game.icon ? (
+                                            <Image
+                                                src={game.icon}
+                                                alt={game.name}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        ) : (
+                                            <Gamepad2 className="h-4 w-4 text-[#8b949e] group-hover:text-[#f5a623]" />
+                                        )}
                                     </div>
                                     <span className="text-sm font-bold tracking-tight text-[#fdfcf0]/80 group-hover:text-white transition-colors">
                                         {game.name}

@@ -69,24 +69,12 @@ export async function createGame(data: {
     slug: string;
     description?: string;
     icon?: string;
+    banner?: string;
     isPopular?: boolean;
     categoryIds: string[];
 }) {
     try {
-        // Check if game name or slug already exists
-        const existingGame = await prisma.game.findFirst({
-            where: {
-                OR: [
-                    { name: { equals: data.name, mode: 'insensitive' } },
-                    { slug: { equals: data.slug, mode: 'insensitive' } }
-                ]
-            }
-        });
 
-        if (existingGame) {
-            const field = existingGame.name.toLowerCase() === data.name.toLowerCase() ? "name" : "slug";
-            return { error: `A game with this ${field} already exists.` };
-        }
 
         const game = await prisma.game.create({
             data: {
@@ -94,6 +82,7 @@ export async function createGame(data: {
                 slug: data.slug,
                 description: data.description,
                 icon: data.icon,
+                banner: data.banner,
                 isPopular: data.isPopular || false,
                 categories: {
                     connect: data.categoryIds.map(id => ({ id }))
@@ -132,25 +121,12 @@ export async function updateGame(gameId: string, data: {
     slug: string;
     description?: string;
     icon?: string;
+    banner?: string;
     isPopular?: boolean;
     categoryIds: string[];
 }) {
     try {
-        // Check if another game already has this name or slug
-        const duplicateGame = await prisma.game.findFirst({
-            where: {
-                OR: [
-                    { name: { equals: data.name, mode: 'insensitive' } },
-                    { slug: { equals: data.slug, mode: 'insensitive' } }
-                ],
-                NOT: { id: gameId }
-            }
-        });
 
-        if (duplicateGame) {
-            const field = duplicateGame.name.toLowerCase() === data.name.toLowerCase() ? "name" : "slug";
-            return { error: `Another game already exists with this ${field}.` };
-        }
 
         // First disconnect all categories
         await prisma.game.update({
@@ -168,6 +144,7 @@ export async function updateGame(gameId: string, data: {
                 slug: data.slug,
                 description: data.description,
                 icon: data.icon,
+                banner: data.banner,
                 isPopular: data.isPopular || false,
                 categories: {
                     connect: data.categoryIds.map(id => ({ id }))
@@ -216,6 +193,17 @@ export async function deleteGame(gameId: string) {
                 if (key) await deleteFromR2(key);
             } catch (e) {
                 console.error("Error deleting game icon:", e);
+            }
+        }
+
+        // Delete banner from R2 if it exists
+        if (game?.banner && game.banner.includes("cdn.iboosts.gg")) {
+            try {
+                const { deleteFromR2 } = await import("@/lib/r2");
+                const key = game.banner.split("cdn.iboosts.gg/")[1];
+                if (key) await deleteFromR2(key);
+            } catch (e) {
+                console.error("Error deleting game banner:", e);
             }
         }
 
@@ -297,6 +285,74 @@ export async function uploadGameIcon(formData: FormData) {
         return { success: true, url: publicUrl };
     } catch (error: any) {
         console.error("Error uploading game icon:", error);
+        return { error: error.message };
+    }
+}
+
+export async function uploadGameBanner(formData: FormData) {
+    try {
+        const file = formData.get("file") as File;
+        const gameId = formData.get("gameId") as string;
+
+        if (!file || file.size === 0) {
+            return { error: "No file provided" };
+        }
+
+        // Validate file type
+        const allowedTypes = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+        if (!allowedTypes.includes(file.type)) {
+            return { error: "Invalid file type. Only PNG, JPG, WebP, GIF allowed." };
+        }
+
+        // Max 5MB for banners
+        if (file.size > 5 * 1024 * 1024) {
+            return { error: "File too large. Max 5MB." };
+        }
+
+        // Get current game to delete old banner
+        const currentGame = gameId ? await prisma.game.findUnique({
+            where: { id: gameId },
+            select: { banner: true }
+        }) : null;
+
+        // Delete old banner from R2 if exists
+        if (currentGame?.banner && currentGame.banner.includes("cdn.iboosts.gg")) {
+            try {
+                const { deleteFromR2 } = await import("@/lib/r2");
+                const oldKey = currentGame.banner.split("cdn.iboosts.gg/")[1];
+                if (oldKey) await deleteFromR2(oldKey);
+            } catch (e) {
+                console.error("Error deleting old game banner:", e);
+            }
+        }
+
+        // Convert file to buffer
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+
+        // Generate unique filename
+        const ext = file.name.split(".").pop() || "png";
+        const timestamp = Date.now();
+        const fileName = `banners/${gameId || "temp"}-${timestamp}.${ext}`;
+
+        // Upload to R2
+        const { uploadToR2 } = await import("@/lib/r2");
+        const publicUrl = await uploadToR2(buffer, fileName, file.type);
+
+        // If gameId provided, update the game
+        if (gameId) {
+            await prisma.game.update({
+                where: { id: gameId },
+                data: { banner: publicUrl }
+            });
+            revalidateTag("navbar-data", {});
+            revalidatePath("/admin/cms");
+            revalidatePath("/");
+        }
+
+        return { success: true, url: publicUrl };
+    } catch (error: any) {
+        console.error("Error uploading game banner:", error);
         return { error: error.message };
     }
 }
