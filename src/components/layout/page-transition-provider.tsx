@@ -49,7 +49,7 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
                             }
                         }}
                     >
-                        <Logo className="w-16 h-16" />
+                        <Logo className="w-24 h-24" iconOnly={true} />
                     </motion.div>
                 </motion.div>
             </motion.div>

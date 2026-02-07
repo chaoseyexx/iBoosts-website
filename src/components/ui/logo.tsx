@@ -3,12 +3,13 @@ import { cn } from "@/lib/utils";
 
 interface LogoProps extends React.SVGProps<SVGSVGElement> {
     className?: string;
+    iconOnly?: boolean;
 }
 
-export function Logo({ className, ...props }: LogoProps) {
+export function Logo({ className, iconOnly = false, ...props }: LogoProps) {
     return (
         <svg
-            viewBox="0 0 450 100"
+            viewBox={iconOnly ? "0 0 100 100" : "0 0 450 100"}
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             className={cn("h-full w-auto", className)}
@@ -26,26 +27,28 @@ export function Logo({ className, ...props }: LogoProps) {
             </g>
 
             {/* 2. Text Part - Matching user style and color exactly */}
-            <text
-                x="120"
-                y="68"
-                style={{
-                    fontFamily: "system-ui, -apple-system, sans-serif",
-                    fontWeight: 800,
-                    fontSize: "56px",
-                    fill: "white",
-                    letterSpacing: "-0.02em"
-                }}
-            >
-                iboosts
-                <tspan
+            {!iconOnly && (
+                <text
+                    x="120"
+                    y="68"
                     style={{
-                        fill: "#f5a623"
+                        fontFamily: "system-ui, -apple-system, sans-serif",
+                        fontWeight: 800,
+                        fontSize: "56px",
+                        fill: "white",
+                        letterSpacing: "-0.02em"
                     }}
                 >
-                    .gg
-                </tspan>
-            </text>
+                    iboosts
+                    <tspan
+                        style={{
+                            fill: "#f5a623"
+                        }}
+                    >
+                        .gg
+                    </tspan>
+                </text>
+            )}
         </svg>
     );
 }
