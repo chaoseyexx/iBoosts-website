@@ -27,11 +27,7 @@ export function RecentPurchasePopup({ initialActivities = [] }: RecentPurchasePo
     const pathname = usePathname();
     const [activePurchases, setActivePurchases] = React.useState<Purchase[]>([]);
 
-    // Don't show on dashboard or admin pages
-    if (pathname?.startsWith("/dashboard") || pathname?.startsWith("/admin")) {
-        return null;
-    }
-
+    // Move hooks to top level
     const removeNotification = React.useCallback((id: string) => {
         setActivePurchases((prev) => prev.filter((p) => p.id !== id));
     }, []);
@@ -79,6 +75,12 @@ export function RecentPurchasePopup({ initialActivities = [] }: RecentPurchasePo
             clearInterval(interval);
         };
     }, [showNotification]);
+
+    // Conditional check after all hooks
+    const isHidden = pathname?.startsWith("/dashboard") || pathname?.startsWith("/admin");
+    if (isHidden) {
+        return null;
+    }
 
     return (
         <div className="fixed bottom-6 left-6 z-[9999] flex flex-col gap-3 pointer-events-none">
