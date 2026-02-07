@@ -47,6 +47,17 @@ export default async function EditListingPage({ params }: EditListingPageProps) 
     // Bind ID to the update action
     const updateAction = updateListing.bind(null, listing.id);
 
+    // Serialize listing for Client Component (fix Decimal/Date error)
+    const serializableListing = {
+        ...listing,
+        price: listing.price.toNumber(),
+        createdAt: listing.createdAt.toISOString(),
+        updatedAt: listing.updatedAt.toISOString(),
+        publishedAt: listing.publishedAt?.toISOString() || null,
+        deletedAt: listing.deletedAt?.toISOString() || null,
+        promotedUntil: listing.promotedUntil?.toISOString() || null,
+    };
+
     return (
         <div className="min-h-screen bg-[#0a0e13] pb-20">
             {/* Header Banner - Matches Ref */}
@@ -57,7 +68,7 @@ export default async function EditListingPage({ params }: EditListingPageProps) 
 
             <main className="container max-w-5xl mx-auto px-4">
                 <ListingForm
-                    initialData={listing}
+                    initialData={serializableListing}
                     categories={categories}
                     games={games}
                     action={updateAction}
