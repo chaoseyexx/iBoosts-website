@@ -1,0 +1,268 @@
+/* ===========================================
+   DASHBOARD SPECIFIC STYLES - ELDORADO THEME
+   =========================================== */
+
+/* Dashboard Color Variables (Eldorado-inspired) */
+.dashboard-theme {
+    --dashboard-bg: #0a0e13;
+    --dashboard-sidebar: #0f1419;
+    --dashboard-card: #1c2128;
+    --dashboard-card-hover: #252b33;
+    --dashboard-accent: #f5a623;
+    --dashboard-accent-hover: #e09612;
+    --dashboard-accent-muted: rgba(245, 166, 35, 0.1);
+    --dashboard-text: #ffffff;
+    --dashboard-text-secondary: #9ca3af;
+    --dashboard-text-muted: #6b7280;
+    --dashboard-border: #2d333b;
+    --dashboard-link: #5c9eff;
+}
+
+/* Apply dashboard theme to layout */
+[data-dashboard] {
+    --bg-primary: var(--dashboard-bg);
+    --bg-secondary: var(--dashboard-sidebar);
+    --bg-card: var(--dashboard-card);
+    --bg-card-hover: var(--dashboard-card-hover);
+    --border-subtle: var(--dashboard-border);
+    background: var(--dashboard-bg);
+    color: var(--dashboard-text);
+}
+
+/* Dashboard Cards */
+[data-dashboard] .card,
+.dashboard-card {
+    background: var(--dashboard-card);
+    border-color: var(--dashboard-border);
+}
+
+[data-dashboard] .card:hover,
+.dashboard-card:hover {
+    background: var(--dashboard-card-hover);
+}
+
+/* Dashboard Buttons */
+.btn-dashboard-primary {
+    background: var(--dashboard-accent);
+    color: #000000;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-dashboard-primary:hover {
+    background: var(--dashboard-accent-hover);
+}
+
+.btn-dashboard-secondary {
+    background: var(--dashboard-card);
+    color: var(--dashboard-text);
+    border: 1px solid var(--dashboard-border);
+}
+
+.btn-dashboard-secondary:hover {
+    background: var(--dashboard-card-hover);
+}
+
+/* Dashboard Table Styles */
+.dashboard-table {
+    width: 100%;
+}
+
+.dashboard-table th {
+    padding: 0.75rem 1.5rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--dashboard-text-muted);
+    border-bottom: 1px solid var(--dashboard-border);
+}
+
+.dashboard-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--dashboard-border);
+}
+
+.dashboard-table tbody tr:hover {
+    background: var(--dashboard-card-hover);
+}
+
+/* Dashboard Tab Styles */
+.dashboard-tab {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: var(--dashboard-text-muted);
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+}
+
+.dashboard-tab:hover {
+    color: var(--dashboard-text);
+}
+
+.dashboard-tab.active {
+    color: var(--dashboard-accent);
+    background: var(--dashboard-accent-muted);
+    border-bottom-color: var(--dashboard-accent);
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+/* Dashboard Input Styles */
+.dashboard-input {
+    height: 2.5rem;
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid var(--dashboard-border);
+    background: var(--dashboard-card);
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    color: var(--dashboard-text);
+    transition: border-color 0.2s;
+}
+
+.dashboard-input::placeholder {
+    color: var(--dashboard-text-muted);
+}
+
+.dashboard-input:focus {
+    outline: none;
+    border-color: var(--dashboard-accent);
+}
+
+/* Dashboard Badge Styles */
+.dashboard-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 9999px;
+}
+
+.dashboard-badge-success {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
+.dashboard-badge-warning {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.dashboard-badge-error {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.dashboard-badge-info {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.dashboard-badge-default {
+    background: var(--dashboard-accent-muted);
+    color: var(--dashboard-accent);
+}
+
+/* Dashboard Stat Cards */
+.dashboard-stat-card {
+    background: var(--dashboard-card);
+    border: 1px solid var(--dashboard-border);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+}
+
+.dashboard-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dashboard-text);
+}
+
+.dashboard-stat-label {
+    font-size: 0.875rem;
+    color: var(--dashboard-text-muted);
+    margin-top: 0.25rem;
+}
+
+/* Dashboard Link */
+.dashboard-link {
+    color: var(--dashboard-link);
+    text-decoration: none;
+}
+
+.dashboard-link:hover {
+    text-decoration: underline;
+}
+
+/* Dashboard Price */
+.dashboard-price {
+    color: var(--dashboard-accent);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Dashboard Avatar */
+.dashboard-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: var(--dashboard-card-hover);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: var(--dashboard-text);
+}
+
+/* Dashboard Section Header */
+.dashboard-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.dashboard-section-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    background: var(--dashboard-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dashboard-section-icon svg {
+    color: var(--dashboard-accent);
+}
+
+.dashboard-section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dashboard-text);
+}
+
+.dashboard-section-desc {
+    font-size: 0.875rem;
+    color: var(--dashboard-text-muted);
+}
+
+/* Scrollbar for Dashboard */
+[data-dashboard] ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+[data-dashboard] ::-webkit-scrollbar-track {
+    background: var(--dashboard-sidebar);
+}
+
+[data-dashboard] ::-webkit-scrollbar-thumb {
+    background: var(--dashboard-border);
+    border-radius: 3px;
+}
+
+[data-dashboard] ::-webkit-scrollbar-thumb:hover {
+    background: #3d444d;
+}

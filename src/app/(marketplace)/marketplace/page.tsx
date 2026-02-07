@@ -13,172 +13,267 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Search, SlidersHorizontal, Grid, List } from "lucide-react";
-import prisma from "@/lib/prisma/client";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
 
-// Prevent static generation - this page requires database access
-export const dynamic = "force-dynamic";
+// Mock data - replace with real data from database
+const categories = [
+    { name: "All Categories", slug: "all", count: 3420 },
+    { name: "Gaming", slug: "gaming", icon: "🎮", count: 1234 },
+    { name: "Streaming", slug: "streaming", icon: "📺", count: 856 },
+    { name: "Software", slug: "software", icon: "💻", count: 543 },
+    { name: "Social Media", slug: "social-media", icon: "📱", count: 432 },
+    { name: "Cloud Services", slug: "cloud", icon: "☁️", count: 321 },
+];
 
-export default async function MarketplacePage() {
-    // 1. Fetch Categories from DB
-    const dbCategories = await prisma.category.findMany({
-        where: { isActive: true },
-        select: {
-            id: true,
-            name: true,
-            slug: true,
-            icon: true,
-            _count: {
-                select: { listings: { where: { status: "ACTIVE" } } }
-            }
-        },
-        orderBy: { sortOrder: "asc" }
-    });
+const listings = [
+    {
+        id: "1",
+        title: "Valorant Immortal Account - Full Access",
+        price: 149.99,
+        originalPrice: 199.99,
+        seller: { username: "ProGamer", avatar: null, rating: 4.9, sales: 234 },
+        category: "Gaming",
+        image: null,
+        stock: 5,
+    },
+    {
+        id: "2",
+        title: "Discord Nitro 1 Year - Instant Delivery",
+        price: 79.99,
+        originalPrice: 99.99,
+        seller: { username: "DigitalDeals", avatar: null, rating: 4.8, sales: 1023 },
+        category: "Software",
+        image: null,
+        stock: 50,
+    },
+    {
+        id: "3",
+        title: "Spotify Premium Lifetime - Warranty",
+        price: 29.99,
+        originalPrice: null,
+        seller: { username: "StreamKing", avatar: null, rating: 4.7, sales: 567 },
+        category: "Streaming",
+        image: null,
+        stock: 100,
+    },
+    {
+        id: "4",
+        title: "Netflix Premium 4K UHD - 1 Month",
+        price: 19.99,
+        originalPrice: null,
+        seller: { username: "MediaPro", avatar: null, rating: 4.9, sales: 890 },
+        category: "Streaming",
+        image: null,
+        stock: 25,
+    },
+    {
+        id: "5",
+        title: "League of Legends Diamond Account",
+        price: 89.99,
+        originalPrice: 129.99,
+        seller: { username: "ProGamer", avatar: null, rating: 4.9, sales: 234 },
+        category: "Gaming",
+        image: null,
+        stock: 3,
+    },
+    {
+        id: "6",
+        title: "Adobe Creative Cloud - 1 Year",
+        price: 199.99,
+        originalPrice: 599.99,
+        seller: { username: "SoftwareHub", avatar: null, rating: 4.6, sales: 321 },
+        category: "Software",
+        image: null,
+        stock: 15,
+    },
+    {
+        id: "7",
+        title: "Instagram 10K Followers - Real",
+        price: 49.99,
+        originalPrice: null,
+        seller: { username: "SocialBoost", avatar: null, rating: 4.5, sales: 456 },
+        category: "Social Media",
+        image: null,
+        stock: 200,
+    },
+    {
+        id: "8",
+        title: "YouTube Premium Family - 1 Year",
+        price: 39.99,
+        originalPrice: 59.99,
+        seller: { username: "MediaPro", avatar: null, rating: 4.9, sales: 890 },
+        category: "Streaming",
+        image: null,
+        stock: 40,
+    },
+];
 
-    const categories = [
-        { name: "All Categories", slug: "all", icon: null as string | null, count: dbCategories.reduce((acc, cat) => acc + cat._count.listings, 0) },
-        ...dbCategories.map(cat => ({
-            name: cat.name,
-            slug: cat.slug,
-            icon: cat.icon,
-            count: cat._count.listings
-        }))
-    ];
+const sortOptions = [
+    { value: "relevance", label: "Relevance" },
+    { value: "price-low", label: "Price: Low to High" },
+    { value: "price-high", label: "Price: High to Low" },
+    { value: "newest", label: "Newest First" },
+    { value: "best-selling", label: "Best Selling" },
+    { value: "rating", label: "Highest Rated" },
+];
 
-    // 2. Fetch Featured/Active Listings
-    const listings = await prisma.listing.findMany({
-        where: { status: "ACTIVE" },
-        take: 12,
-        include: {
-            seller: {
-                select: {
-                    id: true,
-                    username: true,
-                    avatar: true,
-                    sellerRating: true,
-                    totalSales: true,
-                }
-            },
-            game: {
-                select: { name: true }
-            }
-        },
-        orderBy: { createdAt: "desc" }
-    });
-
-    const sortOptions = [
-        { label: "Most Relevant", value: "relevance" },
-        { label: "Newest First", value: "newest" },
-        { label: "Price: Low to High", value: "price_asc" },
-        { label: "Price: High to Low", value: "price_desc" },
-        { label: "Best Rating", value: "rating" },
-    ];
-
+export default function MarketplacePage() {
     return (
-        <div className="min-h-screen bg-[#050506]">
-            <NavbarServer variant="landing" />
+        <div className="min-h-screen bg-[var(--bg-primary)]">
+            <NavbarServer />
 
-            <main className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-                <div className="flex flex-col space-y-8">
-                    {/* Hero Section */}
-                    <div className="text-center space-y-4 py-8">
-                        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight uppercase">
-                            Premium <span className="text-[#f5a623]">Marketplace</span>
+            <main className="pt-20 pb-12">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    {/* Header */}
+                    <div className="mb-8">
+                        <h1 className="text-3xl font-bold text-[var(--text-primary)]">
+                            Marketplace
                         </h1>
-                        <p className="text-[#8b949e] max-w-2x1 mx-auto text-lg">
-                            The most trusted platform for buying and selling digital assets, currency, and boosting services.
+                        <p className="text-[var(--text-muted)] mt-2">
+                            Discover thousands of digital products from verified sellers
                         </p>
                     </div>
 
-                    {/* Filter Bar */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl bg-[#0d1117] border border-[#1c2128]">
-                        <div className="relative flex-1 max-w-md">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b949e]" />
-                            <Input
-                                placeholder="Search the marketplace..."
-                                className="pl-10 h-10 bg-[#161b22] border-[#2d333b]"
-                            />
+                    {/* Search & Filters */}
+                    <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div className="flex flex-1 items-center gap-4">
+                            <div className="relative flex-1 max-w-md">
+                                <Input
+                                    placeholder="Search products..."
+                                    leftIcon={<Search className="h-4 w-4" />}
+                                    className="pr-4"
+                                />
+                            </div>
+                            <Button variant="secondary">
+                                <SlidersHorizontal className="h-4 w-4 mr-2" />
+                                Filters
+                            </Button>
                         </div>
 
                         <div className="flex items-center gap-4">
                             <Select defaultValue="relevance">
-                                <SelectTrigger className="w-44 h-10 bg-[#161b22] border-[#2d333b]">
+                                <SelectTrigger className="w-44">
                                     <SelectValue placeholder="Sort order" />
                                 </SelectTrigger>
-                                <SelectContent className="bg-[#1c2128] border-[#2d333b]">
+                                <SelectContent>
                                     {sortOptions.map((option) => (
-                                        <SelectItem key={option.value} value={option.value} className="text-white hover:bg-[#252b33]">
+                                        <SelectItem key={option.value} value={option.value}>
                                             {option.label}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
-                            <Button variant="outline" className="h-10 border-[#2d333b] bg-[#161b22] text-[#8b949e]">
-                                <SlidersHorizontal className="h-4 w-4 mr-2" />
-                                Filters
-                            </Button>
+                            <div className="hidden sm:flex items-center gap-1 border border-[var(--border-subtle)] rounded-lg p-1">
+                                <Button variant="ghost" size="icon-sm" className="rounded">
+                                    <Grid className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon-sm" className="rounded">
+                                    <List className="h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex flex-col lg:flex-row gap-8">
+                    <div className="flex gap-8">
                         {/* Sidebar Categories */}
-                        <aside className="w-full lg:w-64 shrink-0">
-                            <Card className="p-4 bg-[#0d1117] border-[#1c2128]">
-                                <h3 className="font-bold text-white mb-4 uppercase text-xs tracking-widest text-[#8b949e]">
+                        <aside className="hidden lg:block w-64 shrink-0">
+                            <Card className="p-4 sticky top-24">
+                                <h3 className="font-semibold text-[var(--text-primary)] mb-4">
                                     Categories
                                 </h3>
                                 <ul className="space-y-1">
                                     {categories.map((category) => (
                                         <li key={category.slug}>
-                                            <Link href={category.slug === "all" ? "/marketplace" : `/${category.slug}`}>
-                                                <div className={cn(
-                                                    "w-full flex items-center justify-between rounded-xl px-4 py-2.5 text-sm transition-all group",
-                                                    category.slug === "all"
-                                                        ? "bg-[#f5a623] text-black font-bold"
-                                                        : "text-[#8b949e] hover:bg-[#161b22] hover:text-white"
-                                                )}>
-                                                    <span className="flex items-center gap-3">
-                                                        {category.icon && <span className="text-lg">{category.icon}</span>}
-                                                        {category.name}
-                                                    </span>
-                                                    <Badge variant="outline" className={cn(
-                                                        "text-[10px] h-5",
-                                                        category.slug === "all" ? "border-black/20 text-black/60" : "border-[#2d333b] text-[#8b949e]"
-                                                    )}>
-                                                        {category.count}
-                                                    </Badge>
-                                                </div>
-                                            </Link>
+                                            <button
+                                                className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors ${category.slug === "all"
+                                                    ? "bg-[var(--olive-600)] text-white"
+                                                    : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
+                                                    }`}
+                                            >
+                                                <span className="flex items-center gap-2">
+                                                    {category.icon && <span>{category.icon}</span>}
+                                                    {category.name}
+                                                </span>
+                                                <Badge variant="secondary" size="sm">
+                                                    {category.count}
+                                                </Badge>
+                                            </button>
                                         </li>
                                     ))}
                                 </ul>
+
+                                {/* Price Range */}
+                                <div className="mt-6 pt-6 border-t border-[var(--border-subtle)]">
+                                    <h3 className="font-semibold text-[var(--text-primary)] mb-4">
+                                        Price Range
+                                    </h3>
+                                    <div className="flex items-center gap-2">
+                                        <Input placeholder="Min" type="number" className="text-sm" />
+                                        <span className="text-[var(--text-muted)]">-</span>
+                                        <Input placeholder="Max" type="number" className="text-sm" />
+                                    </div>
+                                    <Button variant="secondary" size="sm" className="w-full mt-3">
+                                        Apply
+                                    </Button>
+                                </div>
+
+                                {/* Seller Rating */}
+                                <div className="mt-6 pt-6 border-t border-[var(--border-subtle)]">
+                                    <h3 className="font-semibold text-[var(--text-primary)] mb-4">
+                                        Seller Rating
+                                    </h3>
+                                    <div className="space-y-2">
+                                        {[4.5, 4.0, 3.5, 3.0].map((rating) => (
+                                            <label
+                                                key={rating}
+                                                className="flex items-center gap-2 cursor-pointer"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    className="rounded border-[var(--border-default)] bg-[var(--bg-input)] text-[var(--olive-600)] focus:ring-[var(--olive-600)]"
+                                                />
+                                                <span className="text-sm text-[var(--text-secondary)]">
+                                                    {rating}+ stars
+                                                </span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
                             </Card>
                         </aside>
 
-                        {/* Main Grid */}
-                        <div className="flex-1 space-y-6">
-                            {listings.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                                    {listings.map((listing) => (
-                                        <ListingCard key={listing.id} listing={listing as any} />
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="flex flex-col items-center justify-center py-20 bg-[#0d1117] rounded-3xl border border-dashed border-[#2d333b]">
-                                    <div className="h-16 w-16 bg-[#161b22] rounded-full flex items-center justify-center mb-4">
-                                        <Search className="h-8 w-8 text-[#8b949e]" />
-                                    </div>
-                                    <h3 className="text-xl font-bold text-white mb-1">No listings found</h3>
-                                    <p className="text-[#8b949e]">Try adjusting your search filters or browse other categories.</p>
-                                </div>
-                            )}
+                        {/* Listings Grid */}
+                        <div className="flex-1">
+                            <div className="mb-4 text-sm text-[var(--text-muted)]">
+                                Showing {listings.length} results
+                            </div>
 
-                            {/* Pagination Placeholder */}
-                            <div className="flex items-center justify-center gap-2 pt-8">
-                                <Button variant="outline" className="border-[#2d333b] bg-[#0d1117] text-[#8b949e]" disabled>Previous</Button>
-                                <Button className="bg-[#f5a623] text-black font-bold">1</Button>
-                                <Button variant="outline" className="border-[#2d333b] bg-[#0d1117] text-[#8b949e]" disabled>Next</Button>
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                                {listings.map((listing) => (
+                                    <ListingCard key={listing.id} listing={listing} />
+                                ))}
+                            </div>
+
+                            {/* Pagination */}
+                            <div className="mt-8 flex items-center justify-center gap-2">
+                                <Button variant="secondary" size="sm" disabled>
+                                    Previous
+                                </Button>
+                                <Button variant="default" size="sm">
+                                    1
+                                </Button>
+                                <Button variant="secondary" size="sm">
+                                    2
+                                </Button>
+                                <Button variant="secondary" size="sm">
+                                    3
+                                </Button>
+                                <span className="text-[var(--text-muted)]">...</span>
+                                <Button variant="secondary" size="sm">
+                                    12
+                                </Button>
+                                <Button variant="secondary" size="sm">
+                                    Next
+                                </Button>
                             </div>
                         </div>
                     </div>

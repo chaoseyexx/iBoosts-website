@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma/client";
 import { createAdminClient } from "@/lib/supabase/server";
 
@@ -117,7 +117,7 @@ export async function createGame(data: {
             }))
         });
 
-        revalidatePath("/", "layout");
+        revalidateTag("navbar-data", {});
         revalidatePath("/admin/cms");
         revalidatePath("/"); // To update navbar if it's dynamic later
         return { success: true, game };
@@ -175,7 +175,7 @@ export async function updateGame(gameId: string, data: {
             }
         });
 
-        revalidatePath("/", "layout");
+        revalidateTag("navbar-data", {});
         revalidatePath("/admin/cms");
         revalidatePath("/");
         // Revalidate category pages
@@ -223,7 +223,7 @@ export async function deleteGame(gameId: string) {
             where: { id: gameId }
         });
 
-        revalidatePath("/", "layout");
+        revalidateTag("navbar-data", {});
         revalidatePath("/admin/cms");
         revalidatePath("/");
         return { success: true };
@@ -289,7 +289,7 @@ export async function uploadGameIcon(formData: FormData) {
                 where: { id: gameId },
                 data: { icon: publicUrl }
             });
-            revalidatePath("/", "layout");
+            revalidateTag("navbar-data", {});
             revalidatePath("/admin/cms");
             revalidatePath("/");
         }

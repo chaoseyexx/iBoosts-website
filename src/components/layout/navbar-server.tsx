@@ -33,11 +33,11 @@ export async function NavbarServer({ variant = "landing" }: NavbarServerProps) {
         transformedGamesData[catName] = {
             popular: data.popular.map((g: any) => ({
                 ...g,
-                href: `/${catSlug}/${g.slug}`
+                href: `/${catSlug}?game=${g.slug}`
             })),
             all: data.all.map((g: any) => ({
                 ...g,
-                href: `/${catSlug}/${g.slug}`
+                href: `/${catSlug}?game=${g.slug}`
             }))
         };
     }
