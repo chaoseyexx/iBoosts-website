@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { RecommendedSellerCard } from "./recommended-seller-card";
+import { RobuxListingHero } from "./robux-listing-hero";
 import { CurrencyListingsTable } from "./currency-listings-table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -135,7 +136,11 @@ export function CurrencyMarketplaceView({ category, game, listings }: CurrencyMa
                                 <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-[#30363d]" />
                             </div>
                             <div className="relative z-10">
-                                <RecommendedSellerCard listing={recommendedListing} />
+                                {game?.slug === 'roblox-robux' ? (
+                                    <RobuxListingHero listing={recommendedListing} />
+                                ) : (
+                                    <RecommendedSellerCard listing={recommendedListing} />
+                                )}
                             </div>
                         </div>
                     )}
