@@ -1028,6 +1028,7 @@ export async function seedMarketplaceData() {
             where: { slug: "currency" },
             update: {},
             create: {
+                id: "currency",
                 name: "Currency",
                 slug: "currency",
                 icon: "💰",
