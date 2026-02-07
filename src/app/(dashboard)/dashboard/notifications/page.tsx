@@ -91,17 +91,17 @@ export default function NotificationsPage() {
                 {/* Page Header */}
                 <div className="flex items-center gap-3">
                     <Bell className="h-6 w-6 text-[#f5a623] fill-[#f5a623]" />
-                    <h1 className="text-3xl font-black text-white tracking-tight italic uppercase">Notifications</h1>
+                    <h1 className="text-3xl font-black text-white tracking-tight uppercase">Notifications</h1>
                 </div>
 
                 {/* Status and Action Row */}
                 <div className="flex items-center justify-between border-b border-[#2d333b]/30 pb-4">
                     <div className="flex items-center gap-2">
                         <span className="relative flex h-2 w-2">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00b67a] opacity-75"></span>
-                            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00b67a]"></span>
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#f5a623] opacity-75"></span>
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.5)]"></span>
                         </span>
-                        <span className="text-[11px] font-bold text-[#4b5563] uppercase tracking-wider">Connected</span>
+                        <span className="text-[11px] font-black text-[#8b949e] uppercase tracking-[0.2em]">Live Connection</span>
                     </div>
                     <button
                         onClick={markAllAsRead}
@@ -119,10 +119,10 @@ export default function NotificationsPage() {
                             href={`/boosting-request/${notification.id}`}
                             onClick={() => markAsRead(notification.id)}
                             className={cn(
-                                "group relative flex items-start gap-4 p-4 transition-all border-l-2 block cursor-pointer",
+                                "group relative flex items-start gap-4 p-5 transition-all border-l-4 block cursor-pointer mb-2 rounded-r-xl",
                                 !notification.read
-                                    ? "border-[#f5a623] bg-[#f5a623]/[0.02]"
-                                    : "border-transparent opacity-60 grayscale hover:grayscale-0 hover:opacity-100 hover:bg-[#1c2128]/30"
+                                    ? "border-[#f5a623] bg-[#f5a623]/[0.03] shadow-[0_0_30px_rgba(245,166,35,0.02)]"
+                                    : "border-[#1c2128] opacity-60 grayscale hover:grayscale-0 hover:opacity-100 hover:bg-[#1c2128]/50 hover:border-[#f5a623] underline-none"
                             )}
                         >
                             {/* Game Icon */}
@@ -138,18 +138,18 @@ export default function NotificationsPage() {
 
                             {/* Notification Content */}
                             <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[13px] font-bold text-white">
-                                        {notification.game} <span className="text-[#8b949e] font-medium italic">({notification.type})</span>
+                                <div className="flex items-center gap-2 mb-1">
+                                    <span className="text-[14px] font-bold text-white tracking-tight">
+                                        {notification.game} <span className="text-[#f5a623] font-bold">({notification.type})</span>
                                     </span>
-                                    <span className="text-[11px] font-bold text-[#4b5563] uppercase">
+                                    <span className="text-[11px] font-bold text-[#8b949e] uppercase tracking-wider">
                                         • {notification.time}
                                     </span>
                                 </div>
                                 {notification.details && (
-                                    <div className="mt-0.5 space-y-0.5">
+                                    <div className="mt-1 space-y-1">
                                         {notification.details.map((detail, idx) => (
-                                            <p key={idx} className="text-[12px] text-[#8b949e] font-medium leading-tight">
+                                            <p key={idx} className="text-[13px] text-[#9ca3af] font-medium leading-normal tracking-tight">
                                                 {detail}
                                             </p>
                                         ))}
@@ -160,14 +160,14 @@ export default function NotificationsPage() {
                             {/* Mark as Read Action */}
                             <button
                                 onClick={() => markAsRead(notification.id)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-[#4b5563] hover:text-[#f5a623] uppercase tracking-tighter"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-[#8b949e] hover:text-[#f5a623] uppercase tracking-tighter"
                             >
                                 Mark as read
                             </button>
 
                             {/* Decorative Line (if unread) */}
                             {!notification.read && (
-                                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#f5a623] rounded-l-full blur-[1px]" />
+                                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-10 bg-[#f5a623] rounded-l-full shadow-[0_0_15px_rgba(245,166,35,0.5)]" />
                             )}
                         </Link>
                     ))}
@@ -177,8 +177,8 @@ export default function NotificationsPage() {
                 {notifications.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-20 bg-[#0d1117]/30 rounded-2xl border border-dashed border-[#2d333b]">
                         <Bell className="h-12 w-12 text-[#2d333b] mb-4" />
-                        <h3 className="text-lg font-bold text-white italic uppercase italic">No notifications</h3>
-                        <p className="text-[#4b5563] text-sm">You are all caught up for now.</p>
+                        <h3 className="text-lg font-bold text-white uppercase">No notifications</h3>
+                        <p className="text-[#8b949e] text-sm font-bold uppercase tracking-widest mt-1">You are all caught up for now.</p>
                     </div>
                 )}
             </div>

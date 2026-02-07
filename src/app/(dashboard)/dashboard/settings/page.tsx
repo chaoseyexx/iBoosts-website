@@ -33,7 +33,7 @@ function SubmitButton() {
         <Button
             type="submit"
             variant="ghost"
-            className="text-[#5c9eff] hover:text-[#5c9eff] hover:bg-[#5c9eff]/10 font-bold"
+            className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 font-bold tracking-tight"
             disabled={pending}
         >
             {pending ? "SAVING..." : "SAVE"}
@@ -113,14 +113,14 @@ function EditableRow({
                 ) : (
                     <div className="flex items-center justify-between group">
                         <div className="flex-1 pr-4">
-                            <div className="h-10 flex items-center px-3 rounded-md bg-[#161b22] border border-transparent text-[#9ca3af]">
+                            <div className="h-10 flex items-center px-3 rounded-md bg-black/40 border border-white/[0.05] text-[#9ca3af]">
                                 {value || "Not set"}
                             </div>
                             {helperText && <p className="text-xs text-[#6b7280] mt-1.5">{helperText}</p>}
                         </div>
                         <Button
                             variant="ghost"
-                            className="text-[#5c9eff] hover:text-[#5c9eff] hover:bg-[#5c9eff]/10 font-bold"
+                            className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 font-bold tracking-tight"
                             onClick={() => setIsEditing(true)}
                         >
                             EDIT
@@ -165,7 +165,7 @@ function AvatarRow({ url, displayChar, onUpload }: AvatarRowProps) {
             </div>
             <div className="md:col-span-9 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <div className="h-16 w-16 rounded-full bg-[#252b33] overflow-hidden border border-[#2d333b] flex items-center justify-center relative">
+                    <div className="h-16 w-16 rounded-full bg-black/40 overflow-hidden border border-white/[0.05] flex items-center justify-center relative">
                         {url ? (
                             <img src={url} alt="Profile" className="h-full w-full object-cover" />
                         ) : (
@@ -193,7 +193,7 @@ function AvatarRow({ url, displayChar, onUpload }: AvatarRowProps) {
                     />
                     <Button
                         variant="ghost"
-                        className="text-[#5c9eff] hover:text-[#5c9eff] hover:bg-[#5c9eff]/10 font-bold"
+                        className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 font-bold tracking-tight"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploading}
                     >
@@ -317,7 +317,7 @@ export default function SettingsPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1c2128]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-black/40 border border-white/[0.05]">
                     <Settings className="h-5 w-5 text-[#f5a623]" />
                 </div>
                 <div>
@@ -328,9 +328,9 @@ export default function SettingsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {/* Navigation */}
-                <Card className="col-span-1 border-[#2d333b] bg-[#1c2128] h-fit">
+                <Card className="col-span-1 border-white/[0.05] bg-[#0d1117] h-fit">
                     <CardContent className="p-2">
-                        <button onClick={() => setActiveSection("profile")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${activeSection === "profile" ? "bg-[#f5a623]/15 text-[#f5a623]" : "text-[#9ca3af] hover:text-white hover:bg-[#252b33]"}`}>
+                        <button onClick={() => setActiveSection("profile")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${activeSection === "profile" ? "bg-[#f5a623]/15 text-[#f5a623]" : "text-[#9ca3af] hover:text-white hover:bg-white/[0.02]"}`}>
                             <User className="h-5 w-5" />
                             <span className="text-sm font-medium">Profile Settings</span>
                         </button>
@@ -346,7 +346,7 @@ export default function SettingsPage() {
                             <CreditCard className="h-5 w-5" />
                             <span className="text-sm font-medium">Payment Methods</span>
                         </button>
-                        <hr className="my-2 border-[#2d333b]" />
+                        <hr className="my-2 border-white/[0.05]" />
                         <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors">
                             <Trash2 className="h-5 w-5" />
                             <span className="text-sm font-medium">Delete Account</span>
@@ -357,7 +357,7 @@ export default function SettingsPage() {
                 {/* Content */}
                 <div className="col-span-1 md:col-span-3 space-y-4">
                     {activeSection === "profile" && (
-                        <Card className="border-[#2d333b] bg-[#1c2128]">
+                        <Card className="border-white/[0.05] bg-[#0d1117]">
                             <CardHeader className="border-b border-[#2d333b] py-4">
                                 <CardTitle className="text-lg text-white">Public Profile</CardTitle>
                                 <CardDescription className="text-[#9ca3af]">Control how you appear to other users.</CardDescription>
@@ -384,7 +384,7 @@ export default function SettingsPage() {
 
                     {/* Restored Static Sections */}
                     {activeSection !== "profile" && staticSections[activeSection as keyof typeof staticSections] && (
-                        <Card className="border-[#2d333b] bg-[#1c2128]">
+                        <Card className="border-white/[0.05] bg-[#0d1117]">
                             <CardHeader className="border-b border-[#2d333b] py-4">
                                 <CardTitle className="text-lg text-white">{staticSections[activeSection as keyof typeof staticSections].title}</CardTitle>
                             </CardHeader>
@@ -393,9 +393,9 @@ export default function SettingsPage() {
                                     <div key={index} className={`flex items-center justify-between p-4 ${index !== staticSections[activeSection as keyof typeof staticSections].items.length - 1 ? "border-b border-[#2d333b]" : ""}`}>
                                         <div>
                                             <div className="flex items-center gap-2">
-                                                <span className="text-sm font-medium text-white">{item.label}</span>
-                                                {(item as any).verified && <Badge className="bg-[#22c55e]/15 text-[#22c55e] border-0 text-xs">Verified</Badge>}
-                                                {(item as any).warning && <Badge className="bg-[#f59e0b]/15 text-[#f59e0b] border-0 text-xs">Recommended</Badge>}
+                                                <span className="text-sm font-bold text-white tracking-tight">{item.label}</span>
+                                                {(item as any).verified && <Badge className="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[10px] font-black uppercase tracking-widest shadow-[0_0_10px_rgba(34,211,238,0.1)]">Verified</Badge>}
+                                                {(item as any).warning && <Badge className="bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-black uppercase tracking-widest">Recommended</Badge>}
                                             </div>
                                             <p className="text-sm text-[#6b7280] mt-0.5">{item.value === "demo@iboosts.gg" && user?.email ? user.email : item.value}</p>
                                         </div>
@@ -404,7 +404,7 @@ export default function SettingsPage() {
                                                 <span className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-transform ${(item as any).enabled ? "left-6" : "left-1"}`} />
                                             </button>
                                         ) : (
-                                            <Button variant="ghost" size="sm" className="text-[#5c9eff] hover:text-[#5c9eff] hover:bg-[#5c9eff]/10">
+                                            <Button variant="ghost" size="sm" className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 font-bold tracking-tight">
                                                 {(item as any).action}
                                                 <ChevronRight className="h-4 w-4 ml-1" />
                                             </Button>

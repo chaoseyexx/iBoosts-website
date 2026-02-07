@@ -54,7 +54,7 @@ export default function MessagesPage() {
                 </div>
                 <div>
                     <h1 className="text-2xl font-bold text-white">Messages</h1>
-                    <p className="text-sm text-[#6b7280]">Chat with buyers and sellers</p>
+                    <p className="text-sm text-[#8b949e]">Chat with buyers and sellers</p>
                 </div>
             </div>
 
@@ -63,11 +63,11 @@ export default function MessagesPage() {
                 <Card className="border-[#2d333b] bg-[#1c2128] overflow-hidden flex flex-col">
                     <div className="p-3 border-b border-[#2d333b]">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b7280]" />
+                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8b949e]" />
                             <input
                                 type="text"
                                 placeholder="Search conversations..."
-                                className="h-9 w-full rounded-lg border border-[#2d333b] bg-[#0a0e13] pl-10 pr-4 text-sm text-white placeholder:text-[#6b7280] focus:border-[#f5a623] focus:outline-none"
+                                className="h-9 w-full rounded-lg border border-[#2d333b] bg-[#0a0e13] pl-10 pr-4 text-sm text-white placeholder:text-[#8b949e] focus:border-[#f5a623] focus:outline-none"
                             />
                         </div>
                     </div>
@@ -87,14 +87,14 @@ export default function MessagesPage() {
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="flex-1 min-w-0">
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-medium text-white text-sm">{conv.user.username}</span>
-                                            <span className="text-xs text-[#6b7280]">{conv.timestamp}</span>
+                                        <div className="flex items-center justify-between mb-0.5">
+                                            <span className="font-bold text-white text-sm tracking-tight">{conv.user.username}</span>
+                                            <span className="text-[10px] font-bold text-[#8b949e] uppercase tracking-wider">{conv.timestamp}</span>
                                         </div>
-                                        <p className="text-xs text-[#9ca3af] truncate mt-0.5">{conv.lastMessage}</p>
-                                        <span className="text-xs text-[#5c9eff] mt-1 inline-block">{conv.orderId}</span>
+                                        <p className="text-[12px] text-[#9ca3af] truncate font-medium">{conv.lastMessage}</p>
+                                        <span className="text-[11px] text-[#f5a623] font-bold mt-1 inline-block tracking-tight">{conv.orderId}</span>
                                     </div>
-                                    {conv.unread && <span className="h-2 w-2 rounded-full bg-[#f5a623] flex-shrink-0 mt-2" />}
+                                    {conv.unread && <span className="h-2 w-2 rounded-full bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.5)] flex-shrink-0 mt-2" />}
                                 </div>
                             </button>
                         ))}
@@ -113,11 +113,11 @@ export default function MessagesPage() {
                                 </AvatarFallback>
                             </Avatar>
                             <div>
-                                <span className="font-medium text-white">{selectedConversation?.user.username}</span>
-                                <p className="text-xs text-[#5c9eff]">{selectedConversation?.orderId}</p>
+                                <span className="font-bold text-white tracking-tight">{selectedConversation?.user.username}</span>
+                                <p className="text-[11px] text-[#f5a623] font-black uppercase tracking-widest">{selectedConversation?.orderId}</p>
                             </div>
                         </div>
-                        <Button variant="ghost" size="sm" className="text-[#6b7280] hover:text-white hover:bg-[#252b33]">
+                        <Button variant="ghost" size="sm" className="text-[#8b949e] hover:text-white hover:bg-[#252b33]">
                             <MoreVertical className="h-4 w-4" />
                         </Button>
                     </div>
@@ -128,8 +128,8 @@ export default function MessagesPage() {
                             <div key={msg.id} className={`flex ${msg.senderId === "me" ? "justify-end" : "justify-start"}`}>
                                 <div className={`max-w-[70%] rounded-lg px-4 py-2.5 ${msg.senderId === "me" ? "bg-[#f5a623] text-black" : "bg-[#252b33] text-white"
                                     }`}>
-                                    <p className="text-sm">{msg.content}</p>
-                                    <p className={`text-xs mt-1 ${msg.senderId === "me" ? "text-black/60" : "text-[#6b7280]"}`}>
+                                    <p className="text-sm leading-relaxed">{msg.content}</p>
+                                    <p className={`text-[9px] mt-1 font-bold uppercase tracking-widest ${msg.senderId === "me" ? "text-black/40" : "text-[#8b949e]"}`}>
                                         {msg.timestamp}
                                     </p>
                                 </div>
@@ -140,7 +140,7 @@ export default function MessagesPage() {
                     {/* Message Input */}
                     <div className="p-4 border-t border-[#2d333b]">
                         <div className="flex items-center gap-3">
-                            <Button variant="ghost" size="sm" className="text-[#6b7280] hover:text-white hover:bg-[#252b33] h-10 w-10 p-0">
+                            <Button variant="ghost" size="sm" className="text-white/70 hover:text-white hover:bg-[#252b33] h-10 w-10 p-0">
                                 <Paperclip className="h-5 w-5" />
                             </Button>
                             <input
@@ -148,9 +148,9 @@ export default function MessagesPage() {
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 placeholder="Type a message..."
-                                className="flex-1 h-10 rounded-lg border border-[#2d333b] bg-[#0a0e13] px-4 text-sm text-white placeholder:text-[#6b7280] focus:border-[#f5a623] focus:outline-none"
+                                className="flex-1 h-11 rounded-xl border border-[#2d333b] bg-[#0a0e13] px-4 text-sm text-white placeholder:text-[#8b949e] focus:border-cyan-500 focus:outline-none transition-all"
                             />
-                            <Button className="bg-[#f5a623] hover:bg-[#e09612] text-black h-10 w-10 p-0">
+                            <Button className="bg-cyan-500 hover:bg-cyan-600 text-white h-11 w-11 p-0 rounded-xl shadow-lg">
                                 <Send className="h-5 w-5" />
                             </Button>
                         </div>

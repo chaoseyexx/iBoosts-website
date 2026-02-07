@@ -79,11 +79,11 @@ export function Footer() {
                     <div>
                         <h4 className="font-medium text-white mb-6">Help Center</h4>
                         <ul className="space-y-3 text-sm text-[#9ca3af]">
-                            <li><Link href="#" className="hover:text-white transition-colors">Contact us</Link></li>
-                            <li><Link href="#" className="hover:text-white transition-colors">Bug Bounty</Link></li>
-                            <li><Link href="#" className="hover:text-white transition-colors">Blog</Link></li>
+                            <li><Link href="/support" className="hover:text-white transition-colors">Help Center</Link></li>
+                            <li><Link href="/support#faq" className="hover:text-white transition-colors">FAQ</Link></li>
                             <li><Link href="#" className="hover:text-white transition-colors">Become a Partner</Link></li>
                             <li><Link href="#" className="hover:text-white transition-colors">Become a Seller</Link></li>
+                            <li><Link href="/status" className="flex items-center gap-2 hover:text-white transition-colors text-green-500/80 hover:text-green-500"><span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />System Status</Link></li>
                         </ul>
                     </div>
 
@@ -91,8 +91,8 @@ export function Footer() {
                     <div>
                         <h4 className="font-medium text-white mb-6">Account Warranty</h4>
                         <ul className="space-y-3 text-sm text-[#9ca3af]">
-                            <li><Link href="#" className="hover:text-white transition-colors">iShield (Buying)</Link></li>
-                            <li><Link href="#" className="hover:text-white transition-colors">iShield (Selling)</Link></li>
+                            <li><Link href="/support#ishield" className="hover:text-white transition-colors">iShield (Buying)</Link></li>
+                            <li><Link href="/support#ishield" className="hover:text-white transition-colors">iShield (Selling)</Link></li>
                             <li><Link href="#" className="hover:text-white transition-colors">Deposits</Link></li>
                             <li><Link href="#" className="hover:text-white transition-colors">Withdrawals</Link></li>
                         </ul>

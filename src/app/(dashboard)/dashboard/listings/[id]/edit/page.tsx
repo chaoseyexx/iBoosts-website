@@ -108,10 +108,10 @@ export default function EditListingPage({ params }: { params: { id: string } }) 
             <main className="container max-w-3xl mx-auto px-4">
                 <div className="space-y-8">
                     {/* Breadcrumbs */}
-                    <div className="flex items-center gap-2 text-sm text-[#9ca3af]">
-                        <span className="cursor-pointer hover:text-[#fdfcf0]" onClick={() => router.push("/dashboard/offers")}>Offers</span>
+                    <div className="flex items-center gap-2 text-sm text-[#8b949e]">
+                        <span className="cursor-pointer hover:text-white" onClick={() => router.push("/dashboard/offers")}>Offers</span>
                         <ChevronRight className="h-3 w-3" />
-                        <span className="text-[#f5a623]">Edit Listing</span>
+                        <span className="text-[#f5a623] font-bold">Edit Listing</span>
                     </div>
 
                     <div className="space-y-2 text-center">
@@ -128,9 +128,9 @@ export default function EditListingPage({ params }: { params: { id: string } }) 
                         <div className="p-4 bg-[#0a0e13] rounded-lg border border-[#2d333b] flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 {listingCategory?.icon}
-                                <span className="text-[#fdfcf0] font-medium">{listingCategory?.title}</span>
+                                <span className="text-white font-black uppercase tracking-tight">{listingCategory?.title}</span>
                             </div>
-                            <span className="text-sm text-[#9ca3af] italic">Category & Game cannot be changed</span>
+                            <span className="text-[10px] text-[#8b949e] font-black uppercase tracking-widest">Locked Category</span>
                         </div>
 
                         {/* Description */}

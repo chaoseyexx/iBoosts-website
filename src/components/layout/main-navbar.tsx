@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getProfile } from "@/app/(dashboard)/dashboard/settings/actions";
 import { MegaMenu } from "./mega-menu";
+import { SearchDropdown } from "./search-dropdown";
 import { fetchGamesForNavbar } from "@/app/(admin)/admin/actions";
 import {
     NavigationMenu,
@@ -289,14 +290,7 @@ export function MainNavbar({
 
                     {/* Middle Section: Search - Shifted Left */}
                     <div className="flex-1 max-w-2xl hidden md:block pl-0 pr-8">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b949e]" />
-                            <input
-                                type="text"
-                                placeholder="Search products..."
-                                className="w-full h-10 pl-10 pr-4 bg-[#161b22] border border-[#30363d] rounded-lg text-sm text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-0 transition-all"
-                            />
-                        </div>
+                        <SearchDropdown gamesData={gamesData} />
                     </div>
 
                     {/* Right Section: Actions & Auth */}

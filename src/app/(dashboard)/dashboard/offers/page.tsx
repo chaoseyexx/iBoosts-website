@@ -98,7 +98,7 @@ function OffersContent() {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <ChevronsUp className="h-7 w-7 text-[#f5a623]" />
-                        <h1 className="text-3xl font-extrabold text-white tracking-tight">Offers</h1>
+                        <h1 className="text-3xl font-black text-white tracking-tighter uppercase">Offers</h1>
                     </div>
                     <Link href="/dashboard/listings/create">
                         <Button className="bg-[#f5a623] hover:bg-[#e09612] text-black font-bold h-[42px] px-8 rounded-lg transition-all shadow-lg hover:shadow-[#f5a623]/20">
@@ -110,26 +110,26 @@ function OffersContent() {
                 {/* Filter Bar */}
                 <div className="flex flex-wrap items-center gap-2">
                     <Button variant="outline" className="bg-[#13181e] border-[#2d333b] text-white hover:bg-[#1c2128] h-[40px] px-4 gap-3 font-bold rounded-lg border-opacity-50 transition-all text-[13px]">
-                        Select Game <ChevronDown className="h-4 w-4 text-[#4b5563]" />
+                        Select Game <ChevronDown className="h-4 w-4 text-[#8b949e]" />
                     </Button>
                     <Button variant="outline" className="bg-[#13181e] border-[#2d333b] text-white hover:bg-[#1c2128] h-[40px] px-5 gap-3 font-bold rounded-lg border-opacity-50 transition-all text-[13px] min-w-[80px]">
-                        All <ChevronDown className="h-4 w-4 text-[#4b5563]" />
+                        All <ChevronDown className="h-4 w-4 text-[#8b949e]" />
                     </Button>
                     <Button variant="outline" className="bg-[#13181e] border-[#2d333b] text-white hover:bg-[#1c2128] h-[40px] px-4 gap-3 font-bold rounded-lg border-opacity-50 transition-all text-[13px]">
-                        Bulk actions <ChevronDown className="h-4 w-4 text-[#4b5563]" />
+                        Bulk actions <ChevronDown className="h-4 w-4 text-[#8b949e]" />
                     </Button>
 
                     <div className="relative flex-1 max-w-xs ml-2">
                         <Input
                             placeholder="Search offers"
-                            className="h-[40px] bg-[#13181e] border-[#2d333b] text-white focus:border-[#f5a623] pl-4 pr-10 rounded-lg placeholder:text-[#4b5563] border-opacity-50 text-[13px] font-medium"
+                            className="h-[40px] bg-[#13181e] border-[#2d333b] text-white focus:border-[#f5a623] pl-4 pr-10 rounded-lg placeholder:text-[#8b949e] border-opacity-50 text-[13px] font-medium"
                         />
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#4b5563]" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b949e]" />
                     </div>
 
                     <div className="flex items-center ml-auto">
                         <Button variant="ghost" className="text-[#9ca3af] hover:text-white h-[40px] gap-2 font-bold transition-colors">
-                            <ArrowUpDown className="h-4 w-4" /> <span className="text-[14px]">Recommended</span> <ChevronDown className="h-4 w-4 text-[#4b5563]" />
+                            <ArrowUpDown className="h-4 w-4" /> <span className="text-[14px]">Recommended</span> <ChevronDown className="h-4 w-4 text-[#8b949e]" />
                         </Button>
                     </div>
                 </div>
@@ -143,22 +143,22 @@ function OffersContent() {
                                 {/* Top Row: Game Info & Status */}
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2 text-[13px] font-bold">
-                                        <span className="text-white hover:text-[#f5a623] cursor-pointer transition-colors tracking-tight">{offer.game}</span>
+                                        <span className="text-[#f5a623] hover:text-[#e09612] cursor-pointer transition-colors tracking-tight uppercase">{offer.game}</span>
                                         {offer.platform && (
                                             <>
-                                                <span className="text-[#4b5563] mx-1">:</span>
+                                                <span className="text-[#8b949e] mx-1">:</span>
                                                 <span className="text-white tracking-tight">{offer.platform}</span>
                                             </>
                                         )}
                                     </div>
                                     <div className="flex items-center gap-4">
-                                        <span className="text-[11px] text-[#4b5563] font-bold uppercase tracking-wider">Expires in {offer.expiresIn}</span>
+                                        <span className="text-[11px] text-[#8b949e] font-bold uppercase tracking-wider">Expires in {offer.expiresIn}</span>
                                         <Badge
                                             className={cn(
-                                                "capitalize border-0 h-6 px-4 text-[11px] font-black rounded-lg transition-transform hover:scale-105 cursor-default",
+                                                "capitalize border h-7 px-4 text-[10px] font-black rounded-full transition-transform hover:scale-105 cursor-default tracking-widest uppercase",
                                                 offer.status === 'active'
-                                                    ? "bg-[#00b67a] text-[#0a0e13]"
-                                                    : "bg-[#5c9eff] text-[#0a0e13]"
+                                                    ? "bg-[#f5a623]/5 text-[#f5a623] border-[#f5a623]/20 shadow-[0_0_10px_rgba(245,166,35,0.1)]"
+                                                    : "bg-white/5 text-white/50 border-white/10"
                                             )}
                                         >
                                             {offer.status}
@@ -202,17 +202,17 @@ function OffersContent() {
 
                                     {/* Description & Stats */}
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="text-[14px] font-bold text-white truncate max-w-lg mb-2 group-hover:text-[#f5a623] transition-colors leading-snug">
+                                        <h3 className="text-[17px] font-black text-white truncate max-w-lg mb-2 group-hover:text-[#f5a623] transition-colors leading-tight tracking-tighter uppercase">
                                             {offer.title}
                                         </h3>
                                         <div className="flex items-center gap-12 text-[12px]">
                                             <div className="flex flex-col">
-                                                <span className="text-[#4b5563] font-bold mb-0.5 text-[10px] uppercase">Quantity:</span>
-                                                <span className="text-white font-black">{offer.quantity}</span>
+                                                <span className="text-[#8b949e] font-black mb-0.5 text-[10px] uppercase tracking-[0.2em]">Inventory:</span>
+                                                <span className="text-white font-black tracking-tight">{offer.quantity} UNIT</span>
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="text-[#4b5563] font-bold mb-0.5 text-[10px] uppercase">Delivery time:</span>
-                                                <span className="text-white font-black">{offer.deliveryTime}</span>
+                                                <span className="text-[#8b949e] font-black mb-0.5 text-[10px] uppercase tracking-[0.2em]">Processing:</span>
+                                                <span className="text-white font-black tracking-tight">{offer.deliveryTime}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -224,13 +224,13 @@ function OffersContent() {
                                                 type="text"
                                                 value={offer.price}
                                                 onChange={(e) => updatePrice(offer.id, e.target.value)}
-                                                className="w-10 bg-transparent text-white font-black text-[15px] focus:outline-none placeholder:text-[#4b5563] text-center"
+                                                className="w-10 bg-transparent text-white font-black text-[15px] focus:outline-none placeholder:text-[#8b949e] text-center"
                                             />
-                                            <span className="text-[11px] text-[#4b5563] ml-1 font-black whitespace-nowrap uppercase">
+                                            <span className="text-[11px] text-[#8b949e] ml-1 font-black whitespace-nowrap uppercase">
                                                 $/unit
                                             </span>
                                         </div>
-                                        <Button variant="outline" size="icon" className="h-[40px] w-[40px] border-[#2d333b] bg-[#1c2128] text-[#4b5563] hover:text-[#00b67a] hover:bg-[#1c2128]/50 transition-all rounded-lg">
+                                        <Button variant="outline" size="icon" className="h-[40px] w-[40px] border-[#2d333b] bg-[#1c2128] text-[#8b949e] hover:text-[#f5a623] hover:bg-[#f5a623]/10 hover:border-[#f5a623]/20 transition-all rounded-lg">
                                             <Check className="h-5 w-5 stroke-[4]" />
                                         </Button>
                                     </div>

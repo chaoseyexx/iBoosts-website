@@ -21,8 +21,8 @@ export async function NavbarServer({ variant = "landing" }: NavbarServerProps) {
         userData = {
             id: user.id,
             email: user.email,
-            username: profile?.username || user.email?.split("@")[0] || "User",
-            avatar: profile?.avatar || undefined
+            username: profile?.username || user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
+            avatar: profile?.avatar || user.user_metadata?.avatar_url,
         };
     }
 

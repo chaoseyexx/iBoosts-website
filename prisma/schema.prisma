@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
 }
 
@@ -59,6 +59,7 @@ model User {
   badges          UserBadge[]
   wallet          Wallet?
   withdrawals     Withdrawal[]
+  boostingRequests BoostingRequest[]
 
   @@index([email])
   @@index([username])
@@ -159,9 +160,28 @@ model Game {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   listings    Listing[]
+  boostingRequests BoostingRequest[]
   categories  Category[] @relation("GameCategories")
 
   @@index([slug])
+}
+
+model BoostingRequest {
+  id              String        @id @default(cuid())
+  gameId          String
+  userId          String
+  title           String
+  description     String
+  price           Decimal       @db.Decimal(10, 2)
+  status          String        @default("available")
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  game            Game          @relation(fields: [gameId], references: [id])
+  user            User          @relation(fields: [userId], references: [id])
+  
+  @@index([gameId])
+  @@index([userId])
+  @@index([status])
 }
 
 model Listing {

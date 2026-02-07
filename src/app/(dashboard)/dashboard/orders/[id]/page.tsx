@@ -108,7 +108,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                         <div>
                             <h1 className="text-white font-bold text-lg flex items-center gap-2">
                                 Order #{ORDER_DETAILS.id}
-                                <Badge className="bg-[#00b67a] hover:bg-[#00b67a] text-black font-bold h-5 text-[10px]">
+                                <Badge className="bg-[#f5a623]/10 text-[#f5a623] border border-[#f5a623]/20 font-black h-5 text-[10px] tracking-widest uppercase shadow-[0_0_10px_rgba(245,166,35,0.1)]">
                                     ACTIVE
                                 </Badge>
                             </h1>
@@ -138,13 +138,13 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                     {/* Chat Header */}
                     <div className="p-4 border-b border-[#2d333b] flex items-center justify-between bg-[#13181e]">
                         <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-full bg-[#252b33] flex items-center justify-center font-bold text-white relative">
+                            <div className="h-10 w-10 rounded-full bg-[#1c2128] border border-[#2d333b] flex items-center justify-center font-bold text-white relative shadow-lg">
                                 P
-                                <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-[#00b67a] border-2 border-[#13181e]" />
+                                <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-[#f5a623] border-2 border-[#13181e] shadow-[0_0_5px_rgba(245,166,35,0.5)]" />
                             </div>
                             <div>
-                                <div className="text-white font-bold text-sm">ProBooster_99</div>
-                                <div className="text-[#00b67a] text-xs font-medium">Online now</div>
+                                <div className="text-white font-bold text-sm tracking-tight">ProBooster_99</div>
+                                <div className="text-[#f5a623] text-[10px] font-black uppercase tracking-widest">Online</div>
                             </div>
                         </div>
                         <div className="text-[#9ca3af] text-xs flex items-center gap-1">
@@ -178,8 +178,8 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                                             ? "bg-[#f5a623] text-black font-medium rounded-tr-none"
                                             : "bg-[#2d333b] text-white rounded-tl-none"
                                     )}>
-                                        <p>{msg.text}</p>
-                                        <div className={cn("text-[10px] mt-1 opacity-70 flex justify-end", isMe ? "text-black/70" : "text-gray-400")}>
+                                        <p className="leading-relaxed">{msg.text}</p>
+                                        <div className={cn("text-[9px] mt-1 font-bold uppercase tracking-wider flex justify-end", isMe ? "text-black/50" : "text-[#8b949e]")}>
                                             {msg.time}
                                         </div>
                                     </div>
@@ -206,7 +206,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                                 <Send className="h-4 w-4" />
                             </Button>
                         </div>
-                        <p className="text-[10px] text-[#4b5563] mt-2 text-center">
+                        <p className="text-[10px] text-[#8b949e] mt-2 text-center">
                             Never share your password or personal social media. Keep communication on iBoosts for protection.
                         </p>
                     </div>
@@ -272,16 +272,16 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                                         <div className={cn(
                                             "z-10 h-6 w-6 rounded-full border-4 flex items-center justify-center shrink-0",
                                             isCompleted
-                                                ? "bg-[#00b67a] border-[#00b67a] text-black"
+                                                ? "bg-[#f5a623] border-[#f5a623] text-black shadow-[0_0_10px_rgba(245,166,35,0.3)]"
                                                 : isCurrent
-                                                    ? "bg-[#1c2128] border-[#f5a623]"
+                                                    ? "bg-[#1c2128] border-[#f5a623] shadow-[0_0_15px_rgba(245,166,35,0.1)]"
                                                     : "bg-[#1c2128] border-[#2d333b]"
                                         )}>
                                             {isCompleted && <CheckCircle2 className="h-3 w-3 stroke-[3]" />}
                                             {isCurrent && <div className="h-2 w-2 rounded-full bg-[#f5a623] animate-pulse" />}
                                         </div>
                                         <div>
-                                            <div className={cn("text-sm font-bold", isCurrent || isCompleted ? "text-white" : "text-[#4b5563]")}>
+                                            <div className={cn("text-sm font-bold", isCurrent || isCompleted ? "text-white" : "text-[#8b949e]")}>
                                                 {step.label}
                                             </div>
                                             <div className="text-xs text-[#9ca3af]">

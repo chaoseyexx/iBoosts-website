@@ -18,6 +18,7 @@ import {
     Settings,
     Eye,
     Shield,
+    User as UserIcon,
 } from "lucide-react";
 
 interface SidebarLink {
@@ -149,34 +150,36 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
     };
 
     return (
-        <aside className="sticky top-[60px] flex h-[calc(100vh-60px)] w-64 flex-col border-r border-[#2d333b]/40 bg-[#0d1117] flex-shrink-0">
-            {/* User Profile Section */}
-            <div className="border-b border-[#2d333b]/40 py-5 px-4">
+        <aside className="sticky top-[96px] flex h-[calc(100vh-96px)] w-64 flex-col border-r border-white/[0.05] bg-[#0d1117] flex-shrink-0 z-20">
+            <div className="border-b border-[#2d333b]/40 p-5 bg-white/[0.01]">
                 <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10 border border-[#2d333b]">
-                        <AvatarImage src={user?.avatar || undefined} alt={user?.username || "User"} />
-                        <AvatarFallback className="bg-[#21262d] text-sm text-[#4b5563]">
-                            {user?.username?.charAt(0).toUpperCase() || "U"}
-                        </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5 mb-0.5">
-                            <span className="font-bold text-white truncate text-base">
-                                {user?.username || "Guest"}
-                            </span>
-                            {user?.verified && (
-                                <Shield className="h-4 w-4 text-[#f5a623] fill-[#f5a623]" />
+                    <div className="h-10 w-10 rounded-full bg-black/40 border border-[#f5a623]/20 flex items-center justify-center relative shadow-lg overflow-hidden">
+                        <Avatar className="h-full w-full rounded-none">
+                            {user?.avatar && user.avatar !== "" && user.avatar !== "null" && (
+                                <AvatarImage src={user.avatar} alt={user?.username || ""} className="object-cover" />
                             )}
+                            <AvatarFallback className="bg-transparent">
+                                <UserIcon className="h-5 w-5 text-[#f5a623]" />
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-[#f5a623] border-2 border-[#0d1117] shadow-[0_0_5px_rgba(245,166,35,0.5)] z-10" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <span className="block font-black text-white truncate text-[13px] tracking-tight uppercase leading-none mb-1">
+                            {user?.username || "Guest"}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                            <span className="block text-[9px] font-black text-[#f5a623] uppercase tracking-[0.2em] leading-none">
+                                Premium Member
+                            </span>
+                            {user?.verified && <Shield className="h-3 w-3 text-[#f5a623] fill-[#f5a623]" />}
                         </div>
-                        <p className="text-[11px] font-bold text-[#4b5563] uppercase">
-                            Registered: {user?.registeredAt || "N/A"}
-                        </p>
                     </div>
                 </div>
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 overflow-y-auto py-2">
+            <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
                 {sidebarSections.map((section) => (
                     <div key={section.id}>
                         {section.children ? (
@@ -184,36 +187,53 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
                                 <button
                                     onClick={() => toggleSection(section.id)}
                                     className={cn(
-                                        "flex w-full items-center justify-between px-4 py-3 transition-colors",
+                                        "flex w-full items-center justify-between px-4 py-3.5 transition-all relative group",
                                         isSectionActive(section)
-                                            ? "text-[#f5a623]"
-                                            : "text-[#8b949e] hover:text-white hover:bg-[#1c2128]"
+                                            ? "text-white bg-white/[0.03]"
+                                            : "text-[#8b949e] hover:text-white hover:bg-white/[0.02]"
                                     )}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <section.icon className="h-4.5 w-4.5" />
-                                        <span className="text-[13px] font-bold">{section.label}</span>
+                                        <section.icon className={cn(
+                                            "h-[18px] w-[18px] transition-colors",
+                                            isSectionActive(section) ? "text-[#f5a623]" : "group-hover:text-[#f5a623]"
+                                        )} />
+                                        <span className={cn(
+                                            "text-[13px] font-bold uppercase tracking-[0.1em] transition-colors",
+                                            isSectionActive(section) ? "text-white" : "text-[#8b949e] group-hover:text-white"
+                                        )}>
+                                            {section.label}
+                                        </span>
                                     </div>
                                     {expandedSections.includes(section.id) ? (
-                                        <ChevronUp className="h-3.5 w-3.5" />
+                                        <ChevronUp className={cn(
+                                            "h-4 w-4 transition-transform duration-200",
+                                            expandedSections.includes(section.id) && "rotate-180",
+                                            isSectionActive(section) ? "text-[#f5a623]" : "text-[#8b949e]"
+                                        )} />
                                     ) : (
-                                        <ChevronDown className="h-3.5 w-3.5" />
+                                        <ChevronDown className="h-4 w-4 text-[#8b949e]" />
                                     )}
                                 </button>
                                 {expandedSections.includes(section.id) && (
-                                    <div className="mt-0.5">
+                                    <div className="mt-1 space-y-1">
                                         {section.children.map((child) => (
                                             <Link
                                                 key={child.href}
                                                 href={child.href}
                                                 className={cn(
-                                                    "block pl-10 pr-4 py-2 text-[12px] font-bold transition-all",
+                                                    "block mx-2 pl-9 pr-3 py-2 text-[12px] font-bold rounded-lg transition-all",
                                                     isActive(child.href)
-                                                        ? "bg-[#f5a623] text-black"
-                                                        : "text-[#8b949e] hover:text-white"
+                                                        ? "bg-[#f5a623] text-black shadow-[0_0_15px_rgba(245,166,35,0.2)]"
+                                                        : "text-[#8b949e] hover:text-white hover:bg-white/[0.03]"
                                                 )}
                                             >
-                                                {child.label}
+                                                <span className={cn(
+                                                    "transition-colors",
+                                                    isActive(child.href) ? "text-black" : "text-[#8b949e] group-hover:text-white"
+                                                )}>
+                                                    {child.label}
+                                                </span>
                                             </Link>
                                         ))}
                                     </div>
@@ -223,19 +243,26 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
                             <Link
                                 href={section.href!}
                                 className={cn(
-                                    "flex items-center gap-3 px-4 py-2.5 transition-colors",
-                                    pathname === section.href
-                                        ? "bg-[#f5a623] text-black"
-                                        : "text-[#8b949e] hover:text-white hover:bg-[#1c2128]"
+                                    "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group text-[13px] font-bold tracking-wide",
+                                        ? "bg-[#f5a623] text-black shadow-[0_0_20px_rgba(245,166,35,0.15)]"
+                                    : "text-[#8b949e] hover:text-white hover:bg-white/[0.02]"
                                 )}
                             >
-                                <section.icon className="h-4.5 w-4.5" />
-                                <span className="text-[13px] font-bold">{section.label}</span>
-                            </Link>
-                        )}
-                    </div>
+                        <section.icon className={cn(
+                            "h-5 w-5 transition-colors",
+                            pathname === section.href ? "text-black" : "text-[#8b949e] group-hover:text-white"
+                        )} />
+                        <span className={cn(
+                            "transition-colors",
+                            pathname === section.href ? "text-black" : "text-[#8b949e] group-hover:text-white"
+                        )}>
+                            {section.label}
+                        </span>
+                    </Link>
+                )}
+            </div>
                 ))}
-            </nav>
-        </aside>
+        </nav>
+        </aside >
     );
 }

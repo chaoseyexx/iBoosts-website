@@ -48,7 +48,7 @@ export function CurrencyMarketplaceView({ category, game, listings }: CurrencyMa
             {/* Background Image Layer */}
             {game?.banner && (
                 <div
-                    className="absolute inset-x-0 top-0 h-[50vh] z-0 pointer-events-none overflow-hidden"
+                    className="absolute inset-x-0 top-0 h-[85vh] z-0 pointer-events-none overflow-hidden"
                     style={{
                         backgroundImage: `url(${game.banner})`,
                         backgroundSize: 'cover',

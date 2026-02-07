@@ -108,7 +108,7 @@ function OrdersContent() {
                         variant="secondary"
                         onClick={() => setStatusOpen(!statusOpen)}
                         className={cn(
-                            "bg-[#1c2128] border text-white hover:bg-[#252b33] h-10 px-4 min-w-[160px] flex items-center justify-between transition-all outline-none",
+                            "bg-black/20 border text-white hover:bg-black/30 h-10 px-4 min-w-[160px] flex items-center justify-between transition-all outline-none",
                             statusOpen ? "border-[#f5a623] ring-1 ring-[#f5a623]" : "border-[#2d333b]"
                         )}
                     >
@@ -117,7 +117,7 @@ function OrdersContent() {
                     </Button>
 
                     {statusOpen && (
-                        <div className="absolute top-[calc(100%+4px)] left-0 w-64 bg-[#1c2128] border border-[#2d333b] rounded-lg shadow-2xl z-50 py-1.5 animate-in fade-in zoom-in-95 duration-100">
+                        <div className="absolute top-[calc(100%+4px)] left-0 w-64 bg-[#0d1117] border border-[#2d333b] rounded-lg shadow-2xl z-50 py-1.5 animate-in fade-in zoom-in-95 duration-100">
                             {statusOptions.map((opt) => (
                                 <button
                                     key={opt.value}
@@ -143,7 +143,7 @@ function OrdersContent() {
                         variant="secondary"
                         onClick={() => setTimeOpen(!timeOpen)}
                         className={cn(
-                            "bg-[#1c2128] border text-white hover:bg-[#252b33] h-10 px-4 min-w-[140px] flex items-center justify-between transition-all outline-none",
+                            "bg-black/20 border text-white hover:bg-black/30 h-10 px-4 min-w-[140px] flex items-center justify-between transition-all outline-none",
                             timeOpen ? "border-[#f5a623] ring-1 ring-[#f5a623]" : "border-[#2d333b]"
                         )}
                     >
@@ -152,7 +152,7 @@ function OrdersContent() {
                     </Button>
 
                     {timeOpen && (
-                        <div className="absolute top-[calc(100%+4px)] left-0 w-48 bg-[#1c2128] border border-[#2d333b] rounded-lg shadow-2xl z-50 py-1.5 animate-in fade-in zoom-in-95 duration-100">
+                        <div className="absolute top-[calc(100%+4px)] left-0 w-48 bg-[#0d1117] border border-[#2d333b] rounded-lg shadow-2xl z-50 py-1.5 animate-in fade-in zoom-in-95 duration-100">
                             {timeOptions.map((opt) => (
                                 <button
                                     key={opt.value}
@@ -176,14 +176,14 @@ function OrdersContent() {
                     <input
                         type="text"
                         placeholder="Search Orders"
-                        className="h-10 w-full rounded-lg border border-[#2d333b] bg-[#1c2128] pl-4 pr-10 text-sm text-white placeholder:text-[#6b7280] focus:border-[#f5a623] focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
+                        className="h-10 w-full rounded-lg border border-[#2d333b] bg-black/20 pl-4 pr-10 text-sm text-white placeholder:text-[#6b7280] focus:border-[#f5a623] focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
                     />
                     <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b7280]" />
                 </div>
 
                 {type === "sold" && (
                     <div className="ml-auto">
-                        <Button variant="outline" className="border-[#2d333b] text-white hover:bg-[#1c2128] h-10 gap-2 font-semibold">
+                        <Button variant="outline" className="border-[#2d333b] text-white hover:bg-black/20 h-10 gap-2 font-semibold">
                             Download invoice
                             <Download className="h-4 w-4" />
                         </Button>
@@ -218,7 +218,7 @@ function OrdersContent() {
                             <tr
                                 key={order.id}
                                 onClick={() => window.location.href = `/dashboard/orders/${order.id}`}
-                                className="group hover:bg-[#1c2128]/40 transition-colors cursor-pointer"
+                                className="group hover:bg-white/[0.02] transition-colors cursor-pointer"
                             >
                                 <td className="py-2.5 px-4">
                                     <div className="flex items-center gap-3">

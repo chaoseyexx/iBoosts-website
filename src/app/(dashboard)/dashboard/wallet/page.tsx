@@ -110,8 +110,8 @@ export default function WalletPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight">Wallet</h1>
-                    <p className="text-[#9ca3af]">Manage your earnings and payouts.</p>
+                    <h1 className="text-3xl font-black text-white tracking-tighter uppercase">Wallet</h1>
+                    <p className="text-sm font-bold text-[#8b949e] uppercase tracking-[0.2em]">Manage your global earnings & payouts</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
@@ -125,11 +125,11 @@ export default function WalletPage() {
                             {withdrawStep === 1 ? (
                                 <>
                                     <DialogHeader>
-                                        <DialogTitle className="text-xl font-bold flex items-center gap-2">
+                                        <DialogTitle className="text-xl font-bold flex items-center gap-2 text-white">
                                             <Wallet className="h-5 w-5 text-[#f5a623]" />
                                             Withdraw Funds
                                         </DialogTitle>
-                                        <DialogDescription className="text-[#9ca3af]">
+                                        <DialogDescription className="text-[#9ca3af] font-medium">
                                             Transfer your earnings to your preferred account.
                                         </DialogDescription>
                                     </DialogHeader>
@@ -138,7 +138,7 @@ export default function WalletPage() {
 
                                         {/* Amount Input */}
                                         <div className="space-y-2">
-                                            <Label className="text-white">Amount to withdraw</Label>
+                                            <Label className="text-white font-bold">Amount to withdraw</Label>
                                             <div className="relative">
                                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#f5a623] font-bold">$</span>
                                                 <Input
@@ -146,9 +146,9 @@ export default function WalletPage() {
                                                     placeholder="0.00"
                                                     value={amount}
                                                     onChange={(e) => setAmount(e.target.value)}
-                                                    className="pl-7 bg-[#0a0e13] border-[#2d333b] text-white focus:border-[#f5a623] h-11 text-lg font-bold"
+                                                    className="pl-7 bg-[#0a0e13] border-[#2d333b] text-white focus:border-[#f5a623] h-11 text-lg font-bold shadow-sm"
                                                 />
-                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#9ca3af]">
+                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#9ca3af] font-bold">
                                                     Max: ${availableBalance.toFixed(2)}
                                                 </div>
                                             </div>
@@ -156,13 +156,13 @@ export default function WalletPage() {
 
                                         {/* Method Selection */}
                                         <div className="space-y-2">
-                                            <Label className="text-white">Payout Method</Label>
+                                            <Label className="text-white font-bold">Payout Method</Label>
                                             <div className="grid grid-cols-2 gap-3">
                                                 <div
                                                     onClick={() => setMethod("paypal")}
                                                     className={cn(
-                                                        "cursor-pointer border rounded-lg p-3 flex flex-col items-center justify-center gap-2 transition-all",
-                                                        method === "paypal" ? "bg-[#f5a623]/10 border-[#f5a623] text-[#f5a623]" : "bg-[#0a0e13] border-[#2d333b] text-[#9ca3af] hover:border-[#f5a623]/50"
+                                                        "cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all",
+                                                        method === "paypal" ? "bg-[#f5a623]/10 border-[#f5a623] text-[#f5a623] shadow-inner" : "bg-[#0a0e13] border-[#2d333b] text-[#8b949e] hover:border-[#f5a623]/50 hover:bg-[#1c2128]"
                                                     )}
                                                 >
                                                     <CreditCard className="h-6 w-6" />
@@ -171,8 +171,8 @@ export default function WalletPage() {
                                                 <div
                                                     onClick={() => setMethod("crypto")}
                                                     className={cn(
-                                                        "cursor-pointer border rounded-lg p-3 flex flex-col items-center justify-center gap-2 transition-all",
-                                                        method === "crypto" ? "bg-[#f5a623]/10 border-[#f5a623] text-[#f5a623]" : "bg-[#0a0e13] border-[#2d333b] text-[#9ca3af] hover:border-[#f5a623]/50"
+                                                        "cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all",
+                                                        method === "crypto" ? "bg-[#f5a623]/10 border-[#f5a623] text-[#f5a623] shadow-inner" : "bg-[#0a0e13] border-[#2d333b] text-[#8b949e] hover:border-[#f5a623]/50 hover:bg-[#1c2128]"
                                                     )}
                                                 >
                                                     <Bitcoin className="h-6 w-6" />
@@ -182,14 +182,14 @@ export default function WalletPage() {
                                         </div>
 
                                         {/* Fee info */}
-                                        <div className="bg-[#0a0e13] p-3 rounded-lg border border-[#2d333b] space-y-2">
-                                            <div className="flex justify-between text-xs">
+                                        <div className="bg-[#0a0e13] p-4 rounded-xl border border-[#2d333b] space-y-3">
+                                            <div className="flex justify-between text-xs font-medium">
                                                 <span className="text-[#9ca3af]">Withdrawal Amount</span>
-                                                <span className="text-white font-medium">${amount || '0.00'}</span>
+                                                <span className="text-white font-bold">${amount || '0.00'}</span>
                                             </div>
-                                            <div className="flex justify-between text-xs">
+                                            <div className="flex justify-between text-xs font-medium">
                                                 <span className="text-[#9ca3af]">Transaction Fee (2%)</span>
-                                                <span className="text-white font-medium">${(Number(amount || 0) * 0.02).toFixed(2)}</span>
+                                                <span className="text-white font-bold">${(Number(amount || 0) * 0.02).toFixed(2)}</span>
                                             </div>
                                             <div className="h-px bg-[#2d333b]" />
                                             <div className="flex justify-between text-sm font-bold">
@@ -211,13 +211,13 @@ export default function WalletPage() {
                                 </>
                             ) : (
                                 <div className="py-12 flex flex-col items-center text-center space-y-4">
-                                    <div className="h-16 w-16 rounded-full bg-[#00b67a]/20 flex items-center justify-center">
-                                        <CheckCircle2 className="h-8 w-8 text-[#00b67a]" />
+                                    <div className="h-20 w-20 rounded-full bg-[#f5a623]/10 flex items-center justify-center shadow-[0_0_20px_rgba(245,166,35,0.2)] border border-[#f5a623]/20">
+                                        <CheckCircle2 className="h-10 w-10 text-[#f5a623]" />
                                     </div>
-                                    <div>
-                                        <h3 className="text-xl font-bold text-white">Request Submitted!</h3>
-                                        <p className="text-[#9ca3af] text-sm mt-1 max-w-[250px]">
-                                            Your withdrawal of <span className="text-white font-bold">${amount}</span> is being processed. Funds typically arrive within 24 hours.
+                                    <div className="space-y-2">
+                                        <h3 className="text-2xl font-black text-white tracking-tight uppercase">Request Submitted!</h3>
+                                        <p className="text-sm font-bold text-[#8b949e] uppercase tracking-widest max-w-[280px]">
+                                            Your withdrawal of <span className="text-white font-black">${amount}</span> is being processed.
                                         </p>
                                     </div>
                                 </div>
@@ -231,64 +231,67 @@ export default function WalletPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                 {/* Available Balance */}
-                <Card className="bg-[#1c2128] border-[#2d333b] p-6 relative overflow-hidden group">
-                    <div className="absolute right-0 top-0 p-32 bg-[#f5a623] opacity-[0.03] rounded-full blur-3xl group-hover:opacity-[0.08] transition-opacity" />
+                <Card className="bg-gradient-to-br from-[#0d1117] to-black border-[#f5a623]/20 p-5 relative overflow-hidden group shadow-2xl hover:border-[#f5a623]/40 transition-all duration-500 backdrop-blur-xl">
+                    <div className="absolute -right-4 -top-4 p-24 bg-[#f5a623] opacity-[0.05] rounded-full blur-3xl group-hover:opacity-[0.1] transition-opacity" />
+                    <div className="absolute -left-4 -bottom-4 p-24 bg-[#00d2ff] opacity-[0.02] rounded-full blur-3xl" />
 
                     <div className="relative z-10 flex justify-between items-start mb-4">
-                        <div className="p-3 bg-[#f5a623]/10 rounded-xl">
-                            <Wallet className="h-6 w-6 text-[#f5a623]" />
+                        <div className="h-10 w-10 bg-white/[0.03] rounded-xl border border-white/[0.05] flex items-center justify-center backdrop-blur-md shadow-inner">
+                            <Wallet className="h-5 w-5 text-[#f5a623] drop-shadow-[0_0_8px_rgba(245,166,35,0.4)]" />
                         </div>
-                        <Button variant="ghost" size="icon" onClick={() => setBalanceHidden(!balanceHidden)} className="text-[#9ca3af] hover:text-white">
+                        <Button variant="ghost" size="icon" onClick={() => setBalanceHidden(!balanceHidden)} className="text-[#8b949e] hover:text-white transition-colors">
                             {balanceHidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
                     </div>
 
                     <div className="relative z-10">
-                        <p className="text-[#9ca3af] text-sm font-medium">Available Balance</p>
-                        <h2 className="text-3xl font-extrabold text-white mt-1 tracking-tight">
+                        <p className="text-[10px] font-black text-[#f5a623] tracking-[0.2em] uppercase mb-1">Available Balance</p>
+                        <h2 className="text-3xl font-black text-white tracking-tighter">
                             {balanceHidden ? "****" : `$${availableBalance.toFixed(2)}`}
                         </h2>
-                        <div className="flex items-center gap-2 mt-2 text-xs text-[#00b67a] bg-[#00b67a]/10 w-fit px-2 py-1 rounded">
-                            <ArrowUpRight className="h-3 w-3" />
-                            +12% vs last month
+                        <div className="flex items-center gap-2 mt-4 text-[10px] font-black text-white bg-white/[0.04] w-fit px-3 py-1.5 rounded-full border border-white/[0.05] backdrop-blur-sm">
+                            <ArrowUpRight className="h-3.5 w-3.5 text-[#f5a623]" />
+                            <span className="uppercase tracking-widest">+12.4% <span className="text-[#8b949e] ml-1">THIS MONTH</span></span>
                         </div>
                     </div>
                 </Card>
 
                 {/* Pending Balance (Escrow) */}
-                <Card className="bg-[#1c2128] border-[#2d333b] p-6 relative overflow-hidden">
+                <Card className="bg-[#0a0e13]/80 border-white/[0.05] p-5 relative overflow-hidden backdrop-blur-xl shadow-2xl hover:border-white/[0.1] transition-all group">
                     <div className="relative z-10 flex justify-between items-start mb-4">
-                        <div className="p-3 bg-[#3b82f6]/10 rounded-xl">
-                            <Clock className="h-6 w-6 text-[#3b82f6]" />
+                        <div className="h-10 w-10 bg-white/[0.03] rounded-xl border border-white/[0.05] flex items-center justify-center">
+                            <Clock className="h-5 w-5 text-[#8b949e] group-hover:text-white transition-colors" />
                         </div>
                     </div>
 
                     <div className="relative z-10">
-                        <p className="text-[#9ca3af] text-sm font-medium">Pending (Escrow)</p>
-                        <h2 className="text-3xl font-extrabold text-white mt-1 tracking-tight">
+                        <p className="text-[10px] font-black text-[#8b949e] tracking-[0.2em] uppercase mb-1">Pending (Escrow)</p>
+                        <h2 className="text-3xl font-black text-white tracking-tighter">
                             {balanceHidden ? "****" : `$${pendingBalance.toFixed(2)}`}
                         </h2>
-                        <p className="text-xs text-[#9ca3af]/70 mt-2">
-                            Funds held securely until order completion to ensure safety.
+                        <p className="text-[9px] font-black text-[#8b949e] mt-4 flex items-center gap-2 uppercase tracking-[0.2em]">
+                            <AlertCircle className="h-3.5 w-3.5 text-[#f5a623]" />
+                            Funds secured by iboosts
                         </p>
                     </div>
                 </Card>
 
                 {/* Total Processed */}
-                <Card className="bg-[#1c2128] border-[#2d333b] p-6 relative overflow-hidden">
+                <Card className="bg-[#0a0e13]/80 border-white/[0.05] p-5 relative overflow-hidden backdrop-blur-xl shadow-2xl hover:border-white/[0.1] transition-all group">
                     <div className="relative z-10 flex justify-between items-start mb-4">
-                        <div className="p-3 bg-[#a855f7]/10 rounded-xl">
-                            <Building2 className="h-6 w-6 text-[#a855f7]" />
+                        <div className="h-10 w-10 bg-white/[0.03] rounded-xl border border-white/[0.05] flex items-center justify-center">
+                            <Building2 className="h-5 w-5 text-[#8b949e] group-hover:text-white transition-colors" />
                         </div>
                     </div>
 
                     <div className="relative z-10">
-                        <p className="text-[#9ca3af] text-sm font-medium">Lifetime Earnings</p>
-                        <h2 className="text-3xl font-extrabold text-white mt-1 tracking-tight">
+                        <p className="text-[10px] font-black text-[#8b949e] tracking-[0.2em] uppercase mb-1">Lifetime Earnings</p>
+                        <h2 className="text-3xl font-black text-white tracking-tighter">
                             {balanceHidden ? "****" : `$4,892.50`}
                         </h2>
-                        <p className="text-xs text-[#9ca3af]/70 mt-2">
-                            Total amount successfully withdrawn.
+                        <p className="text-[9px] font-black text-[#8b949e] mt-4 flex items-center gap-2 uppercase tracking-[0.2em]">
+                            <ArrowUpRight className="h-3.5 w-3.5 text-[#f5a623]" />
+                            Global platform total
                         </p>
                     </div>
                 </Card>
@@ -297,76 +300,76 @@ export default function WalletPage() {
             {/* Transactions Section */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-white">Transaction History</h2>
+                    <h2 className="text-xl font-black text-white tracking-tighter uppercase">Transaction History</h2>
                     <div className="flex items-center gap-2">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6b7280]" />
-                            <Input placeholder="Search ID..." className="pl-9 h-9 w-[200px] bg-[#1c2128] border-[#2d333b] text-white text-xs" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b949e]" />
+                            <Input placeholder="SEARCH TRANSACTION..." className="pl-9 h-11 w-[240px] bg-[#0d1117] border-white/[0.05] text-white text-[10px] font-black tracking-widest shadow-inner focus:border-[#f5a623]/50 focus:ring-0" />
                         </div>
-                        <Button variant="outline" className="h-9 border-[#2d333b] bg-[#1c2128] text-white hover:bg-[#252b33]">
+                        <Button variant="outline" className="h-11 border-[#2d333b] bg-[#1c2128] text-[#9ca3af] hover:text-white hover:bg-[#212832] font-bold px-6 border-dashed">
                             <Download className="h-4 w-4 mr-2" />
-                            Export
+                            Export CSV
                         </Button>
                     </div>
                 </div>
 
-                <Card className="bg-[#1c2128] border-[#2d333b] overflow-hidden">
+                <Card className="bg-[#0d1117] border-[#2d333b] overflow-hidden shadow-2xl">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="border-b border-[#2d333b] bg-[#0a0e13]/50">
-                                <th className="p-4 text-xs font-bold text-[#9ca3af] uppercase">Transaction</th>
-                                <th className="p-4 text-xs font-bold text-[#9ca3af] uppercase">Type</th>
-                                <th className="p-4 text-xs font-bold text-[#9ca3af] uppercase">Amount</th>
-                                <th className="p-4 text-xs font-bold text-[#9ca3af] uppercase">Status</th>
-                                <th className="p-4 text-xs font-bold text-[#9ca3af] uppercase text-right">Date</th>
+                            <tr className="border-b border-[#2d333b] bg-white/[0.02]">
+                                <th className="p-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em]">Transaction Details</th>
+                                <th className="p-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em]">Type</th>
+                                <th className="p-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em]">Amount (USD)</th>
+                                <th className="p-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em]">Status</th>
+                                <th className="p-4 text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em] text-right">Date & Time</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#2d333b]">
+                        <tbody className="divide-y divide-[#2d333b]/30">
                             {TRANSACTIONS.map((trx) => (
-                                <tr key={trx.id} className="group hover:bg-[#252b33]/50 transition-colors">
+                                <tr key={trx.id} className="group hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4">
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-4">
                                             <div className={cn(
-                                                "h-10 w-10 rounded-full flex items-center justify-center border",
-                                                trx.type === 'withdrawal' ? "bg-red-500/10 border-red-500/20 text-red-500" :
-                                                    trx.type === 'sale' ? "bg-green-500/10 border-green-500/20 text-green-500" :
-                                                        "bg-blue-500/10 border-blue-500/20 text-blue-500"
+                                                "h-12 w-12 rounded-2xl flex items-center justify-center border transition-all duration-300 shadow-xl",
+                                                trx.type === 'withdrawal' ? "bg-red-500/5 border-red-500/20 text-red-500" :
+                                                    trx.type === 'sale' ? "bg-[#f5a623]/10 border-[#f5a623]/20 text-[#f5a623]" :
+                                                        "bg-white/5 border-white/10 text-white"
                                             )}>
                                                 {trx.type === 'withdrawal' && <ArrowUpRight className="h-5 w-5" />}
                                                 {trx.type === 'sale' && <ArrowDownLeft className="h-5 w-5" />}
                                                 {trx.type === 'purchase' && <CreditCard className="h-5 w-5" />}
                                             </div>
                                             <div>
-                                                <div className="text-sm font-bold text-white">{trx.description}</div>
-                                                <div className="text-xs text-[#6b7280]">{trx.method} • {trx.id}</div>
+                                                <div className="text-sm font-black text-white tracking-tight uppercase">{trx.description}</div>
+                                                <div className="text-[9px] font-black text-[#8b949e] uppercase tracking-[0.15em] mt-0.5">{trx.method} • <span className="text-white/20">{trx.id}</span></div>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="p-4">
-                                        <Badge variant="outline" className="capitalize border-[#2d333b] text-[#9ca3af]">
+                                        <Badge variant="outline" className="capitalize border-white/10 text-[#8b949e] font-black bg-white/[0.02] text-[9px] px-2.5 py-1 tracking-widest rounded-md uppercase">
                                             {trx.type}
                                         </Badge>
                                     </td>
                                     <td className="p-4">
                                         <span className={cn(
-                                            "font-bold",
-                                            trx.amount > 0 ? "text-[#00b67a]" : "text-white"
+                                            "text-lg font-black tracking-tighter",
+                                            trx.amount > 0 ? "text-[#f5a623]" : "text-white"
                                         )}>
-                                            {trx.amount > 0 ? "+" : ""}{trx.amount.toFixed(2)} USD
+                                            {trx.amount > 0 ? "+" : ""}{trx.amount.toFixed(2)}
                                         </span>
                                     </td>
                                     <td className="p-4">
                                         <div className={cn(
-                                            "inline-flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-bold uppercase",
-                                            trx.status === 'completed' || trx.status === 'available' ? "bg-[#00b67a]/10 text-[#00b67a]" :
-                                                trx.status === 'pending' ? "bg-[#f5a623]/10 text-[#f5a623]" :
-                                                    "bg-[#ef4444]/10 text-[#ef4444]"
+                                            "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.15em] border backdrop-blur-md shadow-lg",
+                                            trx.status === 'completed' || trx.status === 'available' ? "bg-[#f5a623]/5 text-[#f5a623] border-[#f5a623]/20" :
+                                                trx.status === 'pending' ? "bg-white/5 text-white/50 border-white/10" :
+                                                    "bg-red-500/5 text-red-500 border-red-500/20"
                                         )}>
                                             {trx.status === 'completed' || trx.status === 'available' ? <CheckCircle2 className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
                                             {trx.status}
                                         </div>
                                     </td>
-                                    <td className="p-4 text-right text-sm text-[#9ca3af]">
+                                    <td className="p-4 text-right text-[10px] font-black text-[#8b949e] uppercase tracking-wider">
                                         {trx.date}
                                     </td>
                                 </tr>
