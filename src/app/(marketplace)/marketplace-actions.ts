@@ -2,6 +2,24 @@
 
 import prisma from "@/lib/prisma/client";
 
+// Helper to serialize Prisma objects with Decimal fields
+function serializeListings(listings: any[]) {
+    return listings.map(listing => ({
+        ...listing,
+        price: listing.price ? Number(listing.price) : null,
+        originalPrice: listing.originalPrice ? Number(listing.originalPrice) : null,
+        createdAt: listing.createdAt?.toISOString() || null,
+        updatedAt: listing.updatedAt?.toISOString() || null,
+        deletedAt: listing.deletedAt?.toISOString() || null,
+        publishedAt: listing.publishedAt?.toISOString() || null,
+        promotedUntil: listing.promotedUntil?.toISOString() || null,
+        seller: listing.seller ? {
+            ...listing.seller,
+            lastActiveAt: listing.seller.lastActiveAt?.toISOString() || null,
+        } : null,
+    }));
+}
+
 export async function fetchMarketplaceData(categorySlug: string, gameSlug?: string) {
     try {
         // Fetch Category
@@ -36,10 +54,10 @@ export async function fetchMarketplaceData(categorySlug: string, gameSlug?: stri
         }
 
         // Fetch Listings for this category (and optionally game)
-        const listings = await prisma.listing.findMany({
+        const rawListings = await prisma.listing.findMany({
             where: {
                 categoryId: category.id,
-                ...(game ? { gameId: game.id } : {}), // Assuming gameId exists in Listing model
+                ...(game ? { gameId: game.id } : {}),
                 status: "ACTIVE",
             },
             include: {
@@ -63,9 +81,13 @@ export async function fetchMarketplaceData(categorySlug: string, gameSlug?: stri
             }
         });
 
+        // Serialize to plain objects for client components
+        const listings = serializeListings(rawListings);
+
         return { category, game, listings };
     } catch (error: any) {
         console.error("Error fetching marketplace data:", error);
         return { error: error.message };
     }
 }
+

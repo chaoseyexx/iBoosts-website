@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { fetchMarketplaceData } from "../marketplace-actions";
 import { CurrencyMarketplaceView } from "@/components/marketplace/currency-marketplace-view";
 import { NavbarServer } from "@/components/layout/navbar-server";
@@ -16,11 +16,6 @@ interface CategoryPageProps {
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
     const { category: categorySlug } = await params;
     const { game: gameSlug } = await searchParams;
-
-    // Redirect currency category to the new /currency/[game] route
-    if (categorySlug === "currency" && gameSlug) {
-        redirect(`/currency/${gameSlug}`);
-    }
 
     const { category, game, listings, error } = await fetchMarketplaceData(categorySlug, gameSlug);
 
