@@ -35,10 +35,19 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
                     transition={{ duration: 0.4, ease: "easeInOut" }}
                 >
                     <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 1.2, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
+                        initial={{ scale: 0.8, opacity: 0, rotate: -180 }}
+                        animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                        exit={{ scale: 1.2, opacity: 0, rotate: 180 }}
+                        transition={{
+                            duration: 0.5,
+                            ease: "easeOut",
+                            // Continuous spin while visible
+                            rotate: {
+                                repeat: Infinity,
+                                duration: 2,
+                                ease: "linear"
+                            }
+                        }}
                     >
                         <Logo className="w-16 h-16" />
                     </motion.div>
