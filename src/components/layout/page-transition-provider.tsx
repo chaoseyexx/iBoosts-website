@@ -31,15 +31,13 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
                     className="fixed inset-0 z-[10000] pointer-events-none flex items-center justify-center bg-[#0a0e13]/60 backdrop-blur-md"
                     initial={{ opacity: 1 }}
                     animate={{ opacity: 0 }}
-                    exit={{ opacity: 1 }}
-                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
                 >
                     <motion.div
                         initial={{ scale: 0.8, opacity: 0, rotate: -180 }}
                         animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                        exit={{ scale: 1.2, opacity: 0, rotate: 180 }}
                         transition={{
-                            duration: 0.5,
+                            duration: 0.4,
                             ease: "easeOut",
                             // Continuous spin while visible
                             rotate: {
