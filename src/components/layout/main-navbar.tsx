@@ -124,11 +124,11 @@ export function MainNavbar({
                     transformedData[catName] = {
                         popular: data.popular.map((g: any) => ({
                             ...g,
-                            href: `/${catSlug}?game=${g.slug}`
+                            href: `/${catSlug}/${g.slug}`
                         })),
                         all: data.all.map((g: any) => ({
                             ...g,
-                            href: `/${catSlug}?game=${g.slug}`
+                            href: `/${catSlug}/${g.slug}`
                         }))
                     };
                 }

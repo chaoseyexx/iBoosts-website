@@ -4,16 +4,17 @@ import { CurrencyMarketplaceView } from "@/components/marketplace/currency-marke
 import { NavbarServer } from "@/components/layout/navbar-server";
 import { Footer } from "@/components/layout/footer";
 
-interface CurrencyGamePageProps {
+interface CategoryGamePageProps {
     params: Promise<{
+        category: string;
         game: string;
     }>;
 }
 
-export default async function CurrencyGamePage({ params }: CurrencyGamePageProps) {
-    const { game: gameSlug } = await params;
+export default async function CategoryGamePage({ params }: CategoryGamePageProps) {
+    const { category: categorySlug, game: gameSlug } = await params;
 
-    const { category, game, listings, error } = await fetchMarketplaceData("currency", gameSlug);
+    const { category, game, listings, error } = await fetchMarketplaceData(categorySlug, gameSlug);
 
     if (error || !category || !game) {
         return notFound();
