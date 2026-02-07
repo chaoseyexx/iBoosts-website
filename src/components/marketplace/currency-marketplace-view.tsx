@@ -48,23 +48,23 @@ export function CurrencyMarketplaceView({ category, game, listings }: CurrencyMa
             {/* Background Image Layer */}
             {game?.banner && (
                 <div
-                    className="absolute inset-0 z-0 pointer-events-none"
+                    className="absolute inset-x-0 top-0 h-[50vh] z-0 pointer-events-none overflow-hidden"
                     style={{
                         backgroundImage: `url(${game.banner})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center top',
-                        backgroundAttachment: 'fixed' // Optional: parallax effect
+                        backgroundAttachment: 'fixed'
                     }}
                 >
                     {/* 
                       Gradient Overlays:
-                      1. Top darkening for navbar readability
-                      2. Strong fade from bottom to blend into the main background color
-                      3. General dark overlay to ensure text contrast everywhere
+                      1. Strong dark overlay for contrast
+                      2. Strong fade-to-black at the bottom to blend into the rest of the page
+                      3. Subtle top darkening
                     */}
                     <div className="absolute inset-0 bg-[#050506]/60" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#050506] via-[#050506]/80 to-transparent" />
-                    <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#050506] to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#050506] via-[#050506]/50 to-transparent" />
+                    <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#050506] to-transparent opacity-50" />
                 </div>
             )}
 
