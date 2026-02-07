@@ -91,6 +91,7 @@ export function MainNavbar({
     const [user, setUser] = React.useState<{ id: string; email?: string; username?: string; avatar?: string; } | null>(initialUser || null);
     const [loading, setLoading] = React.useState(true);
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+    const [expandedCategory, setExpandedCategory] = React.useState<string | null>(null);
     const [userMenuOpen, setUserMenuOpen] = React.useState(false);
     const [languageModalOpen, setLanguageModalOpen] = React.useState(false);
     const [mounted, setMounted] = React.useState(false); // Add mounted state
@@ -490,22 +491,76 @@ export function MainNavbar({
                                 {/* Categories & Links */}
                                 <div className="space-y-1">
                                     <p className="text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em] px-3 mb-2">Categories</p>
-                                    {navCategories.map((cat) => (
-                                        <Link
-                                            key={cat.id}
-                                            href={`/category/${cat.slug}`}
-                                            onClick={() => setMobileMenuOpen(false)}
-                                            className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[#1c2128] text-white transition-colors group"
-                                        >
-                                            <div className="h-10 w-10 rounded-lg bg-[#1c2128] flex items-center justify-center text-[#f5a623] text-lg border border-[#30363d] group-hover:border-[#f5a623]/30">
-                                                {cat.name.charAt(0)}
+                                    <div className="space-y-1">
+                                        {navCategories.map((cat) => (
+                                            <div key={cat.id} className="space-y-1">
+                                                <button
+                                                    onClick={() => setExpandedCategory(expandedCategory === cat.id ? null : cat.id)}
+                                                    className="w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-[#1c2128] text-white transition-colors group"
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="h-10 w-10 rounded-lg bg-[#1c2128] flex items-center justify-center text-[#f5a623] text-lg border border-[#30363d] group-hover:border-[#f5a623]/30">
+                                                            {cat.name.charAt(0)}
+                                                        </div>
+                                                        <div className="flex flex-col text-left">
+                                                            <span className="text-[14px] font-bold">{cat.name}</span>
+                                                            <span className="text-[11px] text-[#8b949e]">Explore {cat.name} products</span>
+                                                        </div>
+                                                    </div>
+                                                    <ChevronDown className={cn(
+                                                        "h-4 w-4 text-[#8b949e] transition-transform",
+                                                        expandedCategory === cat.id && "rotate-180"
+                                                    )} />
+                                                </button>
+
+                                                <AnimatePresence>
+                                                    {expandedCategory === cat.id && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, height: 0 }}
+                                                            animate={{ opacity: 1, height: 'auto' }}
+                                                            exit={{ opacity: 0, height: 0 }}
+                                                            className="overflow-hidden pl-13 pr-4 space-y-1"
+                                                        >
+                                                            {/* Popular Games Label */}
+                                                            {gamesData[cat.name]?.popular.length > 0 && (
+                                                                <p className="text-[10px] font-bold text-[#8b949e] uppercase tracking-wider mb-2 ml-1">Popular Games</p>
+                                                            )}
+                                                            <div className="grid grid-cols-1 gap-1">
+                                                                {gamesData[cat.name]?.popular.map((game) => (
+                                                                    <Link
+                                                                        key={game.id}
+                                                                        href={game.href}
+                                                                        onClick={() => {
+                                                                            setMobileMenuOpen(false);
+                                                                            setExpandedCategory(null);
+                                                                        }}
+                                                                        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#1c2128] text-sm text-[#8b949e] hover:text-white transition-colors"
+                                                                    >
+                                                                        {game.icon && (
+                                                                            <img src={game.icon} alt="" className="h-4 w-4 rounded-sm object-cover" />
+                                                                        )}
+                                                                        {game.name}
+                                                                    </Link>
+                                                                ))}
+                                                            </div>
+
+                                                            {/* View All Category Link */}
+                                                            <Link
+                                                                href={`/category/${cat.slug}`}
+                                                                onClick={() => {
+                                                                    setMobileMenuOpen(false);
+                                                                    setExpandedCategory(null);
+                                                                }}
+                                                                className="flex items-center gap-2 px-3 py-3 mt-2 rounded-lg bg-[#1c2128]/50 text-xs font-bold text-[#f5a623] hover:bg-[#1c2128] transition-colors"
+                                                            >
+                                                                View All {cat.name}
+                                                            </Link>
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
                                             </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-[14px] font-bold">{cat.name}</span>
-                                                <span className="text-[11px] text-[#8b949e]">Explore {cat.name} products</span>
-                                            </div>
-                                        </Link>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
 
                                 {/* Quick Links */}

@@ -56,7 +56,7 @@ export default async function DashboardLayout({
                 </React.Suspense>
 
                 {/* Main Content */}
-                <main className="flex-1 min-h-[calc(100vh-64px)] overflow-y-auto bg-[var(--dashboard-bg)] p-4 sm:p-6 md:p-8">
+                <main className="flex-1 min-h-[calc(100vh-64px)] overflow-x-hidden bg-[var(--dashboard-bg)] p-4 sm:p-6 md:p-8">
                     {/* Max width container */}
                     <div className="max-w-[1200px] w-full mx-auto md:mx-0">
                         {children}
