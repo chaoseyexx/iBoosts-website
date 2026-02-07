@@ -28,7 +28,7 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
 
                 {/* Overlay Loader Animation */}
                 <motion.div
-                    className="fixed inset-0 z-[10000] pointer-events-none flex items-center justify-center bg-[#0a0e13]"
+                    className="fixed inset-0 z-[10000] pointer-events-none flex items-center justify-center bg-[#0a0e13]/60 backdrop-blur-md"
                     initial={{ opacity: 1 }}
                     animate={{ opacity: 0 }}
                     exit={{ opacity: 1 }}
