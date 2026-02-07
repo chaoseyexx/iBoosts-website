@@ -229,7 +229,7 @@ export function MainNavbar({
                 </div>
 
                 {/* Main Navbar */}
-                <div className="flex h-[64px] items-center justify-between px-4 max-w-[1920px] mx-auto gap-6">
+                <div className="flex h-[60px] lg:h-[64px] items-center justify-between px-4 max-w-[1920px] mx-auto gap-3 lg:gap-6">
 
                     {/* Left Section: Logo & Nav Links */}
                     <div className="flex items-center gap-6">
@@ -241,7 +241,7 @@ export function MainNavbar({
 
                         {/* Inline Logo Component */}
                         <Link href="/" className="flex items-center gap-2 shrink-0">
-                            <Logo className="h-[44px] w-auto" />
+                            <Logo className="h-[36px] lg:h-[44px] w-auto" />
                         </Link>
 
                         {/* Desktop Navigation - Dynamic from Database */}
@@ -299,12 +299,14 @@ export function MainNavbar({
                             <div className="h-8 w-20 bg-[#1c2128] rounded-lg animate-pulse" />
                         ) : user ? (
                             <>
-                                <Button variant="ghost" size="icon" className="h-9 w-9 text-[#c9d1d9] hover:text-white">
-                                    <MessageCircle className="h-5 w-5" />
-                                </Button>
+                                <div className="hidden sm:flex items-center gap-2">
+                                    <Button variant="ghost" size="icon" className="h-9 w-9 text-[#c9d1d9] hover:text-white">
+                                        <MessageCircle className="h-5 w-5" />
+                                    </Button>
 
-                                <NotificationBell userId={user.id} />
-                                <ActivityButton />
+                                    <NotificationBell userId={user.id} />
+                                    <ActivityButton />
+                                </div>
 
                                 {/* User Menu */}
                                 <div className="relative">
@@ -470,21 +472,69 @@ export function MainNavbar({
                     </div>
                 </div>
 
-                {/* Mobile menu - Dynamic */}
-                {mobileMenuOpen && (
-                    <div className="lg:hidden border-t border-[#2d333b] bg-[#0d1117] absolute w-full left-0 top-[96px] shadow-2xl h-[calc(100vh-96px)] overflow-y-auto">
-                        <div className="p-4 space-y-1">
-                            {navCategories.map((cat) => (
-                                <div
-                                    key={cat.id}
-                                    className="block px-4 py-3 text-base font-medium text-[#c9d1d9] hover:text-white hover:bg-[#1c2128] rounded-lg transition-colors cursor-default"
-                                >
-                                    {cat.icon} {cat.name}
+                {/* Mobile menu - Enhanced */}
+                <AnimatePresence>
+                    {mobileMenuOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="lg:hidden border-t border-[#1c2128] bg-[#0a0e13] absolute w-full left-0 top-full shadow-2xl max-h-[calc(100vh-64px)] overflow-y-auto z-40"
+                        >
+                            <div className="p-4 space-y-6">
+                                {/* Mobile Search */}
+                                <div className="md:hidden">
+                                    <SearchDropdown gamesData={gamesData} isMobile={true} />
                                 </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+
+                                {/* Categories & Links */}
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em] px-3 mb-2">Categories</p>
+                                    {navCategories.map((cat) => (
+                                        <Link
+                                            key={cat.id}
+                                            href={`/category/${cat.slug}`}
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[#1c2128] text-white transition-colors group"
+                                        >
+                                            <div className="h-10 w-10 rounded-lg bg-[#1c2128] flex items-center justify-center text-[#f5a623] text-lg border border-[#30363d] group-hover:border-[#f5a623]/30">
+                                                {cat.name.charAt(0)}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-[14px] font-bold">{cat.name}</span>
+                                                <span className="text-[11px] text-[#8b949e]">Explore {cat.name} products</span>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+
+                                {/* Quick Links */}
+                                <div className="space-y-1 pt-4 border-t border-[#1c2128]">
+                                    <p className="text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em] px-3 mb-2">Platform</p>
+                                    <Link href="/support" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-2 text-[#c9d1d9] hover:text-white transition-colors">
+                                        <div className="h-2 w-2 rounded-full bg-[#f5a623]" />
+                                        <span className="text-sm font-bold">Support Hub</span>
+                                    </Link>
+                                    <Link href="/status" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-2 text-[#c9d1d9] hover:text-white transition-colors">
+                                        <div className="h-2 w-2 rounded-full bg-green-500" />
+                                        <span className="text-sm font-bold">System Status</span>
+                                    </Link>
+                                </div>
+
+                                {!user && (
+                                    <div className="grid grid-cols-2 gap-3 pt-4 border-t border-[#1c2128]">
+                                        <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                                            <Button variant="outline" className="w-full border-[#30363d] text-white h-11">Log In</Button>
+                                        </Link>
+                                        <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
+                                            <Button className="w-full bg-[#f5a623] text-black h-11 font-bold">Sign Up</Button>
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </nav>
         </>
     );

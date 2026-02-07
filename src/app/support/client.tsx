@@ -280,16 +280,16 @@ export function SupportClient() {
                 </section>
 
                 {/* Contact CTA */}
-                <section className="bg-gradient-to-r from-[#1c2128] to-[#0d1117] border border-[#30363d] rounded-3xl p-12 text-center">
-                    <h2 className="text-3xl font-black text-white mb-4">Still need <span className="text-[#f5a623]">help</span>?</h2>
-                    <p className="text-[#8b949e] mb-8 max-w-xl mx-auto">
+                <section className="bg-gradient-to-r from-[#1c2128] to-[#0d1117] border border-[#30363d] rounded-2xl md:rounded-3xl p-6 md:p-12 text-center">
+                    <h2 className="text-2xl md:text-3xl font-black text-white mb-4">Still need <span className="text-[#f5a623]">help</span>?</h2>
+                    <p className="text-[#8b949e] text-sm mb-8 max-w-xl mx-auto">
                         Our dedicated support champions are ready to assist you with any inquiries regarding the platform.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Button className="bg-[#f5a623] hover:bg-[#d48c1a] text-black font-black uppercase px-8 py-6 rounded-xl transition-all">
+                        <Button className="bg-[#f5a623] hover:bg-[#d48c1a] text-black font-black uppercase px-8 py-6 rounded-xl transition-all w-full sm:w-auto">
                             Open Support Ticket
                         </Button>
-                        <Button variant="outline" className="border-[#30363d] text-white font-bold px-8 py-6 rounded-xl hover:bg-[#1c2128]">
+                        <Button variant="outline" className="border-[#30363d] text-white font-bold px-8 py-6 rounded-xl hover:bg-[#1c2128] w-full sm:w-auto">
                             View Documentation
                         </Button>
                     </div>

@@ -48,9 +48,9 @@ export function RobuxListingHero({ listing }: RobuxListingHeroProps) {
                 <Card className="bg-[#0d1117]/80 backdrop-blur-sm border-[#30363d] overflow-hidden">
                     <CardContent className="p-0">
                         {/* Seller Ribbon */}
-                        <div className="bg-[#161b22] px-6 py-4 flex items-center justify-between border-b border-[#30363d]">
+                        <div className="bg-[#161b22] px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-[#30363d] gap-4">
                             <div className="flex items-center gap-4">
-                                <Avatar className="h-12 w-12 border-2 border-[#22c55e]">
+                                <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border-2 border-[#22c55e]">
                                     <AvatarImage src={listing.seller.avatar || undefined} />
                                     <AvatarFallback className="bg-[#30363d]">
                                         {listing.seller.username.charAt(0).toUpperCase()}
@@ -58,21 +58,21 @@ export function RobuxListingHero({ listing }: RobuxListingHeroProps) {
                                 </Avatar>
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <h3 className="text-lg font-black text-white">{listing.seller.username}</h3>
+                                        <h3 className="text-base sm:text-lg font-black text-white">{listing.seller.username}</h3>
                                         <CheckCircle2 className="h-4 w-4 text-[#22c55e] fill-[#22c55e]/10" />
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <div className="flex items-center gap-1 text-[#22c55e]">
-                                            <TrendingUp className="h-3.5 w-3.5" />
-                                            <span className="text-xs font-bold">99.3%</span>
+                                            <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                                            <span className="text-[10px] sm:text-xs font-bold">99.3%</span>
                                         </div>
-                                        <span className="text-xs text-[#58a6ff] hover:underline cursor-pointer">
+                                        <span className="text-[10px] sm:text-xs text-[#58a6ff] hover:underline cursor-pointer">
                                             {listing.seller.totalSales?.toLocaleString() || "732,044"} reviews
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                            <div className="text-right">
+                            <div className="sm:text-right w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-[#30363d]">
                                 <span className="text-[10px] text-[#8b949e] font-bold uppercase tracking-widest block mb-1">Delivery time</span>
                                 <span className="text-sm font-black text-white">8 min - 20 min</span>
                             </div>

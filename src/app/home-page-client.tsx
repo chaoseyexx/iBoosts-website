@@ -210,7 +210,7 @@ export function HomePageClient({ initialCategories = [], initialGamesData = {} }
                         </div>
 
                         {/* Headline */}
-                        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#fdfcf0] leading-tight mb-4">
+                        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-[#fdfcf0] leading-[1.1] sm:leading-tight mb-4 tracking-tight">
                             The Largest{" "}
                             <span className="bg-gradient-to-r from-[#f5a623] to-[#ffb347] bg-clip-text text-transparent">
                                 Digital Gaming
@@ -238,13 +238,15 @@ export function HomePageClient({ initialCategories = [], initialGamesData = {} }
                         </div>
 
                         {/* Trust features */}
-                        <div className="flex flex-wrap gap-6 mt-10">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-10">
                             {features.map((feature) => (
-                                <div key={feature.title} className="flex items-center gap-2">
-                                    <feature.icon className="h-5 w-5 text-[#f5a623]" />
+                                <div key={feature.title} className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-lg bg-[#f5a623]/10 flex items-center justify-center shrink-0">
+                                        <feature.icon className="h-5 w-5 text-[#f5a623]" />
+                                    </div>
                                     <div>
-                                        <p className="text-white text-sm font-medium">{feature.title}</p>
-                                        <p className="text-[#6b7280] text-xs">{feature.desc}</p>
+                                        <p className="text-white text-sm font-bold">{feature.title}</p>
+                                        <p className="text-[#6b7280] text-[11px]">{feature.desc}</p>
                                     </div>
                                 </div>
                             ))}

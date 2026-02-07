@@ -3,6 +3,7 @@ import * as React from "react";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { NavbarServer } from "@/components/layout/navbar-server";
+import { MobileDashboardNav } from "@/components/layout/mobile-dashboard-nav";
 import prisma from "@/lib/prisma/client";
 import "../dashboard.css";
 
@@ -44,17 +45,20 @@ export default async function DashboardLayout({
             <NavbarServer variant="dashboard" />
 
             {/* Content area with sidebar - positioned below fixed navbar */}
-            <div className="flex pt-[96px]">
-                {/* Sidebar */}
-                <React.Suspense fallback={<div className="w-64 bg-[#0d1117] border-r border-[#1c2128]" />}>
+            <div className="flex flex-col lg:flex-row pt-[60px] lg:pt-[64px]">
+                {/* Mobile Sub-Nav (Horizontal Scroll) */}
+                <MobileDashboardNav />
+
+                {/* Sidebar (Hidden on mobile via components) */}
+                <React.Suspense fallback={<div className="hidden lg:block w-64 bg-[#0d1117] border-r border-[#1c2128]" />}>
                     {/* @ts-ignore */}
                     <DashboardSidebar user={userData || undefined} />
                 </React.Suspense>
 
                 {/* Main Content */}
-                <main className="flex-1 min-h-[calc(100vh-96px)] overflow-y-auto bg-[var(--dashboard-bg)] p-6">
-                    {/* Max width container to keep space on right side */}
-                    <div className="max-w-[1200px] w-full">
+                <main className="flex-1 min-h-[calc(100vh-64px)] overflow-y-auto bg-[var(--dashboard-bg)] p-4 sm:p-6 md:p-8">
+                    {/* Max width container */}
+                    <div className="max-w-[1200px] w-full mx-auto md:mx-0">
                         {children}
                     </div>
                 </main>

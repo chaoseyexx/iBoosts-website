@@ -55,21 +55,21 @@ export function RecommendedSellerCard({ listing }: RecommendedSellerCardProps) {
                     </div>
 
                     {/* Right: Pricing & CTA */}
-                    <div className="flex flex-col items-end gap-3 text-right">
+                    <div className="flex flex-col items-center sm:items-end gap-4 text-center sm:text-right">
                         <div className="space-y-0.5">
-                            <span className="text-sm text-[#8b949e] uppercase font-bold tracking-tighter">Current Best Price</span>
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-4xl font-black text-white">$ {listing.price.toFixed(4)}</span>
+                            <span className="text-[10px] sm:text-sm text-[#8b949e] uppercase font-bold tracking-tighter">Current Best Price</span>
+                            <div className="flex items-baseline justify-center sm:justify-end gap-2">
+                                <span className="text-3xl sm:text-4xl font-black text-white">$ {listing.price.toFixed(4)}</span>
                                 <span className="text-sm text-[#8b949e]">/ unit</span>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                            <div className="flex flex-col items-end">
+                        <div className="flex flex-wrap items-center justify-center sm:justify-end gap-4">
+                            <div className="flex flex-col items-center sm:items-end">
                                 <span className="text-[10px] text-[#00b67a] font-bold uppercase">Stock Available</span>
                                 <span className="text-sm font-bold text-white">{listing.stock.toLocaleString()}</span>
                             </div>
-                            <Button className="bg-[#f5a623] hover:bg-[#e09612] text-black font-extrabold h-12 px-8 text-base shadow-[0_0_20px_rgba(245,166,35,0.3)] hover:shadow-[0_0_30px_rgba(245,166,35,0.4)] transition-all">
+                            <Button className="bg-[#f5a623] hover:bg-[#e09612] text-black font-extrabold h-11 sm:h-12 px-6 sm:px-8 text-sm sm:text-base shadow-[0_0_20px_rgba(245,166,35,0.3)] hover:shadow-[0_0_30px_rgba(245,166,35,0.4)] transition-all">
                                 Buy Now
                             </Button>
                         </div>

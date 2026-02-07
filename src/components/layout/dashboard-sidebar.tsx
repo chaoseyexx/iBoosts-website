@@ -150,7 +150,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
     };
 
     return (
-        <aside className="sticky top-[96px] flex h-[calc(100vh-96px)] w-64 flex-col border-r border-white/[0.05] bg-[#0d1117] flex-shrink-0 z-20">
+        <aside className="hidden lg:flex sticky top-[96px] h-[calc(100vh-96px)] w-64 flex-col border-r border-white/[0.05] bg-[#0d1117] flex-shrink-0 z-20">
             <div className="border-b border-[#2d333b]/40 p-5 bg-white/[0.01]">
                 <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-black/40 border border-[#f5a623]/20 flex items-center justify-center relative shadow-lg overflow-hidden">

@@ -18,6 +18,7 @@ interface NavGame {
 interface SearchDropdownProps {
     gamesData: Record<string, { popular: NavGame[]; all: NavGame[] }>;
     className?: string;
+    isMobile?: boolean;
 }
 
 interface SearchResult {
@@ -27,7 +28,7 @@ interface SearchResult {
     icon: string | null;
 }
 
-export function SearchDropdown({ gamesData, className }: SearchDropdownProps) {
+export function SearchDropdown({ gamesData, className, isMobile }: SearchDropdownProps) {
     const router = useRouter();
     const [query, setQuery] = React.useState("");
     const [isOpen, setIsOpen] = React.useState(false);
@@ -97,7 +98,11 @@ export function SearchDropdown({ gamesData, className }: SearchDropdownProps) {
     };
 
     return (
-        <div ref={containerRef} className={cn("relative w-full max-w-2xl", className)}>
+        <div ref={containerRef} className={cn(
+            "relative w-full",
+            !isMobile && "max-w-2xl",
+            className
+        )}>
             <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b949e]" />
                 <input
@@ -109,8 +114,11 @@ export function SearchDropdown({ gamesData, className }: SearchDropdownProps) {
                         setIsOpen(true);
                     }}
                     onFocus={() => setIsOpen(true)}
-                    placeholder="Search products (e.g. Roblox, WoW)..."
-                    className="w-full h-10 pl-10 pr-10 bg-[#161b22] border border-[#30363d] rounded-lg text-sm text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-0 transition-all"
+                    placeholder={isMobile ? "Search..." : "Search products (e.g. Roblox, WoW)..."}
+                    className={cn(
+                        "w-full pr-10 bg-[#161b22] border border-[#30363d] rounded-lg text-sm text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-0 transition-all",
+                        isMobile ? "h-11 pl-11" : "h-10 pl-10"
+                    )}
                 />
                 {query && (
                     <button
@@ -132,7 +140,10 @@ export function SearchDropdown({ gamesData, className }: SearchDropdownProps) {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.98 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute top-[calc(100%+8px)] left-0 w-full bg-[#1c2128] border border-[#30363d] rounded-xl shadow-2xl z-50 overflow-hidden max-h-[400px] overflow-y-auto"
+                        className={cn(
+                            "absolute top-[calc(100%+8px)] left-0 w-full bg-[#1c2128] border border-[#30363d] rounded-xl shadow-2xl z-50 overflow-hidden overflow-y-auto",
+                            isMobile ? "max-h-[60vh]" : "max-h-[400px]"
+                        )}
                     >
                         {filteredItems.length > 0 ? (
                             <div className="py-2">

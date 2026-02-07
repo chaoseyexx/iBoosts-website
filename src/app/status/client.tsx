@@ -61,24 +61,26 @@ const UptimeGraph = ({ serviceId, uptime }: { serviceId: string, uptime: string 
 
     return (
         <div className="mt-4">
-            <div className="flex items-end gap-[3px] h-8 w-full">
-                {days.map((day, i) => (
-                    <TooltipProvider key={i} delayDuration={0}>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <div
-                                    className="flex-1 h-full bg-[#3ecf8e] rounded-[1px] hover:opacity-80 transition-opacity cursor-pointer"
-                                />
-                            </TooltipTrigger>
-                            <TooltipContent className="bg-[#1c2128] border border-[#30363d] text-white text-xs p-2">
-                                <p className="font-bold mb-1">{day.date}</p>
-                                <p className="text-[#3ecf8e]">No downtime recorded on this day.</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                ))}
+            <div className="overflow-x-auto pb-2 scrollbar-hide">
+                <div className="flex items-end gap-[3px] h-8 min-w-[600px] md:min-w-0 md:w-full">
+                    {days.map((day, i) => (
+                        <TooltipProvider key={i} delayDuration={0}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <div
+                                        className="flex-1 h-full bg-[#3ecf8e] rounded-[1px] hover:opacity-80 transition-opacity cursor-pointer"
+                                    />
+                                </TooltipTrigger>
+                                <TooltipContent className="bg-[#1c2128] border border-[#30363d] text-white text-xs p-2">
+                                    <p className="font-bold mb-1">{day.date}</p>
+                                    <p className="text-[#3ecf8e]">No downtime recorded on this day.</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    ))}
+                </div>
             </div>
-            <div className="flex justify-between items-center mt-2 text-xs text-[#8b949e] font-medium">
+            <div className="flex justify-between items-center mt-1 text-[10px] sm:text-xs text-[#8b949e] font-medium">
                 <span>90 days ago</span>
                 <span className="text-white font-bold">{uptime} uptime</span>
                 <span>Today</span>
@@ -104,11 +106,11 @@ export function StatusPageClient() {
 
                 {/* Header Section */}
                 <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-3xl font-bold text-white">System Status</h1>
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-[#3ecf8e]/10 border border-[#3ecf8e]/20 rounded-full">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-white">System Status</h1>
+                        <div className="flex items-center w-fit gap-2 px-3 py-1.5 bg-[#3ecf8e]/10 border border-[#3ecf8e]/20 rounded-full">
                             <CheckCircle className="h-4 w-4 text-[#3ecf8e]" />
-                            <span className="text-sm font-bold text-[#3ecf8e]">All Systems Operational</span>
+                            <span className="text-xs sm:text-sm font-bold text-[#3ecf8e]">All Systems Operational</span>
                         </div>
                     </div>
                 </div>
