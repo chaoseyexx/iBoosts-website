@@ -244,25 +244,26 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
                                 href={section.href!}
                                 className={cn(
                                     "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group text-[13px] font-bold tracking-wide",
+                                    isActive(section.href!)
                                         ? "bg-[#f5a623] text-black shadow-[0_0_20px_rgba(245,166,35,0.15)]"
-                                    : "text-[#8b949e] hover:text-white hover:bg-white/[0.02]"
+                                        : "text-[#8b949e] hover:text-white hover:bg-white/[0.02]"
                                 )}
                             >
-                        <section.icon className={cn(
-                            "h-5 w-5 transition-colors",
-                            pathname === section.href ? "text-black" : "text-[#8b949e] group-hover:text-white"
-                        )} />
-                        <span className={cn(
-                            "transition-colors",
-                            pathname === section.href ? "text-black" : "text-[#8b949e] group-hover:text-white"
-                        )}>
-                            {section.label}
-                        </span>
-                    </Link>
-                )}
-            </div>
+                                <section.icon className={cn(
+                                    "h-5 w-5 transition-colors",
+                                    pathname === section.href ? "text-black" : "text-[#8b949e] group-hover:text-white"
+                                )} />
+                                <span className={cn(
+                                    "transition-colors",
+                                    pathname === section.href ? "text-black" : "text-[#8b949e] group-hover:text-white"
+                                )}>
+                                    {section.label}
+                                </span>
+                            </Link>
+                        )}
+                    </div>
                 ))}
-        </nav>
+            </nav>
         </aside >
     );
 }
