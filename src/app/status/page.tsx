@@ -3,6 +3,8 @@ import { Footer } from "@/components/layout/footer";
 import { StatusPageClient } from "./client";
 import { getSystemStatus } from "./status-actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function StatusPage() {
     const initialData = await getSystemStatus();
 

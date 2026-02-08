@@ -83,7 +83,8 @@ export async function getSystemStatus(): Promise<StatusResponse> {
 
         const { error } = await client.auth.getSession();
         if (error) throw error;
-    } catch (error) {
+    } catch (error: any) {
+        if (error?.digest === 'DYNAMIC_SERVER_USAGE') throw error;
         console.error("Status Check: Auth Error", error);
         authStatus = "degraded";
     }
