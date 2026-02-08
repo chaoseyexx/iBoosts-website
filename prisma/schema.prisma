@@ -157,6 +157,7 @@ model Game {
   banner      String?
   isPopular   Boolean    @default(false)
   isActive    Boolean    @default(true)
+  sortOrder   Int        @default(0)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   listings    Listing[]
@@ -164,6 +165,7 @@ model Game {
   categories  Category[] @relation("GameCategories")
 
   @@index([slug])
+  @@index([sortOrder])
 }
 
 model BoostingRequest {

@@ -364,12 +364,6 @@ export function MainNavbar({
                                                                     <span className="text-[10px] text-[#8b949e] uppercase tracking-widest font-bold">Available</span>
                                                                 </div>
                                                             </div>
-
-                                                            <Link href="/dashboard/listings/create" onClick={() => setUserMenuOpen(false)}>
-                                                                <Button className="bg-[#f5a623] hover:bg-[#ffb339] text-black font-black h-10 px-5 rounded-xl shadow-[0_4px_15px_rgba(245,166,35,0.3)] transition-all hover:scale-105 active:scale-95 text-xs uppercase tracking-wider">
-                                                                    Sell
-                                                                </Button>
-                                                            </Link>
                                                         </div>
                                                     </div>
 
@@ -445,14 +439,14 @@ export function MainNavbar({
                             </>
                         ) : (
                             /* Guest Actions */
-                            <div className="flex items-center gap-4 ml-2">
+                            <div className="flex items-center gap-2 ml-2">
                                 <Link href="/login">
-                                    <Button variant="ghost" className="text-white hover:text-[#f5a623] font-bold text-[15px] h-9 px-0">
+                                    <Button variant="ghost" className="text-[#c9d1d9] hover:text-[#f5a623] hover:bg-[#1c2128] font-bold text-[15px] h-10 px-6 rounded-xl transition-all">
                                         Log In
                                     </Button>
                                 </Link>
                                 <Link href="/signup">
-                                    <Button className="bg-[#f5a623] hover:bg-[#e09612] text-black font-bold h-10 px-8 rounded-lg shadow-lg shadow-orange-500/10 text-[15px]">
+                                    <Button className="bg-[#f5a623] hover:bg-[#e09612] text-black font-bold h-10 px-8 rounded-xl shadow-lg shadow-orange-500/20 text-[15px] transition-all hover:scale-105 active:scale-95">
                                         Sign Up
                                     </Button>
                                 </Link>
@@ -554,7 +548,7 @@ export function MainNavbar({
                                 {/* Quick Links */}
                                 <div className="space-y-1 pt-4 border-t border-[#1c2128]">
                                     <p className="text-[10px] font-black text-[#8b949e] uppercase tracking-[0.2em] px-3 mb-2">Platform</p>
-                                    <Link href="/support" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-2 text-[#c9d1d9] hover:text-white transition-colors">
+                                    <Link href="https://support.iboosts.gg" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-2 text-[#c9d1d9] hover:text-white transition-colors">
                                         <div className="h-2 w-2 rounded-full bg-[#f5a623]" />
                                         <span className="text-sm font-bold">Support Hub</span>
                                     </Link>

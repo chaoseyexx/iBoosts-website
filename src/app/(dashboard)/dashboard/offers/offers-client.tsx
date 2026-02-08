@@ -237,9 +237,11 @@ export function OffersClient({ initialOffers, categoryQuery = "all" }: OffersCli
 
                                 {/* Description & Stats */}
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="text-[17px] font-semibold text-white truncate max-w-lg mb-2 group-hover:text-[#f5a623] transition-colors leading-tight tracking-tighter uppercase">
-                                        {offer.title}
-                                    </h3>
+                                    {offer.category !== 'currency' && (
+                                        <h3 className="text-[17px] font-semibold text-white truncate max-w-lg mb-2 group-hover:text-[#f5a623] transition-colors leading-tight tracking-tighter uppercase">
+                                            {offer.title}
+                                        </h3>
+                                    )}
                                     <div className="flex items-center gap-12 text-[12px]">
                                         <div className="flex flex-col">
                                             <span className="text-[#8b949e] font-semibold mb-0.5 text-[10px] uppercase tracking-[0.2em]">Inventory:</span>

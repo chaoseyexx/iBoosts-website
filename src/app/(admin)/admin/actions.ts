@@ -242,6 +242,31 @@ export async function deleteGame(gameId: string) {
     }
 }
 
+export async function reorderGames(gameIds: string[]) {
+    try {
+        console.log("Updating games order:", gameIds.length);
+
+        // Use a transaction to update all games
+        await prisma.$transaction(
+            gameIds.map((id, index) =>
+                prisma.game.update({
+                    where: { id },
+                    data: { sortOrder: index }
+                })
+            )
+        );
+
+        revalidateTag("navbar-data", {});
+        revalidatePath("/admin/cms");
+        revalidatePath("/");
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error reordering games:", error);
+        return { error: error.message };
+    }
+}
+
 export async function uploadGameIcon(formData: FormData) {
     try {
         const file = formData.get("file") as File;
@@ -397,12 +422,14 @@ export async function fetchGamesForNavbar() {
             });
 
             const games = await prisma.game.findMany({
+                where: { isActive: true },
                 include: {
                     categories: {
                         select: { id: true, name: true, slug: true }
                     }
                 },
                 orderBy: [
+                    { sortOrder: "asc" },
                     { isPopular: "desc" },
                     { name: "asc" }
                 ]
@@ -447,7 +474,7 @@ export async function fetchGames() {
     try {
         return await prisma.game.findMany({
             include: { categories: true },
-            orderBy: { createdAt: 'desc' }
+            orderBy: { sortOrder: 'asc' }
         });
     } catch (error) {
         return [];

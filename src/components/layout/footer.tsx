@@ -90,10 +90,9 @@ export function Footer() {
                     <div className="text-center sm:text-left">
                         <h4 className="font-black text-xs uppercase tracking-[0.2em] text-[#8b949e] mb-6">Help Center</h4>
                         <ul className="space-y-4 text-sm font-bold text-[#c9d1d9]">
-                            <li><Link href="/support" className="hover:text-[#f5a623] transition-colors">Help Center</Link></li>
-                            <li><Link href="/support#faq" className="hover:text-[#f5a623] transition-colors">FAQ</Link></li>
+                            <li><Link href="https://support.iboosts.gg" className="hover:text-[#f5a623] transition-colors">Help Center</Link></li>
+                            <li><Link href="https://support.iboosts.gg#faq" className="hover:text-[#f5a623] transition-colors">FAQ</Link></li>
                             <li><Link href="#" className="hover:text-[#f5a623] transition-colors">Become a Partner</Link></li>
-                            <li><Link href="/seller" className="hover:text-[#f5a623] transition-colors">Become a Seller</Link></li>
                             <li><Link href="/status" className="inline-flex items-center gap-2 text-green-500/80 hover:text-green-500 transition-colors">
                                 <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
                                 System Status
@@ -105,7 +104,7 @@ export function Footer() {
                     <div className="text-center sm:text-left">
                         <h4 className="font-black text-xs uppercase tracking-[0.2em] text-[#8b949e] mb-6">Security & Warranty</h4>
                         <ul className="space-y-4 text-sm font-bold text-[#c9d1d9]">
-                            <li><Link href="/support#ishield" className="hover:text-[#f5a623] transition-colors inline-flex items-center gap-2 justify-center sm:justify-start">
+                            <li><Link href="https://support.iboosts.gg#ishield" className="hover:text-[#f5a623] transition-colors inline-flex items-center gap-2 justify-center sm:justify-start">
                                 <ShieldCheck className="h-4 w-4 text-[#f5a623]" />
                                 iShield Platform
                             </Link></li>

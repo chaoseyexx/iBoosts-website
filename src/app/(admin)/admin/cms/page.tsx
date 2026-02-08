@@ -13,8 +13,25 @@ import {
     Upload,
     ImageIcon,
     PauseCircle,
-    PlayCircle
+    PlayCircle,
+    GripVertical
 } from "lucide-react";
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+} from "@dnd-kit/core";
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -27,10 +44,154 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchCategories, fetchGames, createGame, seedCMSData, updateGame, deleteGame, uploadGameIcon, uploadGameBanner, toggleGameStatus } from "@/app/(admin)/admin/actions";
+import { fetchCategories, fetchGames, createGame, seedCMSData, updateGame, deleteGame, uploadGameIcon, uploadGameBanner, toggleGameStatus, reorderGames } from "@/app/(admin)/admin/actions";
 import { toast } from "sonner";
 import slugify from "slugify";
 import Image from "next/image";
+
+function SortableGameItem({
+    game,
+    isActive,
+    onToggleStatus,
+    onEdit,
+    onDelete,
+    deleteConfirmId,
+    setDeleteConfirmId
+}: any) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({ id: game.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 50 : undefined,
+    };
+
+    return (
+        <div
+            ref={setNodeRef}
+            style={style}
+            className={cn(
+                "group relative bg-[#1c2128] border border-[#2d333b] rounded-xl p-3 transition-all duration-300 hover:border-[#f5a623]/30 flex items-center justify-between",
+                isDragging && "opacity-50 ring-2 ring-[#f5a623] shadow-2xl"
+            )}
+        >
+            <div className="flex items-center gap-4 flex-1">
+                {/* Drag Handle */}
+                <div
+                    {...attributes}
+                    {...listeners}
+                    className="p-1 cursor-grab active:cursor-grabbing text-[#4b5563] hover:text-[#f5a623] transition-colors"
+                >
+                    <GripVertical className="h-4 w-4" />
+                </div>
+
+                <div className="h-12 w-12 rounded-lg bg-[#0a0e13] border border-[#2d333b] flex items-center justify-center overflow-hidden relative shrink-0">
+                    {game.icon ? (
+                        <Image
+                            src={game.icon}
+                            alt={game.name}
+                            width={48}
+                            height={48}
+                            className="h-full w-full object-cover"
+                        />
+                    ) : (
+                        <span className="text-xl font-bold text-[#f5a623]">{game.name.charAt(0)}</span>
+                    )}
+                </div>
+
+                <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-white text-sm group-hover:text-[#f5a623] transition-colors">{game.name}</h3>
+                        {game.isPopular && (
+                            <span className="text-[8px] font-black text-[#f5a623] bg-[#f5a623]/10 px-1.5 py-0.5 rounded border border-[#f5a623]/20 uppercase tracking-wider">Trending</span>
+                        )}
+                        <span className={cn(
+                            "text-[8px] font-black px-1.5 py-0.5 rounded border uppercase tracking-wider",
+                            game.isActive
+                                ? "text-emerald-400 bg-emerald-400/10 border-emerald-400/20"
+                                : "text-rose-400 bg-rose-400/10 border-rose-400/20"
+                        )}>
+                            {game.isActive ? "Active" : "Paused"}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
+                        <p className="text-[#4b5563]">{game.slug}</p>
+                        <div className="h-1 w-1 rounded-full bg-[#2d333b]" />
+                        <div className="flex gap-1.5">
+                            {game.categories?.map((c: any) => (
+                                <span key={c.id} className="text-[#8b949e]">
+                                    {c.name}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onToggleStatus(game.id, game.isActive, game.name)}
+                    className={cn(
+                        "h-8 w-8 p-0",
+                        game.isActive
+                            ? "text-rose-400 hover:text-rose-300 hover:bg-rose-500/10"
+                            : "text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10"
+                    )}
+                    title={game.isActive ? "Pause Game" : "Activate Game"}
+                >
+                    {game.isActive ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onEdit(game)}
+                    className="h-8 px-3 text-sky-400 hover:text-sky-300 hover:bg-sky-500/10 text-xs font-bold"
+                >
+                    <Pencil className="h-3.5 w-3.5 mr-1.5" />
+                    Edit
+                </Button>
+                {deleteConfirmId === game.id ? (
+                    <div className="flex items-center gap-1">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onDelete(game.id, game.name)}
+                            className="h-8 px-3 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xs font-bold"
+                        >
+                            Confirm
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setDeleteConfirmId(null)}
+                            className="h-8 w-8 p-0 text-[#8b949e] hover:text-white"
+                        >
+                            <X className="h-3.5 w-3.5" />
+                        </Button>
+                    </div>
+                ) : (
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDeleteConfirmId(game.id)}
+                        className="h-8 w-8 p-0 text-[#8b949e] hover:text-rose-400 hover:bg-rose-500/10"
+                    >
+                        <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                )}
+            </div>
+        </div>
+    );
+}
 
 export default function AdminCMSPage() {
     const [loading, setLoading] = React.useState(true);
@@ -57,6 +218,13 @@ export default function AdminCMSPage() {
         isPopular: false,
         categoryIds: [] as string[]
     });
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
 
     const loadData = React.useCallback(async () => {
         setLoading(true);
@@ -264,6 +432,30 @@ export default function AdminCMSPage() {
         }
     };
 
+    const handleDragEnd = async (event: any) => {
+        const { active, over } = event;
+
+        if (active.id !== over?.id) {
+            setGames((items) => {
+                const oldIndex = items.findIndex((i) => i.id === active.id);
+                const newIndex = items.findIndex((i) => i.id === over.id);
+
+                const newGames = arrayMove(items, oldIndex, newIndex);
+
+                // Update database
+                const reorderedIds = newGames.map(g => g.id);
+                reorderGames(reorderedIds).then(res => {
+                    if (!res.success) {
+                        toast.error(res.error || "Failed to save new order");
+                        loadData(); // Revert on failure
+                    }
+                });
+
+                return newGames;
+            });
+        }
+    };
+
     const filteredGames = selectedCategory
         ? games.filter(g => g.categories.some((c: any) => c.id === selectedCategory))
         : games;
@@ -321,7 +513,6 @@ export default function AdminCMSPage() {
                 ))}
             </div>
 
-            {/* Games List */}
             <div className="space-y-2">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
@@ -329,113 +520,30 @@ export default function AdminCMSPage() {
                         <p className="text-[#8b949e] font-bold tracking-widest uppercase text-[10px] animate-pulse">Loading games...</p>
                     </div>
                 ) : filteredGames.length > 0 ? (
-                    <div className="flex flex-col gap-2">
-                        {filteredGames.map((game) => (
-                            <div
-                                key={game.id}
-                                className="group relative bg-[#1c2128] border border-[#2d333b] rounded-xl p-3 transition-all duration-300 hover:border-[#f5a623]/30 flex items-center justify-between"
-                            >
-                                <div className="flex items-center gap-4">
-                                    <div className="h-12 w-12 rounded-lg bg-[#0a0e13] border border-[#2d333b] flex items-center justify-center overflow-hidden relative shrink-0">
-                                        {game.icon ? (
-                                            <Image
-                                                src={game.icon}
-                                                alt={game.name}
-                                                width={48}
-                                                height={48}
-                                                className="h-full w-full object-cover"
-                                            />
-                                        ) : (
-                                            <span className="text-xl font-bold text-[#f5a623]">{game.name.charAt(0)}</span>
-                                        )}
-                                    </div>
-
-                                    <div className="space-y-0.5">
-                                        <div className="flex items-center gap-2">
-                                            <h3 className="font-bold text-white text-sm group-hover:text-[#f5a623] transition-colors">{game.name}</h3>
-                                            {game.isPopular && (
-                                                <span className="text-[8px] font-black text-[#f5a623] bg-[#f5a623]/10 px-1.5 py-0.5 rounded border border-[#f5a623]/20 uppercase tracking-wider">Trending</span>
-                                            )}
-                                            <span className={cn(
-                                                "text-[8px] font-black px-1.5 py-0.5 rounded border uppercase tracking-wider",
-                                                game.isActive
-                                                    ? "text-emerald-400 bg-emerald-400/10 border-emerald-400/20"
-                                                    : "text-rose-400 bg-rose-400/10 border-rose-400/20"
-                                            )}>
-                                                {game.isActive ? "Active" : "Paused"}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
-                                            <p className="text-[#4b5563]">{game.slug}</p>
-                                            <div className="h-1 w-1 rounded-full bg-[#2d333b]" />
-                                            <div className="flex gap-1.5">
-                                                {game.categories?.map((c: any) => (
-                                                    <span key={c.id} className="text-[#8b949e]">
-                                                        {c.name}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleToggleStatus(game.id, game.isActive, game.name)}
-                                        className={cn(
-                                            "h-8 w-8 p-0",
-                                            game.isActive
-                                                ? "text-rose-400 hover:text-rose-300 hover:bg-rose-500/10"
-                                                : "text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10"
-                                        )}
-                                        title={game.isActive ? "Pause Game" : "Activate Game"}
-                                    >
-                                        {game.isActive ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleOpenEdit(game)}
-                                        className="h-8 px-3 text-sky-400 hover:text-sky-300 hover:bg-sky-500/10 text-xs font-bold"
-                                    >
-                                        <Pencil className="h-3.5 w-3.5 mr-1.5" />
-                                        Edit
-                                    </Button>
-                                    {deleteConfirmId === game.id ? (
-                                        <div className="flex items-center gap-1">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => handleDelete(game.id, game.name)}
-                                                className="h-8 px-3 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xs font-bold"
-                                            >
-                                                Confirm
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => setDeleteConfirmId(null)}
-                                                className="h-8 w-8 p-0 text-[#8b949e] hover:text-white"
-                                            >
-                                                <X className="h-3.5 w-3.5" />
-                                            </Button>
-                                        </div>
-                                    ) : (
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => setDeleteConfirmId(game.id)}
-                                            className="h-8 w-8 p-0 text-[#8b949e] hover:text-rose-400 hover:bg-rose-500/10"
-                                        >
-                                            <Trash2 className="h-3.5 w-3.5" />
-                                        </Button>
-                                    )}
-                                </div>
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <SortableContext
+                            items={filteredGames.map(g => g.id)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <div className="flex flex-col gap-2">
+                                {filteredGames.map((game) => (
+                                    <SortableGameItem
+                                        key={game.id}
+                                        game={game}
+                                        onToggleStatus={handleToggleStatus}
+                                        onEdit={handleOpenEdit}
+                                        onDelete={handleDelete}
+                                        deleteConfirmId={deleteConfirmId}
+                                        setDeleteConfirmId={setDeleteConfirmId}
+                                    />
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        </SortableContext>
+                    </DndContext>
                 ) : (
                     <div className="flex flex-col items-center justify-center py-20 bg-[#1c2128]/50 border-2 border-dashed border-[#2d333b] rounded-2xl">
                         <Gamepad2 className="h-10 w-10 text-[#2d333b] mb-3" />
@@ -672,6 +780,6 @@ export default function AdminCMSPage() {
                     </form>
                 </DialogContent>
             </Dialog>
-        </div>
+        </div >
     );
 }
