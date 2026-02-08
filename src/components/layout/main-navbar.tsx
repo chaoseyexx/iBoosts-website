@@ -554,7 +554,7 @@ export function MainNavbar({
                                         <div className="h-2 w-2 rounded-full bg-[#f5a623]" />
                                         <span className="text-sm font-bold">Support Hub</span>
                                     </Link>
-                                    <Link href="/status" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-2 text-[#c9d1d9] hover:text-white transition-colors">
+                                    <Link href="https://status.iboosts.gg" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-2 text-[#c9d1d9] hover:text-white transition-colors">
                                         <div className="h-2 w-2 rounded-full bg-green-500" />
                                         <span className="text-sm font-bold">System Status</span>
                                     </Link>

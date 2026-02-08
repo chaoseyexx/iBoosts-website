@@ -97,7 +97,7 @@ export function Footer() {
                             <li><Link href="https://support.iboosts.gg" className="hover:text-[#f5a623] transition-colors">Help Center</Link></li>
                             <li><Link href="https://support.iboosts.gg#faq" className="hover:text-[#f5a623] transition-colors">FAQ</Link></li>
                             <li><Link href="#" className="hover:text-[#f5a623] transition-colors">Become a Partner</Link></li>
-                            <li><Link href="/status" className="inline-flex items-center gap-2 text-green-500/80 hover:text-green-500 transition-colors">
+                            <li><Link href="https://status.iboosts.gg" className="inline-flex items-center gap-2 text-green-500/80 hover:text-green-500 transition-colors">
                                 <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
                                 System Status
                             </Link></li>
