@@ -17,7 +17,8 @@ import {
     EyeOff,
     CheckCircle2,
     XCircle,
-    AlertCircle
+    AlertCircle,
+    Plus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -41,6 +42,9 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { StripeProvider } from "@/components/stripe/stripe-provider";
+import { CheckoutForm } from "@/components/stripe/checkout-form";
+import { toast } from "sonner";
 
 // --- Mock Data ---
 
@@ -87,6 +91,9 @@ export default function WalletPage() {
     const [balanceHidden, setBalanceHidden] = React.useState(false);
     const [withdrawOpen, setWithdrawOpen] = React.useState(false);
     const [withdrawStep, setWithdrawStep] = React.useState(1);
+    const [addFundsOpen, setAddFundsOpen] = React.useState(false);
+    const [clientSecret, setClientSecret] = React.useState("");
+    const [addFundsAmount, setAddFundsAmount] = React.useState("10.00");
 
     // Withdrawal Form State
     const [amount, setAmount] = React.useState("");
@@ -104,6 +111,50 @@ export default function WalletPage() {
         }, 2000);
     };
 
+    const handleAddFunds = async () => {
+        try {
+            const response = await fetch("/api/stripe/create-payment-intent", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount: Number(addFundsAmount) }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || "Failed to initialize payment");
+            }
+
+            const data = await response.json();
+            setClientSecret(data.clientSecret);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to initialize payment.");
+        }
+    };
+
+    // Reset client secret when dialog closes
+    React.useEffect(() => {
+        if (!addFundsOpen) {
+            setClientSecret("");
+        } else {
+            // Initialize default amount intent
+            handleAddFunds();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [addFundsOpen]);
+
+    // Debounce amount update for new intent
+    React.useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (addFundsOpen && Number(addFundsAmount) > 0) {
+                handleAddFunds();
+            }
+        }, 800);
+        return () => clearTimeout(timeoutId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [addFundsAmount]);
+
+
     return (
         <div className="space-y-8 pb-12">
 
@@ -114,6 +165,48 @@ export default function WalletPage() {
                     <p className="text-sm text-[#8b949e]">Manage your global earnings & payouts</p>
                 </div>
                 <div className="flex items-center gap-3">
+                    <Dialog open={addFundsOpen} onOpenChange={setAddFundsOpen}>
+                        <DialogTrigger asChild>
+                            <Button className="bg-[#1c2128] hover:bg-[#252b33] text-white font-bold h-11 px-6 border border-[#2d333b]">
+                                <Plus className="h-4 w-4 mr-2" />
+                                Add Funds
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-[#1c2128] border-[#2d333b] text-white sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle className="text-xl font-bold flex items-center gap-2 text-white">
+                                    <CreditCard className="h-5 w-5 text-[#f5a623]" />
+                                    Add Funds via Stripe
+                                </DialogTitle>
+                                <DialogDescription className="text-[#9ca3af] font-medium">
+                                    Top up your wallet securely using your credit card.
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="grid gap-6 py-4">
+                                <div className="space-y-2">
+                                    <Label className="text-white font-bold">Amount (USD)</Label>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#f5a623] font-bold">$</span>
+                                        <Input
+                                            type="number"
+                                            placeholder="0.00"
+                                            value={addFundsAmount}
+                                            onChange={(e) => setAddFundsAmount(e.target.value)}
+                                            className="pl-7 bg-[#0a0e13] border-[#2d333b] text-white focus:border-[#f5a623] h-11 text-lg font-bold shadow-sm"
+                                        />
+                                    </div>
+                                </div>
+
+                                {clientSecret && (
+                                    <StripeProvider clientSecret={clientSecret}>
+                                        <CheckoutForm amount={Number(addFundsAmount)} onSuccess={() => setAddFundsOpen(false)} />
+                                    </StripeProvider>
+                                )}
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+
                     <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
                         <DialogTrigger asChild>
                             <Button className="bg-[#f5a623] hover:bg-[#e09612] text-black font-bold h-11 px-6 shadow-lg shadow-[#f5a623]/20">
