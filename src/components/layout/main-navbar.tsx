@@ -63,7 +63,9 @@ interface MainNavbarProps {
         avatar?: string;
     } | null;
     initialCategories?: NavCategory[];
+    initialCategories?: NavCategory[];
     initialGamesData?: Record<string, { popular: NavGame[]; all: NavGame[] }>;
+    homeLink?: string;
 }
 
 // Interface for games from database
@@ -87,7 +89,11 @@ export function MainNavbar({
     variant = "landing",
     user: initialUser,
     initialCategories,
-    initialGamesData
+    variant = "landing",
+    user: initialUser,
+    initialCategories,
+    initialGamesData,
+    homeLink = "/"
 }: MainNavbarProps) {
     const router = useRouter();
     const [user, setUser] = React.useState<{ id: string; email?: string; username?: string; avatar?: string; } | null>(initialUser || null);
@@ -243,7 +249,7 @@ export function MainNavbar({
                         </div>
 
                         {/* Inline Logo Component */}
-                        <Link href="/" className="flex items-center gap-2 shrink-0">
+                        <Link href={homeLink} className="flex items-center gap-2 shrink-0">
                             <Logo className="h-[36px] lg:h-[44px] w-auto" />
                         </Link>
 

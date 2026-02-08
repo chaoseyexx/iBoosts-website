@@ -2,6 +2,7 @@ import { fetchGamesForNavbar } from "@/app/(admin)/admin/actions";
 import { MainNavbar } from "./main-navbar";
 import { getProfile } from "@/app/(dashboard)/dashboard/settings/actions";
 import { createClient } from "@/lib/supabase/server";
+import { headers } from "next/headers";
 
 interface NavbarServerProps {
     variant?: "landing" | "dashboard";
@@ -10,6 +11,12 @@ interface NavbarServerProps {
 export async function NavbarServer({ variant = "landing" }: NavbarServerProps) {
     // 1. Fetch cached navbar data
     const { categories, gamesByCategory } = await fetchGamesForNavbar();
+
+    // 1.5 Determine Home Link based on subdomain
+    const headerList = await headers();
+    const host = headerList.get("host") || "";
+    const isSupport = host.includes("support.iboosts.gg");
+    const homeLink = isSupport ? "https://iboosts.gg" : "/";
 
     // 2. Fetch user session if possible (server-side)
     const supabase = await createClient();
@@ -55,6 +62,7 @@ export async function NavbarServer({ variant = "landing" }: NavbarServerProps) {
             user={userData}
             initialCategories={transformedCategories}
             initialGamesData={transformedGamesData}
+            homeLink={homeLink}
         />
     );
 }
