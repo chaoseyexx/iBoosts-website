@@ -63,7 +63,6 @@ interface MainNavbarProps {
         avatar?: string;
     } | null;
     initialCategories?: NavCategory[];
-    initialCategories?: NavCategory[];
     initialGamesData?: Record<string, { popular: NavGame[]; all: NavGame[] }>;
     homeLink?: string;
 }
