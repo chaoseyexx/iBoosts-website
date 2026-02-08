@@ -66,7 +66,7 @@ export function Footer() {
                                     </div>
                                 ))}
                             </div>
-                            <div className="text-[11px] font-medium text-[#8b949e]">TrustScore <span className="text-white font-bold">4.4</span> | 128,816 reviews</div>
+                            <div className="text-[11px] font-medium text-[#8b949e]">TrustScore <span className="text-white font-bold">4.9</span> | 1,248 reviews</div>
                         </Link>
 
                         {/* Social Icons */}
