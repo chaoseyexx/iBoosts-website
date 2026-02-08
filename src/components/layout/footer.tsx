@@ -83,6 +83,9 @@ export function Footer() {
                             <Link href="#" className="h-9 w-9 rounded-lg bg-[#1c2128] border border-[#2d333b] flex items-center justify-center text-white hover:text-[#f5a623] hover:border-[#f5a623]/30 transition-all group">
                                 <Youtube className="h-4 w-4 group-hover:scale-110 transition-transform" />
                             </Link>
+                            <Link href="https://discord.gg/MhBBdsWHhZ" target="_blank" className="h-9 w-9 rounded-lg bg-[#5865F2] border border-[#5865F2] flex items-center justify-center text-white hover:bg-[#4752c4] transition-all group shadow-[0_0_15px_rgba(88,101,242,0.3)] hover:shadow-[0_0_25px_rgba(88,101,242,0.5)]">
+                                <Gamepad2 className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                            </Link>
                         </div>
                     </div>
 

@@ -125,14 +125,6 @@ export default function NotificationsPage() {
     return (
         <div className="relative min-h-[calc(100vh-100px)]">
             {/* Background Character Graphic */}
-            <div className="absolute right-0 top-0 bottom-0 w-1/2 opacity-15 pointer-events-none z-0 overflow-hidden">
-                <Image
-                    src="https://i.imgur.com/39A8n8A.png"
-                    alt="Background Character"
-                    fill
-                    className="object-contain object-right"
-                />
-            </div>
 
             <div className="relative z-10 space-y-6">
                 {/* Page Header */}
