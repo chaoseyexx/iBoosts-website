@@ -55,7 +55,7 @@ export function Footer() {
                         </p>
 
                         {/* Trustpilot Placeholder */}
-                        <div className="flex flex-col items-center sm:items-start gap-2">
+                        <Link href="https://www.trustpilot.com/review/iboosts.gg" target="_blank" className="flex flex-col items-center sm:items-start gap-2 hover:opacity-80 transition-opacity">
                             <div className="flex items-center gap-1 text-[#00b67a] font-black text-sm uppercase tracking-wider">
                                 <span className="text-lg">★</span> Trustpilot
                             </div>
@@ -67,7 +67,7 @@ export function Footer() {
                                 ))}
                             </div>
                             <div className="text-[11px] font-medium text-[#8b949e]">TrustScore <span className="text-white font-bold">4.4</span> | 128,816 reviews</div>
-                        </div>
+                        </Link>
 
                         {/* Social Icons */}
                         <div className="flex items-center justify-center sm:justify-start gap-4">

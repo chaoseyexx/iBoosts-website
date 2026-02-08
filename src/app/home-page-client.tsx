@@ -197,19 +197,24 @@ export function HomePageClient({
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.2, duration: 0.5 }}
-                                    className="inline-flex items-center gap-3 mb-8 px-4 py-2 rounded-full glass border-[#f5a623]/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
                                 >
-                                    <div className="flex items-center gap-1.5 border-r border-white/10 pr-3 mr-1">
-                                        <Badge className="bg-[#00b67a] text-white border-0 px-2 py-0.5 text-[10px] uppercase font-black">
-                                            ★ Trustpilot
-                                        </Badge>
-                                    </div>
-                                    <div className="flex items-center gap-0.5">
-                                        {[1, 2, 3, 4, 5].map((star) => (
-                                            <Star key={star} className="h-3 w-3 text-[#00b67a] fill-[#00b67a]" />
-                                        ))}
-                                    </div>
-                                    <span className="text-[11px] font-bold text-white/70 uppercase tracking-widest hidden sm:inline">4.9/5 Rating</span>
+                                    <Link
+                                        href="https://www.trustpilot.com/review/iboosts.gg"
+                                        target="_blank"
+                                        className="inline-flex items-center gap-3 mb-8 px-4 py-2 rounded-full glass border-[#f5a623]/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:bg-[#f5a623]/10 transition-colors"
+                                    >
+                                        <div className="flex items-center gap-1.5 border-r border-white/10 pr-3 mr-1">
+                                            <Badge className="bg-[#00b67a] text-white border-0 px-2 py-0.5 text-[10px] uppercase font-black">
+                                                ★ Trustpilot
+                                            </Badge>
+                                        </div>
+                                        <div className="flex items-center gap-0.5">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <Star key={star} className="h-3 w-3 text-[#00b67a] fill-[#00b67a]" />
+                                            ))}
+                                        </div>
+                                        <span className="text-[11px] font-bold text-white/70 uppercase tracking-widest hidden sm:inline">4.9/5 Rating</span>
+                                    </Link>
                                 </motion.div>
 
                                 {/* Headline with Cinematic Typography */}
