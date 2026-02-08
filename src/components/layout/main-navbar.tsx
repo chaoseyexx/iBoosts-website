@@ -89,9 +89,6 @@ export function MainNavbar({
     variant = "landing",
     user: initialUser,
     initialCategories,
-    variant = "landing",
-    user: initialUser,
-    initialCategories,
     initialGamesData,
     homeLink = "/"
 }: MainNavbarProps) {
