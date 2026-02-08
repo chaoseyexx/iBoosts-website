@@ -101,28 +101,26 @@ export function SupportClient() {
                             link: "#account"
                         }
                     ].map((item, idx) => (
-                    ].map((item, idx) => (
-                    <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 + idx * 0.1 }}
-                    >
-                        <Card className="h-full p-8 rounded-3xl bg-[#161b22]/50 backdrop-blur-md border-[#30363d]/50 hover:border-[#f5a623]/30 hover:bg-[#161b22] transition-all duration-300 group cursor-pointer relative overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <div className="relative z-10">
-                                <div className="h-14 w-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 duration-300" style={{ backgroundColor: `${item.color}15`, border: `1px solid ${item.color}30` }}>
-                                    <item.icon className="h-7 w-7" style={{ color: item.color }} />
+                        <motion.div
+                            key={idx}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4 + idx * 0.1 }}
+                        >
+                            <Card className="h-full p-8 rounded-3xl bg-[#161b22]/50 backdrop-blur-md border-[#30363d]/50 hover:border-[#f5a623]/30 hover:bg-[#161b22] transition-all duration-300 group cursor-pointer relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <div className="relative z-10">
+                                    <div className="h-14 w-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 duration-300" style={{ backgroundColor: `${item.color}15`, border: `1px solid ${item.color}30` }}>
+                                        <item.icon className="h-7 w-7" style={{ color: item.color }} />
+                                    </div>
+                                    <h3 className="text-xl font-black text-white mb-3 uppercase tracking-tight group-hover:text-[#f5a623] transition-colors">{item.title}</h3>
+                                    <p className="text-[#8b949e] text-sm leading-relaxed mb-6 font-medium">{item.desc}</p>
+                                    <div className="mt-auto flex items-center text-[#c9d1d9] text-xs font-bold uppercase tracking-widest group-hover:text-[#f5a623] transition-colors">
+                                        View Guides <ChevronRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
+                                    </div>
                                 </div>
-                                <h3 className="text-xl font-black text-white mb-3 uppercase tracking-tight group-hover:text-[#f5a623] transition-colors">{item.title}</h3>
-                                <p className="text-[#8b949e] text-sm leading-relaxed mb-6 font-medium">{item.desc}</p>
-                                <div className="mt-auto flex items-center text-[#c9d1d9] text-xs font-bold uppercase tracking-widest group-hover:text-[#f5a623] transition-colors">
-                                    View Guides <ChevronRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
-                                </div>
-                            </div>
-                        </Card>
-                    </motion.div>
-                    ))}
+                            </Card>
+                        </motion.div>
                     ))}
                 </div>
             </div>
