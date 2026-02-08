@@ -71,6 +71,9 @@ const UptimeGraph = ({ serviceId, status, uptime }: { serviceId: string, status:
         status: i === 89 ? status : "operational" // Current day reflects real status, history is simulated for UX
     }));
 
+    const [mounted, setMounted] = React.useState(false);
+    React.useEffect(() => { setMounted(true); }, []);
+
     return (
         <div className="mt-4">
             <div className="flex items-end gap-[4px] h-10 w-full mb-2">
@@ -87,7 +90,7 @@ const UptimeGraph = ({ serviceId, status, uptime }: { serviceId: string, status:
                                 />
                             </TooltipTrigger>
                             <TooltipContent className="bg-[#1c2128] border border-[#30363d] text-white text-[11px] p-2.5 shadow-2xl">
-                                <p className="opacity-60 mb-1">{day.date}</p>
+                                <p className="opacity-60 mb-1">{mounted ? day.date : "..."}</p>
                                 <p className={cn(
                                     "text-xs uppercase",
                                     day.status === "operational" ? "text-[#3ecf8e]" :
@@ -113,6 +116,13 @@ const UptimeGraph = ({ serviceId, status, uptime }: { serviceId: string, status:
 };
 
 export function StatusPageClient({ initialData }: StatusPageClientProps) {
+    const [isMounted, setIsMounted] = React.useState(false);
+    const [expandedIncident, setExpandedIncident] = React.useState<string | null>(null);
+
+    React.useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
     const isAllOperational = initialData.services.every(s => s.status === "operational");
 
     return (
@@ -221,7 +231,7 @@ export function StatusPageClient({ initialData }: StatusPageClientProps) {
 
                                             <div className="flex items-center gap-3">
                                                 <span className="text-[10px] text-[#4b5563] uppercase tracking-widest bg-[#1c2128] px-2 py-0.5 rounded border border-[#30363d]">
-                                                    {new Date(incident.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                    {isMounted ? new Date(incident.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "..."}
                                                 </span>
                                                 <h4 className="text-lg text-white uppercase tracking-tight">{incident.title}</h4>
                                             </div>
@@ -239,7 +249,7 @@ export function StatusPageClient({ initialData }: StatusPageClientProps) {
                                                         </span>
                                                         <span className="h-1 w-1 rounded-full bg-[#30363d]" />
                                                         <span className="text-[10px] text-[#4b5563]">
-                                                            {new Date(update.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })} UTC
+                                                            {isMounted ? new Date(update.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : "..."} UTC
                                                         </span>
                                                     </div>
                                                     <p className="text-[#8b949e] text-sm font-medium leading-relaxed max-w-2xl">
@@ -275,7 +285,7 @@ export function StatusPageClient({ initialData }: StatusPageClientProps) {
 
                     <div className="flex items-center gap-2 text-[10px] text-[#4b5563] uppercase tracking-[0.2em] bg-[#1c2128]/50 px-4 py-2 rounded-full border border-[#30363d]/30">
                         <Clock className="h-3 w-3" />
-                        Last Synced: {new Date(initialData.lastUpdated).toLocaleTimeString()}
+                        Last Synced: {isMounted ? new Date(initialData.lastUpdated).toLocaleTimeString() : "..."}
                     </div>
                 </div>
 
