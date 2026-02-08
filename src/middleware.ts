@@ -14,12 +14,35 @@ export default async function middleware(request: NextRequest) {
 
     // 1. Handle Status Subdomain
     if (isStatusSubdomain) {
+        // Rewrite root to /status
         if (url.pathname === "/") {
             return await updateSession(request, NextResponse.rewrite(new URL("/status", request.url)));
         }
-        if (!url.pathname.startsWith('/status')) {
-            return await updateSession(request, NextResponse.rewrite(new URL(`/status${url.pathname}`, request.url)));
+        // Allow access to /status subpaths directly (rewriting them to keep URL clean if needed, 
+        // but here we want to map subdomain root to /status)
+
+        // If the path is ALREADY starting with /status, rewrite to it directly (this might happen if internal links are used)
+        if (url.pathname.startsWith('/status')) {
+            return await updateSession(request, NextResponse.rewrite(new URL(url.pathname, request.url)));
         }
+
+        // START STRICT MODE: checking if the path is NOT a status path, we might want to block or redirect
+        // For now, let's assume anything else on this subdomain should be treated as relative to /status 
+        // OR if it's a resource (api, static) let it pass.
+        // If it's a main app page like /currency, /dashboard -> Redirect to main domain
+        const isPublicResource = url.pathname.startsWith('/_next') || url.pathname.startsWith('/api') || url.pathname.match(/\.(png|jpg|jpeg|gif|ico|svg)$/);
+
+        if (!isPublicResource && !url.pathname.startsWith('/status')) {
+            // If user tries to access /currency on status.iboosts.gg, redirect to iboosts.gg/currency
+            const baseDomain = hostname.replace('status.', '');
+            return NextResponse.redirect(`${url.protocol}//${baseDomain}${url.pathname}${url.search}`, 307);
+        }
+
+        // Rewrite logic update: valid status paths are likely just /status or /status/api (if any). 
+        // Actually the logic above for "/" -> "/status" covers the main case.
+        // If they go to /status/history, we rewrite to /status/history.
+        // But if they go to /status (the path), on the subdomain, it effectively means status.iboosts.gg/status.
+        // We probably want to canonicalize: status.iboosts.gg/ -> serves /status content.
     }
 
     // 2. Handle Support Subdomain
@@ -27,8 +50,18 @@ export default async function middleware(request: NextRequest) {
         if (url.pathname === "/") {
             return await updateSession(request, NextResponse.rewrite(new URL("/support", request.url)));
         }
-        if (!url.pathname.startsWith('/support')) {
-            return await updateSession(request, NextResponse.rewrite(new URL(`/support${url.pathname}`, request.url)));
+
+        const isPublicResource = url.pathname.startsWith('/_next') || url.pathname.startsWith('/api') || url.pathname.match(/\.(png|jpg|jpeg|gif|ico|svg)$/);
+
+        // If path starts with /support, let it pass (rewrite to clear if needed, but Next handles it)
+        if (url.pathname.startsWith('/support')) {
+            return await updateSession(request, NextResponse.rewrite(new URL(url.pathname, request.url)));
+        }
+
+        // Strict mode for support: Redirect other paths to main domain
+        if (!isPublicResource) {
+            const baseDomain = hostname.replace('support.', '');
+            return NextResponse.redirect(`${url.protocol}//${baseDomain}${url.pathname}${url.search}`, 307);
         }
     }
 
