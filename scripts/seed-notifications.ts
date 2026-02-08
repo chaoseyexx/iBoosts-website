@@ -1,5 +1,5 @@
-
 import { PrismaClient } from '@prisma/client';
+import { randomUUID } from 'node:crypto';
 
 const prisma = new PrismaClient();
 
@@ -65,6 +65,7 @@ async function main() {
         await prisma.notification.create({
             data: {
                 ...notif,
+                id: randomUUID(),
                 type: notif.type as any
             }
         });
