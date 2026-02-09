@@ -36,16 +36,28 @@ async function main() {
         }
         console.log("----------------------------------------------------------------");
 
-        // 1. Create a PaymentIntent designed to succeed immediately
-        // We use 'pm_card_visa' which simulates a successful card payment.
-        console.log("Creating a $500 charge to self...");
+        // 1. Create a PaymentMethod using the "Bypass Pending" test card
+        // Card: 4000 0000 0000 0077
+        console.log("Creating payment method with 'Bypass Pending' card...");
+
+        const paymentMethod = await stripe.paymentMethods.create({
+            type: 'card',
+            card: {
+                number: '4000000000000077',
+                exp_month: 12,
+                exp_year: 2050,
+                cvc: '123',
+            },
+        });
+
+        console.log("Creating a $500 charge using this card...");
 
         const paymentIntent = await stripe.paymentIntents.create({
             amount: 50000, // $500.00
             currency: "usd",
-            payment_method: "pm_card_visa",
+            payment_method: paymentMethod.id,
             confirm: true,
-            description: "Self-funding for Payout Testing",
+            description: "Instant Funding via Bypass Card",
             automatic_payment_methods: {
                 enabled: true,
                 allow_redirects: "never"
@@ -80,7 +92,20 @@ async function main() {
         console.log("   Click 'Add to balance' and simulate a bank transfer.");
 
     } catch (error: any) {
-        console.error("❌ Error adding funds:", error.message);
+        // Handle common error where raw card data is blocked (even in test mode)
+        if (error.type === 'StripeInvalidRequestError' || (error.message && error.message.includes("raw card data"))) {
+            console.log("❌ Error: Stripe account settings block sending raw card numbers via API.");
+            console.log("   (This is common for security, even in Test Mode).");
+            console.log("");
+            console.log("✅ GUARANTEED SOLUTION for INSTANT FUNDS:");
+            console.log("   1. Go to https://dashboard.stripe.com/test/balance/overview");
+            console.log("   2. Click 'Add to balance' -> Select 'Bank transfer'.");
+            console.log("   3. Start the transfer. Funds become AVAILABLE instantly.");
+            console.log("");
+            console.log("   You can then proceed with your withdrawal test on the site.");
+        } else {
+            console.error("❌ Error adding funds:", error.message);
+        }
     }
 }
 
