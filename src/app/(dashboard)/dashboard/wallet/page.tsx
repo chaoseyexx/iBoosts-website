@@ -45,25 +45,34 @@ export default async function WalletPage() {
 
     // Process Wallet Data
     const wallet = walletData?.wallet;
-    const initialWallet = {
-        balance: wallet?.balance ? Number(wallet.balance) : 0,
-        pendingBalance: wallet?.pendingBalance ? Number(wallet.pendingBalance) : 0,
-        transactions: wallet?.transactions?.map(t => ({
-            ...t,
-            amount: Number(t.amount),
-            createdAt: t.createdAt.toISOString(), // Serialize Date
-            metadata: t.metadata as any
-        })) || []
+
+    // safe formatting to avoid serialization errors
+    const formattedWallet = wallet ? {
+        ...wallet,
+        balance: Number(wallet.balance),
+        pendingBalance: Number(wallet.pendingBalance),
+        transactions: wallet.transactions.map(tx => ({
+            ...tx,
+            amount: Number(tx.amount),
+            balanceBefore: Number(tx.balanceBefore),
+            balanceAfter: Number(tx.balanceAfter),
+            createdAt: tx.createdAt.toISOString(),
+            metadata: tx.metadata as any
+        }))
+    } : {
+        balance: 0,
+        pendingBalance: 0,
+        transactions: []
     };
 
     const initialUser = {
         role: dbUser.role,
-        kycStatus: dbUser.kycStatus,
+        kycStatus: dbUser.kycStatus || "NOT_SUBMITTED",
     };
 
     return (
         <WalletView
-            initialWallet={initialWallet}
+            initialWallet={formattedWallet}
             initialUser={initialUser}
         />
     );

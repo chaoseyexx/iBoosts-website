@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma/client";
 import Stripe from "stripe";
 import { Prisma } from "@prisma/client";
 import { calculateWithdrawal } from "@/lib/utils/fees";
+import { generateId } from "@/lib/utils/ids";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -66,6 +67,14 @@ export async function POST(request: Request) {
                 amount: Math.round(netAmount * 100),
                 currency: "usd",
                 destination: stripeAccountId,
+                metadata: {
+                    type: "WITHDRAWAL",
+                    userId: dbUser.id,
+                    username: dbUser.username,
+                    grossAmount: amount,
+                    fee: fee.toFixed(2),
+                    netAmount: netAmount.toFixed(2)
+                }
             });
 
             // 5. Updating Wallet Balance (deduct the full gross amount)
@@ -79,12 +88,13 @@ export async function POST(request: Request) {
             // 6. Create Transaction Record
             await tx.walletTransaction.create({
                 data: {
+                    id: generateId("WalletTransaction"),
                     walletId: wallet.id,
                     type: "WITHDRAWAL",
                     amount: new Prisma.Decimal(amount),
                     balanceBefore: wallet.balance,
                     balanceAfter: updatedWallet.balance,
-                    description: `Payout via Stripe Connect (Fee: $${fee.toFixed(2)})`,
+                    description: `Payout via Stripe Connect(Fee: $${fee.toFixed(2)})`,
                     reference: transfer.id,
                     referenceType: "STRIPE_TRANSFER",
                     metadata: {

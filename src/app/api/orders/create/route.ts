@@ -105,10 +105,15 @@ export async function POST(request: Request) {
                 amount: Math.round(total * 100),
                 currency: "usd",
                 metadata: {
+                    type: "ORDER_PAYMENT",
                     orderId: order.id,
+                    orderNumber: order.orderNumber,
                     buyerId: dbUser.id,
+                    buyerUsername: dbUser.username,
+                    sellerId: listing.sellerId,
+                    sellerUsername: listing.seller.username,
                     listingId: listing.id,
-                    type: "marketplace_order"
+                    productName: listing.title
                 }
             });
             clientSecret = paymentIntent.client_secret;
