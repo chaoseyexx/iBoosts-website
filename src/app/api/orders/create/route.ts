@@ -1,13 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma/client";
-import Stripe from "stripe";
+import { stripe } from "@/lib/stripe";
 import { generateId } from "@/lib/utils/ids";
 import { calculateOrderTotal } from "@/lib/utils/fees";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2024-11-20.acacia" as any,
-});
 
 export async function POST(request: Request) {
     try {

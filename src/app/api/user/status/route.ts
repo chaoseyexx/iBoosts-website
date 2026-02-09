@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma/client";
-import Stripe from "stripe";
+import { stripe } from "@/lib/stripe";
 
 export async function GET(request: Request) {
     try {
@@ -67,9 +67,7 @@ export async function GET(request: Request) {
         let payoutsEnabled = false;
         if (dbUser.stripeAccountId) {
             try {
-                const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-                    apiVersion: "2024-12-18.acacia" as any,
-                });
+
                 const account = await stripe.accounts.retrieve(dbUser.stripeAccountId);
 
                 // Check if payouts are actually enabled

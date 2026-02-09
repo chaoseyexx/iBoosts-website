@@ -6,6 +6,7 @@ import { WalletWithdrawalView } from "./withdrawal-view";
 import { notFound } from "next/navigation";
 import { generateId } from "@/lib/utils/ids";
 import Stripe from "stripe";
+import { stripe } from "@/lib/stripe";
 
 interface BankAccountInfo {
     bankName: string;
@@ -50,9 +51,7 @@ export default async function WithdrawalPage() {
 
     if (dbUser.stripeAccountId) {
         try {
-            const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-                apiVersion: "2024-12-18.acacia" as any,
-            });
+
             const account = await stripe.accounts.retrieve(dbUser.stripeAccountId);
             payoutsEnabled = account.payouts_enabled === true;
 

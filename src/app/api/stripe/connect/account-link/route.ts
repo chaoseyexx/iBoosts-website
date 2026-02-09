@@ -2,11 +2,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma/client";
-import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2024-12-18.acacia" as any,
-});
+import { stripe } from "@/lib/stripe";
 
 export async function POST(request: Request) {
     try {

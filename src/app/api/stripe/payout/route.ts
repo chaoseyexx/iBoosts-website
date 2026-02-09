@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma/client";
-import Stripe from "stripe";
+import { stripe } from "@/lib/stripe";
 import { Prisma } from "@prisma/client";
 import { calculateWithdrawal } from "@/lib/utils/fees";
 import { generateId } from "@/lib/utils/ids";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
 
 export async function POST(request: Request) {
     try {
