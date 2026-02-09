@@ -96,7 +96,7 @@ async function getUserWithData(username: string) {
         gameName: l.game?.name || 'Unknown',
         gameSlug: l.game?.slug || '',
         categoryName: l.category?.name || 'Item',
-        deliveryType: l.deliveryType,
+        deliveryType: l.deliveryMethod.toLowerCase(),
         createdAt: l.createdAt.toISOString(),
     }));
 
