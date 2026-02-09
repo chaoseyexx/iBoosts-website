@@ -20,9 +20,10 @@ interface Listing {
 
 interface CurrencyListingsTableProps {
     listings: any[];
+    currentUserId?: string;
 }
 
-export function CurrencyListingsTable({ listings }: CurrencyListingsTableProps) {
+export function CurrencyListingsTable({ listings, currentUserId }: CurrencyListingsTableProps) {
     if (listings.length === 0) {
         return (
             <div className="text-center py-20 border border-dashed border-[#2d333b] rounded-xl bg-[#0d1117]/50">
@@ -56,8 +57,10 @@ export function CurrencyListingsTable({ listings }: CurrencyListingsTableProps) 
                                             {listing.seller.verified && <ShieldCheck className="h-3 w-3 text-[#f5a623]" />}
                                         </div>
                                         <div className="flex items-center gap-1 mt-1 text-[10px] text-[#8b949e]">
-                                            <span className="text-[#f5a623]">★ {listing.seller.sellerRating || 5.0}</span>
-                                            <span>• {listing.seller.totalSales || 0} sales</span>
+                                            <span className="text-[#f5a623] font-bold">★ {Number(listing.seller.sellerRating || 5).toFixed(1)}</span>
+                                            <span className="opacity-50">({listing.seller.totalReviews || 0})</span>
+                                            <span>•</span>
+                                            <span className="text-[#22c55e] font-bold">{listing.seller.totalSales || 0} sales</span>
                                         </div>
                                     </div>
                                 </TableCell>
@@ -80,10 +83,16 @@ export function CurrencyListingsTable({ listings }: CurrencyListingsTableProps) 
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    <Button size="sm" className="bg-[#f5a623] hover:bg-[#e09612] text-black font-extrabold h-9 px-4 glow-olive">
-                                        Buy Now
-                                        <ArrowRight className="ml-2 h-4 w-4" />
-                                    </Button>
+                                    {currentUserId && listing.seller?.supabaseId === currentUserId ? (
+                                        <Button size="sm" disabled className="bg-[#30363d] text-[#8b949e] font-extrabold h-9 px-4 opacity-50 cursor-not-allowed">
+                                            Your Listing
+                                        </Button>
+                                    ) : (
+                                        <Button size="sm" className="bg-[#f5a623] hover:bg-[#e09612] text-black font-extrabold h-9 px-4 glow-olive">
+                                            Buy Now
+                                            <ArrowRight className="ml-2 h-4 w-4" />
+                                        </Button>
+                                    )}
                                 </TableCell>
                             </TableRow>
                         ))}

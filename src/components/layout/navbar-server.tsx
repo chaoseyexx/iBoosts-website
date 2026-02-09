@@ -26,10 +26,12 @@ export async function NavbarServer({ variant = "landing" }: NavbarServerProps) {
     if (user) {
         const profile = await getProfile();
         userData = {
-            id: user.id,
+            id: profile?.id || user.id,
             email: user.email,
             username: profile?.username || user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
             avatar: profile?.avatar || user.user_metadata?.avatar_url,
+            balance: profile?.wallet?.balance ? Number(profile.wallet.balance) : 0,
+            role: profile?.role || "BUYER",
         };
     }
 

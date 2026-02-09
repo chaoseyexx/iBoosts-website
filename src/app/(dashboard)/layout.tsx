@@ -20,7 +20,8 @@ export default async function DashboardLayout({
     if (authUser) {
         // Fetch from Prisma Source of Truth
         const profile = await prisma.user.findUnique({
-            where: { supabaseId: authUser.id }
+            where: { supabaseId: authUser.id },
+            include: { wallet: true }
         });
 
         // Format date: MM/DD/YY
@@ -38,6 +39,7 @@ export default async function DashboardLayout({
             verified: true,
             role: profile?.role || "BUYER",
             sellerLevel: profile?.sellerLevel || 0,
+            balance: profile?.wallet?.balance ? Number(profile.wallet.balance) : 0,
         };
     }
 

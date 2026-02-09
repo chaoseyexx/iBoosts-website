@@ -19,7 +19,8 @@ export async function getProfile() {
 
     try {
         let user = await prisma.user.findUnique({
-            where: { supabaseId: authUser.id }
+            where: { supabaseId: authUser.id },
+            include: { wallet: true }
         });
 
         // Self-healing: Create or Link Prisma record if missing but Auth exists
@@ -37,7 +38,8 @@ export async function getProfile() {
                     // Link the existing user to the Supabase ID
                     user = await prisma.user.update({
                         where: { id: existingUserByEmail.id },
-                        data: { supabaseId: authUser.id }
+                        data: { supabaseId: authUser.id },
+                        include: { wallet: true }
                     });
                 } else {
                     user = await prisma.user.create({
@@ -47,15 +49,21 @@ export async function getProfile() {
                             email: email,
                             username: username,
                             role: "BUYER",
-                            status: "ACTIVE"
-                        }
+                            status: "ACTIVE",
+                            wallet: {
+                                create: {
+                                    id: generateId("Wallet"),
+                                }
+                            }
+                        },
+                        include: { wallet: true }
                     });
                 }
             } catch (createError) {
                 console.error("Auto-creation/linking of user failed:", createError);
             }
         }
-        return user;
+        return JSON.parse(JSON.stringify(user));
     } catch (e) {
         console.error("Failed to fetch profile:", e);
         return null;

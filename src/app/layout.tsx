@@ -65,6 +65,7 @@ import { fetchRecentActivity } from "@/app/(admin)/admin/actions";
 import { PageTransitionProvider } from "@/components/layout/page-transition-provider";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
+import { Toaster } from "sonner";
 
 export default async function RootLayout({
   children,
@@ -79,6 +80,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-[var(--bg-primary)] overflow-x-hidden`}
       >
+        <Toaster position="top-right" theme="dark" richColors />
         <PageTransitionProvider>
           {children}
         </PageTransitionProvider>

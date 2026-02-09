@@ -2,109 +2,140 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma/client";
 import { createClient } from "@/lib/supabase/server";
-import prisma from "@/lib/prisma/client";
-import slugify from "slugify";
 import { generateId } from "@/lib/utils/ids";
+import { DeliveryMethod, ListingStatus } from "@prisma/client";
 
-export type CreateListingState = {
-    error?: string | null;
-    success?: boolean;
-    listingId?: string;
-};
-
-export async function createListing(prevState: CreateListingState | null, formData: FormData): Promise<CreateListingState> {
+export async function createListing(prevState: any, formData: FormData) {
     const supabase = await createClient();
-    const { data: { user: authUser } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!authUser) {
+    if (!user) {
         return { error: "You must be logged in to create a listing." };
     }
 
-    // Get input data
-    const categoryId = formData.get("categoryId") as string;
-    const gameName = formData.get("gameName") as string; // We'll look up game by name or ID
-    const description = formData.get("description") as string;
-    const price = parseFloat(formData.get("price") as string);
-    const minQuantity = parseInt(formData.get("minQuantity") as string) || 1;
-    const stock = parseInt(formData.get("stock") as string) || 0;
-    const deliveryTimeStr = formData.get("deliveryTime") as string;
+    // Get Prisma user
+    const dbUser = await prisma.user.findUnique({
+        where: { supabaseId: user.id }
+    });
 
-    // Validate
-    if (!categoryId || !gameName || !price || !description) {
-        return { error: "Please fill in all required fields." };
+    if (!dbUser) {
+        return { error: "User profile not found." };
     }
 
+    // Extract form data
+    const categoryId = formData.get("categoryId") as string;
+    const gameId = formData.get("gameId") as string;
+    const gameName = formData.get("gameName") as string;
+    const description = formData.get("description") as string;
+    const priceStr = formData.get("price") as string;
+    const stockStr = formData.get("stock") as string;
+    const minQuantityStr = formData.get("minQuantity") as string;
+    const deliveryTimeStr = formData.get("deliveryTime") as string;
+    const deliveryMethodType = formData.get("deliveryMethodType") as string;
+
+    // Items
+    const accountItemsStr = formData.get("accountItems") as string;
+    const giftCardKeysStr = formData.get("giftCardKeys") as string;
+
+    // Validation
+    if (!categoryId) return { error: "Category is required." };
+    if (!description || description.length < 20) return { error: "Description must be at least 20 characters." };
+    if (!priceStr || parseFloat(priceStr) <= 0) return { error: "Price must be greater than 0." };
+
+    // Determine Delivery Method
+    let deliveryMethod: DeliveryMethod = "MANUAL";
+    if (deliveryMethodType === "AUTOMATIC") {
+        deliveryMethod = "AUTOMATIC";
+    }
+
+    // Parse numeric values
+    const price = parseFloat(priceStr);
+    const stock = parseInt(stockStr) || 1;
+    const minQuantity = parseInt(minQuantityStr) || 1;
+
+    // Parse Delivery Time (Simple mapping for now)
+    let deliveryTime = 24 * 60; // Default 24h
+    if (deliveryTimeStr === "instant") deliveryTime = 0;
+    else if (deliveryTimeStr === "20m") deliveryTime = 20;
+    else if (deliveryTimeStr === "1h") deliveryTime = 60;
+    else if (deliveryTimeStr === "24h") deliveryTime = 1440;
+
+    // Generate Title & Slug
+    // Title format: Level 20 Account | Full Access | [Game Name]
+    // For now, we'll use a generic title or extract from description/game
+    const shortDesc = description.substring(0, 50).replace(/<[^>]*>?/gm, ''); // Remove HTML tags
+    const title = `${gameName ? gameName + ' - ' : ''}${shortDesc.substring(0, 30)}...`;
+
+    const slug = `${gameName ? gameName.toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'listing'}-${Date.now()}-${generateId("Listing").substring(0, 8)}`;
+
     try {
-        // 1. Find the user in our DB
-        const seller = await prisma.user.findUnique({
-            where: { supabaseId: authUser.id }
-        });
+        const listingId = generateId("Listing");
 
-        if (!seller) {
-            return { error: "Seller profile not found." };
+        // Prepare Listing Items if Automatic
+        let listingItemsData: any[] = [];
+        let rCalculatedStock = stock; // Recalculate stock based on items if auto
+
+        if (deliveryMethod === "AUTOMATIC") {
+            if (accountItemsStr) {
+                try {
+                    const items = JSON.parse(accountItemsStr);
+                    // Filter empty items
+                    const validItems = items.filter((i: any) => i.login && i.password);
+                    if (validItems.length > 0) {
+                        listingItemsData = validItems.map((item: any) => ({
+                            id: generateId("ListingItem"),
+                            content: JSON.stringify(item),
+                            isSold: false
+                        }));
+                        rCalculatedStock = listingItemsData.length;
+                    }
+                } catch (e) {
+                    console.error("Error parsing account items:", e);
+                }
+            } else if (giftCardKeysStr) {
+                const keys = giftCardKeysStr.split('\n').filter(k => k.trim());
+                if (keys.length > 0) {
+                    listingItemsData = keys.map(key => ({
+                        id: generateId("ListingItem"),
+                        content: key.trim(),
+                        isSold: false
+                    }));
+                    rCalculatedStock = listingItemsData.length;
+                }
+            }
         }
 
-        // 2. Find or match the Game
-        // In a real app, we should pass gameId. For now, we'll try to find by name or create a placeholder if it allows
-        // But better to fetch the game by name from the mock data found in the wizard IF we haven't connected real games yet.
-        // Wait, the wizard currently uses MOCK_GAMES strings.
-        // We should try to find a real Game entity that matches.
-
-        // 2. Fetch Category to get the slug for redirection
-        const category = await prisma.category.findUnique({
-            where: { id: categoryId }
-        });
-
-        if (!category) {
-            return { error: "Category not found." };
-        }
-
-        // 3. Find or match the Game
-        let game = await prisma.game.findFirst({
-            where: { name: { equals: gameName, mode: "insensitive" } }
-        });
-
-        if (!game) {
-            return { error: `Game '${gameName}' not found in database. Please ask Admin to add it.` };
-        }
-
-        // 3. Generate Slug
-        const slugBase = `${game.name} ${description.substring(0, 20)} ${seller.username}`.trim();
-        const slug = slugify(slugBase, { lower: true, strict: true, remove: /[*+~.()'"!:@]/g }) + "-" + Date.now().toString().slice(-4);
-
-        // 4. Parse Delivery Time (e.g. "20m" -> minutes integer)
-        let deliveryMinutes = 24 * 60; // default 24h
-        if (deliveryTimeStr.endsWith("m")) deliveryMinutes = parseInt(deliveryTimeStr);
-        if (deliveryTimeStr.endsWith("h")) deliveryMinutes = parseInt(deliveryTimeStr) * 60;
-
-        // 5. Create Listing
-        const listing = await prisma.listing.create({
+        // Create Listing
+        await prisma.listing.create({
             data: {
-                id: generateId("Listing"),
-                sellerId: seller.id,
-                categoryId: categoryId,
-                gameId: game.id,
-                title: `${game.name} Currency`, // Auto-generated title
-                slug: slug,
-                description: description,
-                price: price,
-                currency: "USD",
-                stock: stock,
-                minQuantity: minQuantity,
-                maxQuantity: stock, // Default max to stock
-                deliveryTime: deliveryMinutes,
-                status: "ACTIVE", // Auto-activate for demo
+                id: listingId,
+                sellerId: dbUser.id,
+                categoryId,
+                gameId: gameId || null,
+                title: title, // We might want a dedicated title field in the form later
+                slug,
+                description,
+                price,
+                stock: deliveryMethod === "AUTOMATIC" ? rCalculatedStock : stock,
+                minQuantity,
+                deliveryTime,
+                deliveryMethod,
+                status: "ACTIVE", // Or DRAFT/PENDING based on logic
+                items: {
+                    create: listingItemsData
+                }
             }
         });
 
-        revalidatePath(`/dashboard/listings`);
-        revalidatePath(`/${category.slug}/${game.slug}`);
+        revalidatePath("/dashboard/listings");
+        revalidatePath("/dashboard/offers");
 
-        return { success: true, listingId: listing.id };
+        return { success: true, listingId };
 
-    } catch (e: any) {
-        console.error("Create listing error:", e);
-        return { error: e.message || "Failed to create listing" };
+    } catch (error: any) {
+        console.error("Failed to create listing:", error);
+        return { error: error.message || "Failed to create listing." };
     }
 }

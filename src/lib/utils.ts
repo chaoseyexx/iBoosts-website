@@ -11,3 +11,10 @@ export function formatCurrency(amount: number) {
     currency: "USD",
   }).format(amount);
 }
+
+export function formatPrice(amount: number, maxDecimals = 4) {
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: maxDecimals,
+  }).format(amount);
+}

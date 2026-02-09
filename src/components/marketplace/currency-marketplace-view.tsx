@@ -14,9 +14,10 @@ interface CurrencyMarketplaceViewProps {
     category: any;
     game: any;
     listings: any[];
+    currentUserId?: string;
 }
 
-export function CurrencyMarketplaceView({ category, game, listings }: CurrencyMarketplaceViewProps) {
+export function CurrencyMarketplaceView({ category, game, listings, currentUserId }: CurrencyMarketplaceViewProps) {
     const [searchQuery, setSearchQuery] = useState("");
 
     // Select the "Recommended Seller" based on high rating + high volume
@@ -141,6 +142,7 @@ export function CurrencyMarketplaceView({ category, game, listings }: CurrencyMa
                                     listing={recommendedListing}
                                     gameSlug={game?.slug}
                                     gameName={game?.name}
+                                    currentUserId={currentUserId}
                                 />
                             </div>
                         </div>
@@ -169,7 +171,7 @@ export function CurrencyMarketplaceView({ category, game, listings }: CurrencyMa
                             </div>
                         </div>
 
-                        <CurrencyListingsTable listings={filteredListings} />
+                        <CurrencyListingsTable listings={filteredListings} currentUserId={currentUserId} />
                     </div>
                 </main>
             </div>

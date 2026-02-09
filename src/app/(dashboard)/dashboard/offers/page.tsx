@@ -2,6 +2,7 @@ import * as React from "react";
 import Image from "next/image";
 import { getSellerListings } from "./actions";
 import { OffersClient } from "./offers-client";
+import prisma from "@/lib/prisma/client";
 
 interface OffersPageProps {
     searchParams: Promise<{
@@ -11,9 +12,14 @@ interface OffersPageProps {
 
 export default async function OffersPage({ searchParams }: OffersPageProps) {
     const params = await searchParams;
-    const categoryQuery = params.category || "all";
-    const { listings, error } = await getSellerListings(categoryQuery);
+    const [categoriesResult] = await Promise.all([
+        prisma.category.findMany({ where: { isActive: true }, orderBy: { sortOrder: 'asc' } })
+    ]);
 
+    const categories = categoriesResult || [];
+    const categoryQuery = params.category || (categories[0]?.slug || "all");
+
+    const { listings } = await getSellerListings(categoryQuery);
     const offers = listings || [];
 
     return (
@@ -29,7 +35,11 @@ export default async function OffersPage({ searchParams }: OffersPageProps) {
                 <div className="absolute inset-0 bg-gradient-to-l from-[#0a0e13] via-transparent to-[#0a0e13]" />
             </div>
 
-            <OffersClient initialOffers={offers} categoryQuery={categoryQuery} />
+            <OffersClient
+                initialOffers={offers}
+                categoryQuery={categoryQuery}
+                categories={categories}
+            />
         </div>
     );
 }

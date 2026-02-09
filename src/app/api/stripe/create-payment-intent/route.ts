@@ -1,10 +1,6 @@
-
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2024-12-18.acacia", // Use latest API version or match installed package
-});
+import { stripe } from "@/lib/stripe";
+import { calculateOrderTotal } from "@/lib/utils/fees";
 
 export async function POST(request: Request) {
     try {
@@ -14,18 +10,23 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
         }
 
+        // Calculate final amount including fees
+        const { total } = calculateOrderTotal(Number(amount));
+
         // Create a PaymentIntent with the order amount and currency
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: Math.round(amount * 100), // Convert to cents
+            amount: Math.round(total * 100), // Convert to cents
             currency: "usd",
-            // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
-            automatic_payment_methods: {
-                enabled: true,
-            },
+            metadata: {
+                baseAmount: amount.toString(),
+                feeIncluded: (total - amount).toFixed(2),
+                type: "direct_order"
+            }
         });
 
         return NextResponse.json({
             clientSecret: paymentIntent.client_secret,
+            totalCharge: total
         });
     } catch (error) {
         console.error("Internal Error:", error);

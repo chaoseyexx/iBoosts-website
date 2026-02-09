@@ -70,6 +70,7 @@ export async function getOrders(type: 'purchased' | 'sold') {
         return {
             orders: orders.map(order => ({
                 id: order.id,
+                orderNumber: order.orderNumber,
                 game: order.listing.game?.name || "Unknown Game",
                 productName: order.listing.title,
                 type: order.listing.category.name,
@@ -88,161 +89,7 @@ export async function getOrders(type: 'purchased' | 'sold') {
     }
 }
 
-export async function seedDemoOrders(providedSupabaseId?: string) {
-    try {
-        let supabaseId = providedSupabaseId;
 
-        if (!supabaseId) {
-            const supabase = await createClient();
-            const { data: { user: authUser } } = await supabase.auth.getUser();
-            if (!authUser) return { error: "Not authenticated" };
-            supabaseId = authUser.id;
-        }
-
-        const demoUser = await prisma.user.findUnique({
-            where: { supabaseId: supabaseId }
-        });
-
-        if (!demoUser) return { error: `Demo user (supabaseId: ${supabaseId}) not found in DB` };
-
-        // 1. Ensure counterpart users exist
-        const user1 = await prisma.user.upsert({
-            where: { email: 'chaoseyex@gmail.com' },
-            update: { username: 'ChaoseyeX' },
-            create: {
-                id: generateId("User"),
-                email: 'chaoseyex@gmail.com',
-                username: 'ChaoseyeX',
-                role: 'SELLER'
-            }
-        });
-
-        const user2 = await prisma.user.upsert({
-            where: { email: 'bouncestacks@gmail.com' },
-            update: { username: 'BounceStacks' },
-            create: {
-                id: generateId("User"),
-                email: 'bouncestacks@gmail.com',
-                username: 'BounceStacks',
-                role: 'BUYER'
-            }
-        });
-
-        // 2. Get some games/categories to link to
-        const games = await prisma.game.findMany({ where: { isActive: true }, take: 3 });
-        const categories = await prisma.category.findMany({ where: { isActive: true }, take: 3 });
-
-        if (games.length === 0 || categories.length === 0) {
-            return { error: "No games or categories found to create listings" };
-        }
-
-        const premiumDescription = `
-            <div class="space-y-4">
-                <div class="flex items-center gap-2 text-red-500 font-bold uppercase tracking-wider">
-                    <span>❗</span> READ BEFORE PURCHASE !
-                </div>
-                <ul class="space-y-2 text-white/80">
-                    <li class="flex items-center gap-2"><span>⭐</span> Face-to-Face Trade Only</li>
-                    <li class="flex items-center gap-2"><span>⭐</span> Do not talk in-game about RMT</li>
-                    <li class="flex items-center gap-2"><span>⭐</span> Put a rare item in trade window for safety</li>
-                </ul>
-                <div class="pt-4">
-                    <div class="flex items-center gap-2 text-[#f5a623] font-bold uppercase tracking-wider mb-2">
-                        <span>🚀</span> How to purchase ?
-                    </div>
-                    <ol class="space-y-3">
-                        <li class="flex gap-3">
-                            <span class="flex-shrink-0 w-5 h-5 rounded bg-[#3b82f6] text-white flex items-center justify-center text-[10px] font-bold">1</span>
-                            <span class="text-white/80 text-sm">Select the amount you want to buy.</span>
-                        </li>
-                        <li class="flex gap-3">
-                            <span class="flex-shrink-0 w-5 h-5 rounded bg-[#3b82f6] text-white flex items-center justify-center text-[10px] font-bold">2</span>
-                            <span class="text-white/80 text-sm">Provide your character name.</span>
-                        </li>
-                        <li class="flex gap-3">
-                            <span class="flex-shrink-0 w-5 h-5 rounded bg-[#3b82f6] text-white flex items-center justify-center text-[10px] font-bold">3</span>
-                            <span class="text-white/80 text-sm">We will invite you to a party and trade the currency.</span>
-                        </li>
-                    </ol>
-                </div>
-            </div>
-        `;
-
-        // 3. Create sample listings
-        const listingPurchased = await prisma.listing.create({
-            data: {
-                id: generateId("Listing"),
-                sellerId: user1.id,
-                categoryId: categories[0].id,
-                gameId: games[0].id,
-                title: "Premium Currency Bundle",
-                slug: `seed-purchased-${Date.now()}`,
-                description: premiumDescription,
-                price: 45.00,
-                status: "ACTIVE",
-                stock: 100
-            }
-        });
-
-        const listingSold = await prisma.listing.create({
-            data: {
-                id: generateId("Listing"),
-                sellerId: demoUser.id,
-                categoryId: categories[1].id,
-                gameId: games[1].id,
-                title: "Pro Boosting Service",
-                slug: `seed-sold-${Date.now()}`,
-                description: "Seeded sold order description",
-                price: 120.00,
-                status: "ACTIVE",
-                stock: 1
-            }
-        });
-
-        // 4. Create Orders
-        await prisma.order.create({
-            data: {
-                id: generateId("Order"),
-                orderNumber: `ORD-P-${Math.floor(Math.random() * 100000)}`,
-                buyerId: demoUser.id,
-                sellerId: user1.id,
-                listingId: listingPurchased.id,
-                quantity: 1,
-                unitPrice: 45.00,
-                subtotal: 45.00,
-                platformFee: 2.25,
-                sellerEarnings: 42.75,
-                finalAmount: 45.00,
-                status: "COMPLETED",
-                paidAt: new Date()
-            }
-        });
-
-        await prisma.order.create({
-            data: {
-                id: generateId("Order"),
-                orderNumber: `ORD-S-${Math.floor(Math.random() * 100000)}`,
-                buyerId: user2.id,
-                sellerId: demoUser.id,
-                listingId: listingSold.id,
-                quantity: 1,
-                unitPrice: 120.00,
-                subtotal: 120.00,
-                platformFee: 6.00,
-                sellerEarnings: 114.00,
-                finalAmount: 120.00,
-                status: "ACTIVE",
-                paidAt: new Date()
-            }
-        });
-
-        revalidatePath("/dashboard/orders");
-        return { success: true };
-    } catch (error: any) {
-        console.error("Error seeding orders:", error);
-        return { error: error.message };
-    }
-}
 
 export async function getOrderDetails(orderId: string) {
     try {
@@ -257,8 +104,9 @@ export async function getOrderDetails(orderId: string) {
 
         if (!profile) return { error: "User profile not found" };
 
-        const order = await prisma.order.findUnique({
-            where: { id: orderId },
+        // Try finding by orderNumber first (public ID), then fall back to internal ID
+        let order = await prisma.order.findUnique({
+            where: { orderNumber: orderId },
             include: {
                 listing: {
                     include: {
@@ -323,7 +171,7 @@ export async function getOrderDetails(orderId: string) {
     }
 }
 
-export async function sendOrderMessage(orderId: string, content: string) {
+export async function sendOrderMessage(orderIdentifier: string, content: string) {
     try {
         const supabase = await createClient();
         const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -336,10 +184,17 @@ export async function sendOrderMessage(orderId: string, content: string) {
 
         if (!profile) return { error: "User profile not found" };
 
+        // Try orderNumber first, then fall back to id
+        let order = await prisma.order.findUnique({ where: { orderNumber: orderIdentifier } });
+        if (!order) {
+            order = await prisma.order.findUnique({ where: { id: orderIdentifier } });
+        }
+        if (!order) return { error: "Order not found" };
+
         const message = await prisma.orderMessage.create({
             data: {
                 id: generateId("OrderMessage"),
-                orderId,
+                orderId: order.id,
                 senderId: profile.id,
                 content
             },
@@ -355,7 +210,7 @@ export async function sendOrderMessage(orderId: string, content: string) {
     }
 }
 
-export async function confirmOrder(orderId: string) {
+export async function confirmOrder(orderIdentifier: string) {
     try {
         const supabase = await createClient();
         const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -368,31 +223,72 @@ export async function confirmOrder(orderId: string) {
 
         if (!profile) return { error: "User profile not found" };
 
-        const order = await prisma.order.findUnique({ where: { id: orderId } });
+        // Try orderNumber first, then fall back to id
+        let order = await prisma.order.findUnique({ where: { orderNumber: orderIdentifier } });
+        if (!order) {
+            order = await prisma.order.findUnique({ where: { id: orderIdentifier } });
+        }
         if (!order) return { error: "Order not found" };
 
         if (order.buyerId !== profile.id && profile.role !== 'ADMIN') {
             return { error: "Only the buyer can confirm the order" };
         }
 
-        const updatedOrder = await prisma.order.update({
-            where: { id: orderId },
-            data: {
-                status: "COMPLETED",
-                completedAt: new Date()
+        // Use a transaction to update order and wallet
+        await prisma.$transaction(async (tx) => {
+            // 1. Update order status
+            await tx.order.update({
+                where: { id: order.id },
+                data: {
+                    status: "COMPLETED",
+                    completedAt: new Date(),
+                    escrowStatus: "RELEASED"
+                }
+            });
+
+            // 2. Update Seller Wallet (Decrease Pending, Increase Available)
+            const sellerWallet = await tx.wallet.findUnique({
+                where: { userId: order.sellerId }
+            });
+
+            if (sellerWallet) {
+                const amount = Number(order.sellerEarnings);
+
+                await tx.wallet.update({
+                    where: { id: sellerWallet.id },
+                    data: {
+                        pendingBalance: { decrement: amount },
+                        balance: { increment: amount }
+                    }
+                });
+
+                // 3. Create Wallet Transaction Record
+                await tx.walletTransaction.create({
+                    data: {
+                        id: generateId("WalletTransaction"),
+                        walletId: sellerWallet.id,
+                        type: "SALE",
+                        amount: amount,
+                        balanceBefore: Number(sellerWallet.balance),
+                        balanceAfter: Number(sellerWallet.balance) + amount,
+                        description: `Earnings from order #${order.orderNumber}`,
+                        reference: order.id
+                    }
+                });
             }
+
+            // 4. Log Timeline
+            await tx.orderTimeline.create({
+                data: {
+                    id: generateId("OrderTimeline"),
+                    orderId: order.id,
+                    event: "ORDER_COMPLETED",
+                    description: `Order confirmed by ${profile.username}. Funds released to seller.`
+                }
+            });
         });
 
-        await prisma.orderTimeline.create({
-            data: {
-                id: generateId("OrderTimeline"),
-                orderId,
-                event: "ORDER_COMPLETED",
-                description: `Order confirmed by ${profile.username}`
-            }
-        });
-
-        revalidatePath(`/dashboard/orders/${orderId}`);
+        revalidatePath(`/dashboard/orders/${order.orderNumber}`);
         return { success: true };
     } catch (error: any) {
         console.error("Error confirming order:", error);
@@ -421,26 +317,56 @@ export async function submitReview(orderId: string, rating: number, content: str
         if (!order) return { error: "Order not found" };
         if (order.buyerId !== profile.id) return { error: "Only buyers can leave reviews" };
         if (order.status !== 'COMPLETED') return { error: "Orders must be completed before reviewing" };
-        if (order.review) return { error: "Review already submitted" };
 
-        const review = await prisma.review.create({
-            data: {
-                id: generateId("Review"),
-                orderId,
-                listingId: order.listingId,
-                authorId: profile.id,
-                targetId: order.sellerId,
-                rating,
-                content
-            }
-        });
+        let review;
+        if (order.review) {
+            // Update existing review
+            review = await prisma.review.update({
+                where: { id: order.review.id },
+                data: { rating, content }
+            });
+
+            // Add to timeline
+            await prisma.orderTimeline.create({
+                data: {
+                    id: generateId("OrderTimeline"),
+                    orderId: order.id,
+                    event: "REVIEW_UPDATED",
+                    description: `Feedback updated: ${rating} Stars - "${content.substring(0, 50)}${content.length > 50 ? '...' : ''}"`
+                }
+            });
+        } else {
+            // Create new review
+            review = await prisma.review.create({
+                data: {
+                    id: generateId("Review"),
+                    orderId,
+                    listingId: order.listingId,
+                    authorId: profile.id,
+                    targetId: order.sellerId,
+                    rating,
+                    content
+                }
+            });
+
+            // Add to timeline
+            await prisma.orderTimeline.create({
+                data: {
+                    id: generateId("OrderTimeline"),
+                    orderId: order.id,
+                    event: "REVIEW_SUBMITTED",
+                    description: `Feedback released: ${rating} Stars - "${content.substring(0, 50)}${content.length > 50 ? '...' : ''}"`
+                }
+            });
+        }
 
         // Update seller rating
         const allReviews = await prisma.review.findMany({
             where: { targetId: order.sellerId }
         });
 
-        const avgRating = allReviews.reduce((acc, curr) => acc + curr.rating, 0) / allReviews.length;
+        const totalRating = allReviews.reduce((acc, curr) => acc + curr.rating, 0);
+        const avgRating = allReviews.length > 0 ? totalRating / allReviews.length : 5.0;
 
         await prisma.user.update({
             where: { id: order.sellerId },
@@ -454,6 +380,265 @@ export async function submitReview(orderId: string, rating: number, content: str
         return { success: true };
     } catch (error: any) {
         console.error("Error submitting review:", error);
+        return { error: error.message };
+    }
+}
+
+export async function submitReport(orderId: string, reason: string, description: string) {
+    try {
+        const supabase = await createClient();
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+
+        if (!authUser) return { error: "Not authenticated" };
+
+        const profile = await prisma.user.findUnique({
+            where: { supabaseId: authUser.id }
+        });
+
+        if (!profile) return { error: "User profile not found" };
+
+        const order = await prisma.order.findUnique({
+            where: { id: orderId }
+        });
+
+        if (!order) return { error: "Order not found" };
+
+        const targetUserId = profile.id === order.buyerId ? order.sellerId : order.buyerId;
+
+        await prisma.report.create({
+            data: {
+                id: generateId("Report"),
+                type: "ORDER",
+                reporterId: profile.id,
+                targetUserId: targetUserId,
+                targetId: order.id,
+                reason,
+                description,
+                status: "PENDING"
+            }
+        });
+
+        // Add to timeline
+        await prisma.orderTimeline.create({
+            data: {
+                id: generateId("OrderTimeline"),
+                orderId: order.id,
+                event: "ORDER_REPORTED",
+                description: `Issue reported by ${profile.username}: ${reason}`
+            }
+        });
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error submitting report:", error);
+        return { error: error.message };
+    }
+}
+
+export async function getSellerFeedback() {
+    try {
+        const supabase = await createClient();
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+
+        if (!authUser) return { error: "Not authenticated" };
+
+        const profile = await prisma.user.findUnique({
+            where: { supabaseId: authUser.id }
+        });
+
+        if (!profile) return { error: "User profile not found" };
+
+        const reviews = await prisma.review.findMany({
+            where: { targetId: profile.id },
+            include: {
+                author: true,
+                order: {
+                    include: {
+                        listing: {
+                            include: {
+                                category: true
+                            }
+                        }
+                    }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        const completedOrdersCount = await prisma.order.count({
+            where: {
+                sellerId: profile.id,
+                status: 'COMPLETED'
+            }
+        });
+
+        const starCounts = {
+            5: reviews.filter(r => r.rating === 5).length,
+            4: reviews.filter(r => r.rating === 4).length,
+            3: reviews.filter(r => r.rating === 3).length,
+            2: reviews.filter(r => r.rating === 2).length,
+            1: reviews.filter(r => r.rating === 1).length,
+        };
+
+        const averageRating = reviews.length > 0
+            ? (reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length).toFixed(1)
+            : "5.0";
+
+        return {
+            reviews: reviews.map(r => ({
+                id: r.id,
+                type: r.order.listing.category.name,
+                user: r.author.username,
+                comment: r.content,
+                rating: r.rating,
+                date: r.createdAt.toISOString(),
+            })),
+            stats: {
+                completedOrders: completedOrdersCount,
+                totalReviews: reviews.length,
+                averageRating,
+                starCounts
+            }
+        };
+    } catch (error: any) {
+        console.error("Error fetching feedback:", error);
+        return { error: error.message };
+    }
+}
+
+export async function markAsDelivered(orderId: string) {
+    try {
+        const supabase = await createClient();
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (!authUser) return { error: "Not authenticated" };
+
+        const profile = await prisma.user.findUnique({ where: { supabaseId: authUser.id } });
+        if (!profile) return { error: "User profile not found" };
+
+        const order = await prisma.order.findUnique({ where: { id: orderId } });
+        if (!order) return { error: "Order not found" };
+
+        if (order.sellerId !== profile.id && profile.role !== 'ADMIN') {
+            return { error: "Only the seller can mark as delivered" };
+        }
+
+        await prisma.order.update({
+            where: { id: order.id },
+            data: {
+                status: "DELIVERED",
+                deliveredAt: new Date()
+            }
+        });
+
+        await prisma.orderTimeline.create({
+            data: {
+                id: generateId("OrderTimeline"),
+                orderId: order.id,
+                event: "ORDER_DELIVERED",
+                description: `Seller marked order as delivered. Buyer confirmation pending.`
+            }
+        });
+
+        revalidatePath(`/dashboard/orders/${order.orderNumber}`);
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error marking as delivered:", error);
+        return { error: error.message };
+    }
+}
+
+export async function cancelOrder(orderId: string, reason: string) {
+    try {
+        const supabase = await createClient();
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (!authUser) return { error: "Not authenticated" };
+
+        const profile = await prisma.user.findUnique({ where: { supabaseId: authUser.id } });
+        if (!profile) return { error: "User profile not found" };
+
+        const order = await prisma.order.findUnique({ where: { id: orderId } });
+        if (!order) return { error: "Order not found" };
+
+        const isSeller = order.sellerId === profile.id;
+        const isAdmin = profile.role === 'ADMIN';
+
+        if (!isSeller && !isAdmin) {
+            return { error: "Unauthorized access" };
+        }
+
+        await prisma.order.update({
+            where: { id: order.id },
+            data: {
+                status: "CANCELLED",
+                cancelledAt: new Date(),
+                cancelReason: reason
+            }
+        });
+
+        await prisma.orderTimeline.create({
+            data: {
+                id: generateId("OrderTimeline"),
+                orderId: order.id,
+                event: "ORDER_CANCELLED",
+                description: `Order cancelled by ${profile.username}. Reason: ${reason}`
+            }
+        });
+
+        revalidatePath(`/dashboard/orders/${order.orderNumber}`);
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error cancelling order:", error);
+        return { error: error.message };
+    }
+}
+
+export async function openDispute(orderId: string, reason: string, description: string) {
+    try {
+        const supabase = await createClient();
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (!authUser) return { error: "Not authenticated" };
+
+        const profile = await prisma.user.findUnique({ where: { supabaseId: authUser.id } });
+        if (!profile) return { error: "User profile not found" };
+
+        const order = await prisma.order.findUnique({ where: { id: orderId } });
+        if (!order) return { error: "Order not found" };
+
+        if (order.buyerId !== profile.id && profile.role !== 'ADMIN') {
+            return { error: "Only the buyer can open a dispute" };
+        }
+
+        await prisma.$transaction([
+            prisma.order.update({
+                where: { id: order.id },
+                data: { status: "DISPUTED" }
+            }),
+            prisma.dispute.create({
+                data: {
+                    id: generateId("Dispute"),
+                    orderId: order.id,
+                    buyerId: order.buyerId,
+                    sellerId: order.sellerId,
+                    initiatedBy: profile.id,
+                    reason,
+                    description,
+                    status: "OPEN"
+                }
+            }),
+            prisma.orderTimeline.create({
+                data: {
+                    id: generateId("OrderTimeline"),
+                    orderId: order.id,
+                    event: "ORDER_DISPUTED",
+                    description: `Dispute opened by ${profile.username}: ${reason}`
+                }
+            })
+        ]);
+
+        revalidatePath(`/dashboard/orders/${order.orderNumber}`);
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error opening dispute:", error);
         return { error: error.message };
     }
 }

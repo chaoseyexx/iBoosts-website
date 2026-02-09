@@ -3,6 +3,7 @@ import { fetchMarketplaceData } from "../../marketplace-actions";
 import { CurrencyMarketplaceView } from "@/components/marketplace/currency-marketplace-view";
 import { NavbarServer } from "@/components/layout/navbar-server";
 import { Footer } from "@/components/layout/footer";
+import { createClient } from "@/lib/supabase/server";
 
 interface CategoryGamePageProps {
     params: Promise<{
@@ -20,6 +21,9 @@ export default async function CategoryGamePage({ params }: CategoryGamePageProps
         return notFound();
     }
 
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
     return (
         <>
             <NavbarServer variant="landing" />
@@ -27,6 +31,7 @@ export default async function CategoryGamePage({ params }: CategoryGamePageProps
                 category={category}
                 game={game}
                 listings={listings || []}
+                currentUserId={user?.id}
             />
             <Footer />
         </>

@@ -16,6 +16,7 @@ export const MODEL_PREFIXES = {
     Game: 'GAME',
     BoostingRequest: 'BST',
     Listing: 'LST',
+    ListingItem: 'LITM',
     ListingImage: 'IMG',
     Order: 'ORDER',
     OrderMessage: 'MSG',

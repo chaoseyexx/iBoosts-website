@@ -23,7 +23,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
     return (
         <div className="flex h-screen bg-[#0d1117] text-[#c9d1d9] overflow-hidden">
-            <Toaster position="top-right" theme="dark" richColors />
             <AdminSidebar />
 
             {/* Main Content */}

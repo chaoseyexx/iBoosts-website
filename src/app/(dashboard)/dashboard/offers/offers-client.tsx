@@ -23,27 +23,39 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { deleteListing, toggleListingStatus, updateListingPrice, DashboardOffer } from "./actions";
 import { cn } from "@/lib/utils";
+import { useRouter, useSearchParams } from "next/navigation";
+
+interface Category {
+    id: string;
+    name: string;
+    slug: string;
+}
 
 interface OffersClientProps {
     initialOffers: DashboardOffer[];
     categoryQuery?: string;
+    categories: Category[];
 }
 
-export function OffersClient({ initialOffers, categoryQuery = "all" }: OffersClientProps) {
+export function OffersClient({ initialOffers, categoryQuery = "all", categories }: OffersClientProps) {
+    const router = useRouter();
+    const searchParams = useSearchParams();
     // Real data state - initialized with server data
     const [offers, setOffers] = React.useState<DashboardOffer[]>(initialOffers);
+
+    // Sync state when props change (on navigation)
+    React.useEffect(() => {
+        setOffers(initialOffers);
+    }, [initialOffers]);
 
     // Filter locally for instant feedback if category changes client-side, 
     // though arguably we should rely on URL params and server re-render for categories.
     // For now, if we receive "all" offers but want to filter by prop:
     // Actually, if server passes filtered offers, this filter is redundant but safe.
 
-    // However, if the user switches tabs (which might just be visual buttons?), 
-    // we need to know if "Select Game" etc changes URL or local state.
-    // The current UI shows static buttons. Let's assume they are just placeholders for now or handled via URL later.
-    // The 'categoryQuery' prop comes from URL.
-
-    const filteredOffers = offers.filter(o => categoryQuery === "all" || o.category === categoryQuery);
+    // The server already filters by category via the action, so we use 'offers' directly.
+    // This avoids double-filtering logic that might cause empty states during transitions.
+    const displayOffers = offers;
 
     const updatePrice = (id: string, newPrice: string) => {
         // Optimistic update for input field
@@ -123,15 +135,19 @@ export function OffersClient({ initialOffers, categoryQuery = "all" }: OffersCli
 
             {/* Filter Bar */}
             <div className="flex flex-wrap items-center gap-2">
-                <Button variant="outline" className="bg-[#13181e] border-[#2d333b] text-white hover:bg-[#1c2128] h-[40px] px-4 gap-3 font-bold rounded-lg border-opacity-50 transition-all text-[13px]">
-                    Select Game <ChevronDown className="h-4 w-4 text-[#8b949e]" />
-                </Button>
-                <Button variant="outline" className="bg-[#13181e] border-[#2d333b] text-white hover:bg-[#1c2128] h-[40px] px-5 gap-3 font-bold rounded-lg border-opacity-50 transition-all text-[13px] min-w-[80px]">
-                    All <ChevronDown className="h-4 w-4 text-[#8b949e]" />
-                </Button>
-                <Button variant="outline" className="bg-[#13181e] border-[#2d333b] text-white hover:bg-[#1c2128] h-[40px] px-4 gap-3 font-bold rounded-lg border-opacity-50 transition-all text-[13px]">
-                    Bulk actions <ChevronDown className="h-4 w-4 text-[#8b949e]" />
-                </Button>
+                {categories.map((cat) => (
+                    <Button
+                        key={cat.id}
+                        variant="outline"
+                        onClick={() => router.push(`/dashboard/offers?category=${cat.slug}`)}
+                        className={cn(
+                            "bg-[#13181e] border-[#2d333b] hover:bg-[#1c2128] h-[40px] px-4 gap-3 font-bold rounded-lg border-opacity-50 transition-all text-[13px]",
+                            categoryQuery === cat.slug ? "border-[#f5a623] text-[#f5a623] border-opacity-100" : "text-white"
+                        )}
+                    >
+                        {cat.name}
+                    </Button>
+                ))}
 
                 <div className="relative flex-1 max-w-xs ml-2">
                     <Input
@@ -141,17 +157,11 @@ export function OffersClient({ initialOffers, categoryQuery = "all" }: OffersCli
                     />
                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b949e]" />
                 </div>
-
-                <div className="flex items-center ml-auto">
-                    <Button variant="ghost" className="text-[#9ca3af] hover:text-white h-[40px] gap-2 font-bold transition-colors">
-                        <ArrowUpDown className="h-4 w-4" /> <span className="text-[14px]">Recommended</span> <ChevronDown className="h-4 w-4 text-[#8b949e]" />
-                    </Button>
-                </div>
             </div>
 
             {/* Offers List */}
             <div className="grid gap-4">
-                {filteredOffers.map((offer) => (
+                {displayOffers.map((offer) => (
                     <Card
                         key={offer.id}
                         className={cn(
@@ -283,7 +293,7 @@ export function OffersClient({ initialOffers, categoryQuery = "all" }: OffersCli
             </div>
 
             {/* Empty State Mock */}
-            {filteredOffers.length === 0 && (
+            {displayOffers.length === 0 && (
                 <div className="py-32 text-center bg-[#13181e] border border-dashed border-[#2d333b] rounded-2xl">
                     <TrendingUp className="h-12 w-12 text-[#2d333b] mx-auto mb-4" />
                     <h3 className="text-lg font-bold text-white mb-1">No offers available</h3>

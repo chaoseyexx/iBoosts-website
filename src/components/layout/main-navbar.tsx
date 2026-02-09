@@ -22,7 +22,9 @@ import {
     LayoutDashboard,
     Tag,
     ChevronRight,
-    ChevronUp
+    ChevronUp,
+    ShieldCheck,
+    Briefcase
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/ui/notification-dropdown";
@@ -54,6 +56,8 @@ import {
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 
+import { useStripeConnect } from "@/hooks/use-stripe-connect";
+
 interface MainNavbarProps {
     variant?: "landing" | "dashboard";
     user?: {
@@ -61,6 +65,9 @@ interface MainNavbarProps {
         email?: string;
         username?: string;
         avatar?: string;
+        balance?: number;
+        isShieldActive?: boolean;
+        role?: string;
     } | null;
     initialCategories?: NavCategory[];
     initialGamesData?: Record<string, { popular: NavGame[]; all: NavGame[] }>;
@@ -92,7 +99,7 @@ export function MainNavbar({
     homeLink = "/"
 }: MainNavbarProps) {
     const router = useRouter();
-    const [user, setUser] = React.useState<{ id: string; email?: string; username?: string; avatar?: string; } | null>(initialUser || null);
+    const [user, setUser] = React.useState<{ id: string; email?: string; username?: string; avatar?: string; balance?: number; isShieldActive?: boolean; role?: string; } | null>(initialUser || null);
     const [loading, setLoading] = React.useState(true);
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
     const [expandedCategory, setExpandedCategory] = React.useState<string | null>(null);
@@ -167,12 +174,15 @@ export function MainNavbar({
                 if (!initialUser) {
                     const { data: { user: authUser } } = await supabase.auth.getUser();
                     if (authUser) {
-                        const profile = await getProfile();
+                        const profile = await getProfile() as any;
                         setUser({
-                            id: authUser.id,
+                            id: profile?.id || authUser.id,
                             email: authUser.email,
                             username: profile?.username || authUser.user_metadata?.full_name || authUser.email?.split("@")[0] || "User",
                             avatar: profile?.avatar || authUser.user_metadata?.avatar_url,
+                            balance: profile?.wallet?.balance ? Number(profile.wallet.balance) : 0,
+                            isShieldActive: profile?.isShieldActive || false,
+                            role: profile?.role || "BUYER",
                         });
                     }
                 }
@@ -187,12 +197,15 @@ export function MainNavbar({
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (event === "SIGNED_IN" && session?.user) {
-                const profile = await getProfile();
+                const profile = await getProfile() as any;
                 setUser({
-                    id: session.user.id,
+                    id: profile?.id || session.user.id,
                     email: session.user.email,
                     username: profile?.username || session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "User",
                     avatar: profile?.avatar || session.user.user_metadata?.avatar_url,
+                    balance: profile?.wallet?.balance ? Number(profile.wallet.balance) : 0,
+                    isShieldActive: profile?.isShieldActive || false,
+                    role: profile?.role || "BUYER",
                 });
             } else if (event === "SIGNED_OUT") {
                 setUser(null);
@@ -224,6 +237,22 @@ export function MainNavbar({
                         </div>
 
                         <div className="flex-1 flex justify-end items-center gap-4 uppercase">
+                            {/* iShield Status Toggle */}
+                            {user && (
+                                <>
+                                    <button
+                                        onClick={() => router.push("/ishield")}
+                                        className="flex items-center gap-1.5 cursor-pointer hover:text-white transition-colors group"
+                                    >
+                                        <ShieldCheck className={cn("h-3 w-3", user.isShieldActive ? "text-[#f5a623]" : "text-[#8b949e]")} />
+                                        <span className={cn("transition-colors", user.isShieldActive ? "text-white" : "text-[#8b949e]")}>
+                                            iShield <span className={cn(user.isShieldActive ? "text-[#f5a623]" : "text-[#8b949e]")}>{user.isShieldActive ? "ON" : "OFF"}</span>
+                                        </span>
+                                    </button>
+                                    <div className="h-3 w-px bg-[#1c2128]" />
+                                </>
+                            )}
+
                             <div className="flex items-center gap-1 hover:text-white cursor-pointer transition-colors">
                                 <Globe className="h-3 w-3" />
                                 <span>English | USD - $</span>
@@ -358,12 +387,18 @@ export function MainNavbar({
                                                             </div>
 
                                                             <div className="flex-1 min-w-0">
-                                                                <p className="font-bold text-white text-base truncate group-hover:text-[#f5a623] transition-colors">
+                                                                <p className="font-bold text-white text-base truncate group-hover:text-[#f5a623] transition-colors flex items-center gap-2">
                                                                     {user.username}
+                                                                    {user.isShieldActive && (
+                                                                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#f5a623] text-black text-[8px] font-bold uppercase tracking-tighter">
+                                                                            <ShieldCheck className="h-2.5 w-2.5" strokeWidth={2} />
+                                                                            PRO
+                                                                        </div>
+                                                                    )}
                                                                 </p>
                                                                 <div className="flex items-center gap-1.5 mt-0.5">
-                                                                    <span className="text-[#f5a623] font-black text-sm">$0.00</span>
-                                                                    <span className="text-[10px] text-[#8b949e] uppercase tracking-widest font-bold">Available</span>
+                                                                    <span className="text-[#f5a623] font-bold text-sm">${(user.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                                    <span className="text-[10px] text-[#8b949e] uppercase tracking-widest font-semibold">Available</span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -377,7 +412,12 @@ export function MainNavbar({
                                                                 { label: 'Orders', icon: ShoppingCart, path: '/dashboard/orders' },
                                                                 { label: 'Offers', icon: Tag, path: '/dashboard/offers' },
                                                                 { label: 'Boosting', icon: ChevronsUp, path: '/dashboard/boosting' },
-                                                            ].map((item) => (
+                                                            ].filter(item => {
+                                                                if (user.role === "BUYER" || !user.role) {
+                                                                    if (item.label === "Offers") return false;
+                                                                }
+                                                                return true;
+                                                            }).map((item) => (
                                                                 <button
                                                                     key={item.path}
                                                                     onClick={() => { router.push(item.path); setUserMenuOpen(false); }}
@@ -390,24 +430,60 @@ export function MainNavbar({
                                                         </div>
 
                                                         {/* Secondary Actions */}
-                                                        <div className="space-y-1">
+                                                        <div className="space-y-2">
                                                             {[
+                                                                {
+                                                                    label: 'Become a Seller',
+                                                                    icon: Briefcase,
+                                                                    path: '/dashboard/kyc',
+                                                                    condition: user.role === "BUYER",
+                                                                    highlight: true
+                                                                },
                                                                 { label: 'Wallet', icon: Wallet, path: '/dashboard/wallet' },
                                                                 { label: 'Messages', icon: MessageCircle, path: '/dashboard/messages' },
                                                                 { label: 'Notifications', icon: Bell, path: '/dashboard/notifications' },
                                                                 { label: 'Feedback', icon: Star, path: '/dashboard/feedback' },
                                                                 { label: 'Settings', icon: Settings, path: '/dashboard/settings' },
-                                                            ].map((item) => (
+                                                            ].filter(item => {
+                                                                if ((item as any).condition === false) return false;
+                                                                if (user.role === "BUYER" || !user.role) {
+                                                                    if (item.label === "Feedback") return false;
+                                                                }
+                                                                return true;
+                                                            }).map((item: any) => (
                                                                 <button
-                                                                    key={item.path}
-                                                                    onClick={() => { router.push(item.path); setUserMenuOpen(false); }}
-                                                                    className="w-full flex items-center justify-between group px-4 py-2.5 rounded-xl hover:bg-[#f5a623]/5 transition-colors"
+                                                                    key={item.label}
+                                                                    onClick={() => {
+                                                                        if (item.action) {
+                                                                            item.action();
+                                                                        } else {
+                                                                            router.push(item.path);
+                                                                        }
+                                                                        setUserMenuOpen(false);
+                                                                    }}
+                                                                    className={cn(
+                                                                        "w-full flex items-center justify-between group px-4 py-2.5 rounded-xl transition-colors",
+                                                                        item.highlight
+                                                                            ? "bg-[#635bff]/10 hover:bg-[#635bff]/20"
+                                                                            : "hover:bg-[#f5a623]/5"
+                                                                    )}
                                                                 >
                                                                     <div className="flex items-center gap-3">
-                                                                        <item.icon className="h-4 w-4 text-[#8b949e] group-hover:text-[#f5a623] transition-colors" />
-                                                                        <span className="text-sm font-semibold text-[#8b949e] group-hover:text-white">{item.label}</span>
+                                                                        <item.icon className={cn(
+                                                                            "h-4 w-4 transition-colors",
+                                                                            item.highlight ? "text-[#635bff]" : "text-[#8b949e] group-hover:text-[#f5a623]"
+                                                                        )} />
+                                                                        <span className={cn(
+                                                                            "text-sm font-semibold group-hover:text-white",
+                                                                            item.highlight ? "text-white" : "text-[#8b949e]"
+                                                                        )}>
+                                                                            {item.label}
+                                                                        </span>
                                                                     </div>
-                                                                    <ChevronRight className="h-3 w-3 text-[#30363d] group-hover:text-[#f5a623] transition-transform group-hover:translate-x-0.5" />
+                                                                    <ChevronRight className={cn(
+                                                                        "h-3 w-3 transition-transform group-hover:translate-x-0.5",
+                                                                        item.highlight ? "text-[#635bff]" : "text-[#30363d] group-hover:text-[#f5a623]"
+                                                                    )} />
                                                                 </button>
                                                             ))}
                                                         </div>
@@ -429,7 +505,7 @@ export function MainNavbar({
                                                                 className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-[#f85149] hover:bg-[#f85149]/10 transition-colors group"
                                                             >
                                                                 <LogOut className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
-                                                                <span className="text-sm font-bold">Log out</span>
+                                                                <span className="text-sm font-semibold">Log out</span>
                                                             </button>
                                                         </div>
                                                     </div>

@@ -125,8 +125,23 @@ export function MegaMenu({ category, popularGames, allGames, onClose }: MegaMenu
                                 </Link>
                             ))
                         ) : (
-                            <div className="text-center py-8 text-[#8b949e]">
-                                No games found
+                            <div className="col-span-full flex flex-col items-center justify-center py-20 text-center space-y-6">
+                                <div className="relative">
+                                    <div className="absolute inset-0 bg-[#f5a623] blur-[40px] opacity-10 rounded-full" />
+                                    <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#1c2128] to-[#0d1117] border border-[#30363d] flex items-center justify-center relative shadow-2xl rotate-3 transform hover:rotate-6 transition-transform duration-500">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-[#f5a623]/20 to-transparent rounded-3xl opacity-50" />
+                                        <Gamepad2 className="h-10 w-10 text-[#f5a623] drop-shadow-[0_0_15px_rgba(245,166,35,0.5)]" />
+                                    </div>
+                                    <div className="w-20 h-20 rounded-3xl bg-[#1c2128]/50 border border-[#30363d]/50 absolute -inset-1 -z-10 rotate-12 opacity-40 scale-95" />
+                                </div>
+                                <div className="space-y-2 max-w-sm">
+                                    <h4 className="text-xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60">
+                                        Coming Soon
+                                    </h4>
+                                    <p className="text-sm font-medium text-[#8b949e] leading-relaxed">
+                                        We are actively working on expanding our catalog. Top-tier services for this category are on the way.
+                                    </p>
+                                </div>
                             </div>
                         )}
                     </div>

@@ -197,14 +197,53 @@ export async function deleteGame(gameId: string) {
             where: { id: gameId }
         });
 
-        // Check if game has listings
-        const listingsCount = await prisma.listing.count({
-            where: { gameId }
+        if (!game) return { error: "Game not found" };
+
+        // fetch listings to notify sellers
+        const listings = await prisma.listing.findMany({
+            where: { gameId },
+            select: { id: true, title: true, sellerId: true }
         });
 
-        if (listingsCount > 0) {
-            return { error: `Cannot delete: ${listingsCount} active listings exist for this game` };
+        const sellersToNotify = [...new Set(listings.map(l => l.sellerId))];
+
+        // Notify Sellers
+        if (sellersToNotify.length > 0) {
+            await prisma.notification.createMany({
+                data: sellersToNotify.map(sellerId => ({
+                    id: generateId("Notification"),
+                    userId: sellerId,
+                    type: "SYSTEM",
+                    title: `⚠️ Listing Cancelled: Game Removed`,
+                    content: `Your listings for ${game.name} have been cancelled because the game was removed from the platform.`,
+                    link: "/dashboard/listings"
+                }))
+            });
         }
+
+        // Global Notification to ALL active users
+        const allUsers = await prisma.user.findMany({
+            where: { status: "ACTIVE" },
+            select: { id: true }
+        });
+
+        if (allUsers.length > 0) {
+            await prisma.notification.createMany({
+                data: allUsers.map(user => ({
+                    id: generateId("Notification"),
+                    userId: user.id,
+                    type: "SYSTEM",
+                    title: `Game Removed: ${game.name}`,
+                    content: `${game.name} has been removed from the platform.`,
+                    link: "/"
+                }))
+            });
+        }
+
+        // Delete Listings (Cascading manually to be safe, though schema might handle it)
+        await prisma.listing.deleteMany({
+            where: { gameId }
+        });
 
         // Delete icon from R2 if it exists
         if (game?.icon && game.icon.includes("cdn.iboosts.gg")) {

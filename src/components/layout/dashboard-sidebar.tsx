@@ -45,6 +45,7 @@ interface DashboardSidebarProps {
         verified?: boolean;
         role?: string;
         sellerLevel?: number;
+        balance?: number;
     };
 }
 
@@ -94,12 +95,6 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
             href: "/dashboard/wallet",
         },
         {
-            id: "messages",
-            label: "Messages",
-            icon: MessageCircle,
-            href: "/dashboard/messages",
-        },
-        {
             id: "notifications",
             label: "Notifications",
             icon: Bell,
@@ -124,6 +119,37 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
             href: `/users/${user?.username || "Guest"}`,
         },
     ];
+
+    // Filter sections based on role
+    const filteredSections = sidebarSections.filter(section => {
+        const isBuyer = !user?.role || user.role === "BUYER";
+
+        if (isBuyer) {
+            // Hide entire sections for Buyers
+            if (section.id === "offers") return false;
+            if (section.id === "feedback") return false;
+        }
+        return true;
+    }).map(section => {
+        const isBuyer = !user?.role || user.role === "BUYER";
+
+        if (isBuyer && section.children) {
+            // Filter specific children for Buyers
+            if (section.id === "orders") {
+                return {
+                    ...section,
+                    children: section.children.filter(child => child.category !== "sold")
+                };
+            }
+            if (section.id === "boosting") {
+                return {
+                    ...section,
+                    children: section.children.filter(child => child.category !== "received")
+                };
+            }
+        }
+        return section;
+    });
 
     const toggleSection = (sectionId: string) => {
         setExpandedSections((prev) =>
@@ -206,7 +232,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
             {/* Navigation */}
             <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-                {sidebarSections.map((section) => (
+                {filteredSections.map((section) => (
                     <div key={section.id}>
                         {section.children ? (
                             <>

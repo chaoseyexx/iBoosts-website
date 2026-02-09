@@ -285,6 +285,60 @@ interface NotificationBellProps {
 export function NotificationBell({ userId }: NotificationBellProps) {
     const [isOpen, setIsOpen] = React.useState(false);
     const [count, setCount] = React.useState(0);
+    const playSound = useNotificationSound();
+
+    // Fetch initial unread count on mount
+    React.useEffect(() => {
+        if (!userId) return;
+
+        const fetchInitialCount = async () => {
+            try {
+                const notifications = await getNotifications(userId);
+                const unreadCount = (notifications || []).filter((n: any) => !n.isRead).length;
+                setCount(unreadCount);
+            } catch (error) {
+                console.error("Error fetching initial notification count:", error);
+            }
+        };
+
+        fetchInitialCount();
+    }, [userId]);
+
+    // Real-time subscription for badge updates
+    React.useEffect(() => {
+        if (!userId) return;
+
+        const supabase = getSupabaseClient();
+        const channel = supabase.channel(`bell-notifications-${userId}`)
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'Notification',
+                filter: `userId=eq.${userId}`
+            }, (payload: any) => {
+                // Increment count
+                setCount(prev => prev + 1);
+                // Play sound
+                playSound();
+                // Show toast
+                if (typeof window !== 'undefined') {
+                    import('sonner').then(({ toast }) => {
+                        toast.info(payload.new?.title || "New Notification", {
+                            description: payload.new?.content || "You have a new notification",
+                            action: {
+                                label: "View",
+                                onClick: () => setIsOpen(true)
+                            }
+                        });
+                    });
+                }
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [userId, playSound]);
 
     return (
         <div className="relative">
@@ -295,7 +349,7 @@ export function NotificationBell({ userId }: NotificationBellProps) {
             >
                 <Bell className="h-5 w-5" />
                 {count > 0 && (
-                    <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#f5a623] text-[9px] font-black text-black shadow-[0_0_10px_rgba(245,166,35,0.4)]">
+                    <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#f5a623] text-[9px] font-black text-black shadow-[0_0_10px_rgba(245,166,35,0.4)] animate-pulse">
                         {count > 99 ? "99+" : count}
                     </span>
                 )}

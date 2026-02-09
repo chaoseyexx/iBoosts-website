@@ -35,6 +35,9 @@ model User {
   bannedAt        DateTime?
   bannedReason    String?
   supabaseId      String?          @unique
+  stripeAccountId String?          @unique
+  stripeAccountStatus String?      @default("PENDING")
+  stripeCustomerId String?         @unique
   adminLogs       AdminLog[]       @relation("AdminLogs")
   auditLogs       AuditLog[]
   couponsCreated  Coupon[]         @relation("CouponCreator")
@@ -60,6 +63,8 @@ model User {
   wallet          Wallet?
   withdrawals     Withdrawal[]
   boostingRequests BoostingRequest[]
+  isShieldActive  Boolean          @default(false)
+  ishieldUntil    DateTime?
 
   @@index([email])
   @@index([username])
@@ -209,6 +214,7 @@ model Listing {
   isFeatured       Boolean        @default(false)
   isPromoted       Boolean        @default(false)
   promotedUntil    DateTime?
+  deliveryMethod   DeliveryMethod @default(MANUAL)
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   deletedAt        DateTime?
@@ -218,6 +224,7 @@ model Listing {
   game             Game?          @relation(fields: [gameId], references: [id])
   seller           User           @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   images           ListingImage[]
+  items            ListingItem[]
   offers           Offer[]
   orders           Order[]
   reports          Report[]       @relation("ListingReports")
@@ -228,6 +235,25 @@ model Listing {
   @@index([slug])
   @@index([status])
   @@index([price])
+}
+
+model ListingItem {
+  id        String   @id
+  listingId String
+  content   String   @db.Text // JSON for accounts, string for keys
+  isSold    Boolean  @default(false)
+  orderId   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  
+  @@index([listingId])
+  @@index([isSold])
+}
+
+enum DeliveryMethod {
+  MANUAL
+  AUTOMATIC
 }
 
 model ListingImage {

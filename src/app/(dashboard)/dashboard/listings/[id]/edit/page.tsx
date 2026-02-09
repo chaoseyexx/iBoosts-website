@@ -1,80 +1,45 @@
-import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import prisma from "@/lib/prisma/client";
-import { ListingForm } from "@/components/listings/listing-form";
-import { updateListing } from "../../actions";
 import { fetchCategories, fetchGames } from "@/app/(admin)/admin/actions";
+import { ListingForm } from "@/components/listings/listing-form";
+import { getListingForEdit, updateListing } from "./actions";
+import { redirect, notFound } from "next/navigation";
 
 interface EditListingPageProps {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
 export default async function EditListingPage({ params }: EditListingPageProps) {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const resolvedParams = await params;
 
-    if (!user) {
-        redirect("/auth/login");
-    }
-
-    const { id } = await params;
-
-    const listing = await prisma.listing.findUnique({
-        where: { id },
-        include: {
-            seller: true,
-            category: true,
-            game: true
-        }
-    });
+    const [categories, games, listing] = await Promise.all([
+        fetchCategories(),
+        fetchGames(),
+        getListingForEdit(resolvedParams.id)
+    ]);
 
     if (!listing) {
         notFound();
     }
 
-    // Verify ownership via supabaseId
-    if (listing.seller.supabaseId !== user.id) {
-        redirect("/dashboard/offers");
-    }
-
-    const [categories, games] = await Promise.all([
-        fetchCategories(),
-        fetchGames()
-    ]);
-
-    // Bind ID to the update action
-    const updateAction = updateListing.bind(null, listing.id);
-
-    // Serialize listing for Client Component (fix Decimal/Date error)
-    const serializableListing = {
-        ...listing,
-        price: listing.price.toNumber(),
-        createdAt: listing.createdAt.toISOString(),
-        updatedAt: listing.updatedAt.toISOString(),
-        publishedAt: listing.publishedAt?.toISOString() || null,
-        deletedAt: listing.deletedAt?.toISOString() || null,
-        promotedUntil: listing.promotedUntil?.toISOString() || null,
-    };
-
     return (
-        <div className="min-h-screen bg-[#0a0e13] pb-20">
-            {/* Header Banner - Matches Ref */}
-            <div className="w-full h-32 bg-gradient-to-r from-blue-600 to-blue-500 relative overflow-hidden mb-12">
-                <div className="absolute inset-0 opacity-10 bg-[url('/grid.svg')]" />
-                <div className="absolute inset-x-0 bottom-0 h-1 bg-[#00ffcc]" /> {/* Cyan stripe from ref */}
+        <div className="max-w-6xl mx-auto p-6 space-y-8">
+            <div className="flex flex-col gap-2">
+                <h1 className="text-3xl font-black text-white uppercase tracking-tighter">
+                    Edit <span className="text-[#f5a623]">Listing</span>
+                </h1>
+                <p className="text-[#8b949e] font-medium">
+                    Update your listing details.
+                </p>
             </div>
 
-            <main className="container max-w-5xl mx-auto px-4">
-                <ListingForm
-                    initialData={serializableListing}
-                    categories={categories}
-                    games={games}
-                    action={updateAction}
-                    mode="edit"
-                />
-            </main>
+            <ListingForm
+                initialData={listing}
+                categories={categories}
+                games={games}
+                action={updateListing}
+                mode="edit"
+            />
         </div>
     );
 }

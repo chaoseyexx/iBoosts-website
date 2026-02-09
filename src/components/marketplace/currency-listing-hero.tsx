@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,96 +17,39 @@ import {
     CheckCircle2,
     Lock,
     Headphones,
-    CreditCard
+    CreditCard,
+    ChevronDown
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 
 interface CurrencyListingHeroProps {
     listing: any;
     gameSlug?: string;
     gameName?: string;
+    currentUserId?: string;
 }
 
-// Game-specific configuration
-const GAME_CONFIG: Record<string, any> = {
-    'roblox-robux': {
-        currencyName: "Robux",
-        warnings: [
-            "30% Tax IS NOT COVERED",
-            "NO GIFT IN GAME",
-            "ROBUX WILL BE PENDING FOR 5-7 DAYS.",
-            "*DON'T ENABLE REGIONAL PRICING*"
-        ],
-        steps: [
-            "Select the amount of Robux you want.",
-            "Make a gamepass and send us the link.",
-            "Robux will be credited to your account and you should be able to see it pending in the transaction page."
-        ]
-    },
-    'poe2-currency': {
-        currencyName: "Chaos Orb",
-        warnings: [
-            "Face-to-Face Trade Only",
-            "Do not talk in-game about RMT",
-            "Put a rare item in trade window for safety"
-        ],
-        steps: [
-            "Select the amount you want to buy.",
-            "Provide your character name.",
-            "We will invite you to a party and trade the currency."
-        ]
-    },
-    'throne-and-liberty-lucent': {
-        currencyName: "Lucent",
-        warnings: [
-            "Auction House Method",
-            "List an item for the amount you bought",
-            "We cover the 20% AH Tax"
-        ],
-        steps: [
-            "List an item on the Auction House.",
-            "Send us a screenshot of your listing.",
-            "We will purchase your item."
-        ]
-    },
-    'default': {
-        currencyName: "Currency",
-        warnings: [
-            "Ensure your inventory has space",
-            "Do not mention real money in-game",
-            "Verify character name before purchase"
-        ],
-        steps: [
-            "Select the amount you want to purchase.",
-            "Enter your character name or ID.",
-            "Wait for our delivery agent to contact you in-game."
-        ]
-    }
-};
-
-export function CurrencyListingHero({ listing, gameSlug = 'default', gameName = 'Game' }: CurrencyListingHeroProps) {
-    const [quantity, setQuantity] = useState(1000);
-    const [isExpanded, setIsExpanded] = useState(true);
+export function CurrencyListingHero({ listing, gameSlug, gameName, currentUserId }: CurrencyListingHeroProps) {
+    const router = useRouter();
+    const [quantity, setQuantity] = useState(listing.minQuantity || 1);
+    const [isExpanded, setIsExpanded] = useState(false);
     const minQty = listing?.minQuantity || 1000;
     const unitPrice = listing?.price || 0.0056;
 
-    const config = GAME_CONFIG[gameSlug] || GAME_CONFIG['default'];
-    const currencyName = config.currencyName;
-
     const handleIncrement = () => {
-        setQuantity(prev => Math.min(prev + 1000, listing?.stock || 1000000));
+        setQuantity((prev: number) => Math.min(prev + 1000, listing?.stock || 1000000));
     };
 
     const handleDecrement = () => {
-        setQuantity(prev => Math.max(prev - 1000, minQty));
+        setQuantity((prev: number) => Math.max(prev - 1000, minQty));
     };
 
     if (!listing) return null;
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Left Column: Seller Info & Instructions (8 cols) */}
+            {/* Left Column: Seller Info & Description (8 cols) */}
             <div className="lg:col-span-7 space-y-6">
                 <Card className="bg-[#0d1117]/80 backdrop-blur-sm border-[#30363d] overflow-hidden">
                     <CardContent className="p-0">
@@ -124,39 +68,29 @@ export function CurrencyListingHero({ listing, gameSlug = 'default', gameName = 
                                         <CheckCircle2 className="h-4 w-4 text-[#22c55e] fill-[#22c55e]/10" />
                                     </div>
                                     <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-1.5 text-[#f5a623] bg-[#f5a623]/5 px-2 py-0.5 rounded-md border border-[#f5a623]/10">
+                                            <Star className="h-3 w-3 fill-current" />
+                                            <span className="text-[10px] font-black">{Number(listing.seller.sellerRating || 5).toFixed(1)}</span>
+                                        </div>
                                         <div className="flex items-center gap-1 text-[#22c55e]">
                                             <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                                            <span className="text-[10px] sm:text-xs font-bold">99.3%</span>
+                                            <span className="text-[10px] sm:text-xs font-bold">99.8%</span>
                                         </div>
-                                        <span className="text-[10px] sm:text-xs text-[#58a6ff] hover:underline cursor-pointer">
-                                            {listing.seller.totalSales?.toLocaleString() || "732,044"} reviews
+                                        <span className="text-[10px] sm:text-xs text-[#8b949e] font-medium">
+                                            {listing.seller.totalReviews?.toLocaleString() || "0"} verified reviews
                                         </span>
                                     </div>
                                 </div>
                             </div>
                             <div className="sm:text-right w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-[#30363d]">
                                 <span className="text-[10px] text-[#8b949e] font-bold uppercase tracking-widest block mb-1">Delivery time</span>
-                                <span className="text-sm font-black text-white">8 min - 20 min</span>
+                                <span className="text-sm font-black text-white uppercase tracking-tighter">
+                                    {listing.deliveryTime}
+                                </span>
                             </div>
                         </div>
 
-                        <div className="p-6 space-y-8">
-                            {/* Critical Warnings */}
-                            <div className="space-y-4">
-                                <h4 className="text-[#f85149] font-black flex items-center gap-3 text-sm tracking-widest uppercase">
-                                    <span className="flex h-5 w-5 items-center justify-center rounded-sm bg-[#f85149] text-white font-black animate-pulse">!</span>
-                                    READ BEFORE PURCHASE !
-                                </h4>
-                                <div className="space-y-3">
-                                    {config.warnings.map((warning: string, i: number) => (
-                                        <div key={i} className="flex items-center gap-3 group">
-                                            <Star className="h-4 w-4 text-[#f5a623] fill-[#f5a623]" />
-                                            <span className="text-sm text-[#d0d7de] font-bold">{warning}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
+                        <div className="p-6 space-y-6">
                             {/* Seller Description (Rich Text) */}
                             {listing.description && (
                                 <div className="space-y-3">
@@ -164,62 +98,34 @@ export function CurrencyListingHero({ listing, gameSlug = 'default', gameName = 
                                         <Info className="h-4 w-4 text-[#58a6ff]" />
                                         <h4 className="text-white font-bold text-xs uppercase tracking-wider">Offer Details</h4>
                                     </div>
-                                    <div
-                                        className="prose prose-invert prose-sm max-w-none text-xs text-[#d0d7de] bg-[#0d1117]/50 p-5 rounded-xl border border-[#30363d] relative overflow-hidden"
-                                    >
-                                        <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-[#58a6ff] to-transparent opacity-50" />
+                                    <div className="relative group">
                                         <div
-                                            className="relative z-10 leading-relaxed"
-                                            dangerouslySetInnerHTML={{ __html: listing.description }}
-                                        />
+                                            className={cn(
+                                                "prose prose-invert prose-sm max-w-none text-xs text-[#d0d7de] bg-[#0d1117]/50 p-5 rounded-xl border border-[#30363d] relative overflow-hidden transition-all duration-300",
+                                                !isExpanded && "max-h-[120px]"
+                                            )}
+                                        >
+                                            <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-[#58a6ff] to-transparent opacity-50" />
+                                            <div
+                                                className="relative z-10 leading-relaxed"
+                                                dangerouslySetInnerHTML={{ __html: listing.description }}
+                                            />
+                                            {!isExpanded && (
+                                                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#0d1117] to-transparent z-20" />
+                                            )}
+                                        </div>
+                                        <div className="pt-4 px-1">
+                                            <button
+                                                onClick={() => setIsExpanded(!isExpanded)}
+                                                className="text-xs font-black text-[#8b949e] hover:text-white uppercase tracking-widest flex items-center gap-2 transition-colors"
+                                            >
+                                                {isExpanded ? "Read less" : "Read more"}
+                                                <ChevronDown className={cn("h-3 w-3 transition-transform duration-300", isExpanded && "rotate-180")} />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             )}
-                        </div>
-
-                        {/* Purchase Steps & Warranty - Conditional on isExpanded */}
-                        {isExpanded && (
-                            <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="space-y-8 pt-6 border-t border-[#30363d]"
-                            >
-                                {/* Purchase Steps */}
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-xl">🚀</span>
-                                        <h4 className="text-white font-bold text-sm">How to purchase <span className="text-[#f85149]">?</span></h4>
-                                    </div>
-                                    <div className="space-y-3">
-                                        {config.steps.map((step: string, i: number) => (
-                                            <div key={i} className="flex items-start gap-3">
-                                                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-[#58a6ff] text-white text-[10px] font-black">{i + 1}</span>
-                                                <p className="text-sm text-[#d0d7de]">{step}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Warranty */}
-                                <div className="flex items-start gap-3 p-4 rounded-xl bg-[#f85149]/5 border border-[#f85149]/20">
-                                    <Zap className="h-4 w-4 text-[#f85149] shrink-0 mt-0.5" />
-                                    <p className="text-xs text-[#d0d7de] font-medium leading-relaxed">
-                                        We do not offer any warranty due to RMT (Real Money Trade) reasons.
-                                    </p>
-                                </div>
-                            </motion.div>
-                        )}
-
-                        <div className="pt-6 border-t border-[#30363d]">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setIsExpanded(!isExpanded)}
-                                className="bg-[#1c2128] border-[#30363d] text-[#8b949e] font-extrabold hover:text-white w-full"
-                            >
-                                {isExpanded ? "Read less" : "Read more"}
-                            </Button>
                         </div>
                     </CardContent>
                 </Card>
@@ -232,10 +138,11 @@ export function CurrencyListingHero({ listing, gameSlug = 'default', gameName = 
                         <div className="flex items-center justify-between">
                             <span className="text-sm text-[#8b949e] font-bold">Price</span>
                             <div className="flex items-baseline gap-1">
-                                <span className="text-2xl font-black text-white">$ {unitPrice.toFixed(4)}</span>
+                                <span className="text-2xl font-black text-white">$ {formatPrice(unitPrice)}</span>
                                 <span className="text-sm text-[#8b949e]">/ unit</span>
                             </div>
                         </div>
+
 
                         {/* Quantity Selector */}
                         <div className="space-y-4">
@@ -264,9 +171,21 @@ export function CurrencyListingHero({ listing, gameSlug = 'default', gameName = 
 
                         {/* Total & Buy Now */}
                         <div className="space-y-4">
-                            <Button className="w-full h-14 bg-[#f5a623] hover:bg-[#e09612] text-[#0d1117] font-black text-lg transition-all rounded-xl shadow-[0_0_20px_rgba(245,166,35,0.2)] hover:shadow-[0_0_30px_rgba(245,166,35,0.3)]">
-                                ${((quantity * unitPrice)).toFixed(2)} | Buy now
-                            </Button>
+                            {currentUserId && listing.seller?.supabaseId === currentUserId ? (
+                                <Button
+                                    onClick={() => router.push(`/dashboard/listings/${listing.id}/edit`)}
+                                    className="w-full h-14 bg-[#30363d] hover:bg-[#1c2128] text-white font-black text-lg transition-all rounded-xl border border-[#8b949e]/50"
+                                >
+                                    Edit Listing
+                                </Button>
+                            ) : (
+                                <Button
+                                    onClick={() => router.push(`/checkout/${listing.id}?quantity=${quantity}`)}
+                                    className="w-full h-14 bg-[#f5a623] hover:bg-[#e09612] text-[#0d1117] font-black text-lg transition-all rounded-xl shadow-[0_0_20px_rgba(245,166,35,0.2)] hover:shadow-[0_0_30px_rgba(245,166,35,0.3)]"
+                                >
+                                    ${formatPrice(quantity * unitPrice, 2)} | Buy now
+                                </Button>
+                            )}
 
                             <div className="space-y-4 pt-4">
                                 <div className="flex items-center gap-3 text-[#58a6ff]">

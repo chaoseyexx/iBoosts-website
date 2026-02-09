@@ -88,7 +88,7 @@ export async function getSellerListings(categorySlug?: string) {
         status: l.status.toLowerCase(), // ACTIVE -> active
         expiresIn: "30d", // Placeholder or calc
         category: l.category?.slug || "unknown", // Return slug for filtering matching URL params
-        image: l.game?.icon || l.images[0]?.url || "/placeholder.png"
+        image: l.game?.icon || (l.images && l.images.length > 0 ? l.images[0].url : "/placeholder.png")
     }));
 
     // We also need to fix the category field.
@@ -103,10 +103,16 @@ export async function getSellerListings(categorySlug?: string) {
 
 // Helper function for delivery time formatting
 function formatDeliveryTime(minutes: number): string {
-    if (minutes >= 1440) return `${Math.round(minutes / 1440)} days`;
-    if (minutes >= 60) return `${Math.round(minutes / 60)} h`;
-    const m = Math.round(minutes);
-    return `${m} m`;
+    if (minutes <= 0) return "Instant";
+    if (minutes >= 1440) {
+        const days = Math.round(minutes / 1440);
+        return `${days} ${days === 1 ? 'Day' : 'Days'}`;
+    }
+    if (minutes >= 60) {
+        const hours = Math.round(minutes / 60);
+        return `${hours} ${hours === 1 ? 'Hour' : 'Hours'}`;
+    }
+    return `${Math.round(minutes)} Minutes`;
 }
 
 // Actions

@@ -69,6 +69,7 @@ export async function fetchMarketplaceData(categorySlug: string, gameSlug?: stri
                         avatar: true,
                         sellerRating: true,
                         totalSales: true,
+                        totalReviews: true,
                         lastActiveAt: true,
                     }
                 },
