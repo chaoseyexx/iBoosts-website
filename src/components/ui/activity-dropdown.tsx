@@ -15,7 +15,7 @@ export interface Activity {
 }
 
 // Activity type icons
-const activityIcons: Record<string, React.ElementType> = {
+const activityIcons: Record<string, any> = {
     order: ShoppingBag,
     dispute: AlertTriangle,
     boosting: TrendingUp,
