@@ -20,6 +20,22 @@ async function main() {
     console.log("----------------------------------------------------------------");
 
     try {
+        // Check Balance First
+        const balance = await stripe.balance.retrieve();
+        console.log("Current Balance:");
+        if (balance.available.length > 0) {
+            console.log(`  Available: ${balance.available[0].amount / 100} ${balance.available[0].currency.toUpperCase()}`);
+        } else {
+            console.log("  Available: 0 USD");
+        }
+
+        if (balance.pending.length > 0) {
+            console.log(`  Pending:   ${balance.pending[0].amount / 100} ${balance.pending[0].currency.toUpperCase()}`);
+        } else {
+            console.log("  Pending:   0 USD");
+        }
+        console.log("----------------------------------------------------------------");
+
         // 1. Create a PaymentIntent designed to succeed immediately
         // We use 'pm_card_visa' which simulates a successful card payment.
         console.log("Creating a $500 charge to self...");
@@ -38,8 +54,30 @@ async function main() {
 
         console.log(`✅ Success! PaymentIntent ID: ${paymentIntent.id}`);
         console.log(`💰 Added $500.00 USD to your Stripe Dashboard balance.`);
-        console.log("Note: In Test Mode, this might not be 'Available' for payouts instantly depending on your settings,");
-        console.log("but it adds to your platform volume.");
+
+        // Check Balance Again
+        const newBalance = await stripe.balance.retrieve();
+        console.log("----------------------------------------------------------------");
+        console.log("New Balance:");
+        if (newBalance.available.length > 0) {
+            console.log(`  Available: ${newBalance.available[0].amount / 100} ${newBalance.available[0].currency.toUpperCase()}`);
+        } else {
+            console.log("  Available: 0 USD");
+        }
+
+        if (newBalance.pending.length > 0) {
+            console.log(`  Pending:   ${newBalance.pending[0].amount / 100} ${newBalance.pending[0].currency.toUpperCase()}`);
+        } else {
+            console.log("  Pending:   0 USD");
+        }
+        console.log("----------------------------------------------------------------");
+
+        console.log("IMPORTANT:");
+        console.log("1. Funds from card payments usually go to 'Pending' first.");
+        console.log("2. The error 'insufficient available funds' happens if your 'Available' balance is too low.");
+        console.log("3. To fix this INSTANTLY in Test Mode:");
+        console.log("   Go to https://dashboard.stripe.com/test/balance/overview");
+        console.log("   Click 'Add to balance' and simulate a bank transfer.");
 
     } catch (error: any) {
         console.error("❌ Error adding funds:", error.message);
