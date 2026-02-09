@@ -100,6 +100,7 @@ export async function POST(request: Request) {
             const paymentIntent = await stripe.paymentIntents.create({
                 amount: Math.round(total * 100),
                 currency: "usd",
+                description: `Order ${orderNumber} - ${listing.title}`,
                 metadata: {
                     type: "ORDER_PAYMENT",
                     orderId: order.id,

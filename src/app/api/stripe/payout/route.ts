@@ -67,6 +67,7 @@ export async function POST(request: Request) {
                 amount: Math.round(netAmount * 100),
                 currency: "usd",
                 destination: stripeAccountId,
+                description: `Withdrawal for ${dbUser.username}`,
                 metadata: {
                     type: "WITHDRAWAL",
                     userId: dbUser.id,

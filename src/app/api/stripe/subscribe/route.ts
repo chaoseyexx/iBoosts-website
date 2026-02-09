@@ -110,6 +110,7 @@ export async function POST(req: Request) {
                 plan: plan,
             },
             subscription_data: {
+                description: `iShield Pro ${plan === 'monthly' ? 'Monthly' : 'Yearly'} Subscription`,
                 metadata: {
                     type: "ISHIELD_SUBSCRIPTION",
                     userId: user.id,
