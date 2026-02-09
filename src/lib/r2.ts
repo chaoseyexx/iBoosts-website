@@ -1,19 +1,19 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
-const accountId = process.env.R2_ACCOUNT_ID;
-const accessKeyId = process.env.R2_ACCESS_KEY_ID;
-const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-const bucketName = process.env.R2_BUCKET_NAME;
+const accountId = process.env.R2_ACCOUNT_ID || "dummy-account-id";
+const accessKeyId = process.env.R2_ACCESS_KEY_ID || "dummy-access-key";
+const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY || "dummy-secret-key";
+const bucketName = process.env.R2_BUCKET_NAME || "dummy-bucket";
 const publicDomain = process.env.R2_PUBLIC_DOMAIN || "https://cdn.iboosts.gg";
 const jurisdiction = process.env.R2_JURISDICTION; // e.g., "eu"
 
 // Validate critical variables
-if (!accountId || !accessKeyId || !secretAccessKey || !bucketName) {
-    console.error("R2 Error: Missing Environment Variables", {
-        hasAccountId: !!accountId,
-        hasAccessKey: !!accessKeyId,
-        hasSecretKey: !!secretAccessKey,
-        hasBucket: !!bucketName
+if (!process.env.R2_ACCOUNT_ID || !process.env.R2_ACCESS_KEY_ID || !process.env.R2_SECRET_ACCESS_KEY || !process.env.R2_BUCKET_NAME) {
+    console.warn("R2 Warning: Missing Environment Variables, using dummy values for build.", {
+        hasAccountId: !!process.env.R2_ACCOUNT_ID,
+        hasAccessKey: !!process.env.R2_ACCESS_KEY_ID,
+        hasSecretKey: !!process.env.R2_SECRET_ACCESS_KEY,
+        hasBucket: !!process.env.R2_BUCKET_NAME
     });
 }
 
@@ -27,8 +27,8 @@ export const r2 = new S3Client({
     region: "auto",
     endpoint,
     credentials: {
-        accessKeyId: accessKeyId || "",
-        secretAccessKey: secretAccessKey || "",
+        accessKeyId: accessKeyId,
+        secretAccessKey: secretAccessKey,
     },
 });
 
