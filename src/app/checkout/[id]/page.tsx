@@ -14,10 +14,13 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     const supabase = await createClient();
     const { data: { user: authUser } } = await supabase.auth.getUser();
 
+    let walletBalance = 0;
     let isShieldActive = false;
+
     if (authUser) {
         const user = await (prisma.user as any).findUnique({
-            where: { supabaseId: authUser.id }
+            where: { supabaseId: authUser.id },
+            include: { wallet: true }
         });
 
         if (user?.isShieldActive && user.ishieldUntil && new Date(user.ishieldUntil) > new Date()) {
@@ -25,6 +28,10 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
         } else if (user?.isShieldActive && !user.ishieldUntil) {
             // Lifetime or untracked
             isShieldActive = true;
+        }
+
+        if (user?.wallet) {
+            walletBalance = Number(user.wallet.balance);
         }
     }
 
@@ -58,6 +65,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
         <CheckoutView
             listing={serializedListing}
             isShieldActive={isShieldActive}
+            walletBalance={walletBalance}
         />
     );
 }

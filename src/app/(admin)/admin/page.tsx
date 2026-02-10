@@ -102,142 +102,152 @@ export default async function AdminDashboardPage() {
     ];
 
     return (
-        <div className="space-y-8 max-w-7xl mx-auto pb-8">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-10 animate-in fade-in duration-700 relative z-10">
+            {/* HUD Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
-                    <p className="text-[#8b949e] text-sm mt-1">Platform overview and quick actions.</p>
+                    <div className="flex items-center gap-2 mb-2">
+                        <div className="h-1.5 w-1.5 rounded-full bg-[#f5a623] shadow-[0_0_8px_rgba(245,166,35,0.6)]" />
+                        <span className="text-[10px] font-black text-[#f5a623] uppercase tracking-[0.3em]">Management Matrix</span>
+                    </div>
+                    <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Command <span className="text-[#f5a623]">Dashboard</span></h1>
+                    <p className="text-white/20 text-xs font-black uppercase tracking-[0.1em] mt-1">Operational Platform Overview & Analytics</p>
                 </div>
-                <div className="flex items-center gap-3 px-4 py-2 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
-                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                    <span className="text-xs font-bold text-emerald-400">All Systems Operational</span>
+                <div className="flex items-center gap-4 px-5 py-2.5 bg-[#f5a623]/5 border border-[#f5a623]/20 rounded-2xl backdrop-blur-sm">
+                    <div className="flex flex-col items-end">
+                        <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">System Health</span>
+                        <span className="text-[11px] font-black text-[#f5a623] uppercase tracking-widest leading-none mt-1 text-right">Operational</span>
+                    </div>
+                    <div className="h-8 w-[1px] bg-white/5" />
+                    <div className="h-2 w-2 rounded-full bg-[#f5a623] animate-pulse shadow-[0_0_10px_rgba(245,166,35,0.8)]" />
                 </div>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* High-Impact Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {stats.map((stat) => {
                     const Icon = stat.icon;
                     return (
                         <Link key={stat.title} href={stat.link}>
-                            <Card className="bg-[#161b22] border-[#30363d] p-5 hover:border-[#f5a623]/30 transition-all cursor-pointer group">
-                                <div className="flex items-start justify-between">
-                                    <div className={cn(
-                                        "p-2.5 rounded-xl",
-                                        stat.color === "emerald" ? "bg-emerald-500/10 text-emerald-400" :
-                                            stat.color === "amber" ? "bg-amber-500/10 text-amber-500" :
-                                                stat.color === "sky" ? "bg-sky-500/10 text-sky-400" : "bg-rose-500/10 text-rose-400"
-                                    )}>
+                            <div className="bg-white/[0.02] border border-white/5 p-6 rounded-3xl hover:border-[#f5a623]/30 transition-all cursor-pointer group relative overflow-hidden backdrop-blur-sm">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-[#f5a623]/5 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/2 group-hover:bg-[#f5a623]/10 transition-colors" />
+
+                                <div className="flex items-start justify-between relative z-10">
+                                    <div className="h-11 w-11 rounded-xl bg-[#f5a623]/10 flex items-center justify-center text-[#f5a623] group-hover:bg-[#f5a623] group-hover:text-black transition-all">
                                         <Icon className="h-5 w-5" />
                                     </div>
-                                    <ArrowUpRight className="h-4 w-4 text-[#8b949e] opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    <ArrowUpRight className="h-4 w-4 text-[#f5a623]/40 group-hover:text-[#f5a623] transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                                 </div>
-                                <div className="mt-4">
-                                    <p className="text-xs text-[#8b949e] font-medium">{stat.title}</p>
-                                    <h2 className="text-2xl font-bold text-white mt-1 tabular-nums">{stat.value}</h2>
-                                    <p className="text-xs text-[#8b949e] mt-1">{stat.subtitle}</p>
+                                <div className="mt-6 relative z-10">
+                                    <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.2em]">{stat.title}</p>
+                                    <h2 className="text-3xl font-black text-white mt-1 tabular-nums drop-shadow-[0_0_15px_rgba(255,255,255,0.05)]">{stat.value}</h2>
+                                    <p className="text-[10px] text-[#f5a623]/60 font-black uppercase tracking-widest mt-1.5">{stat.subtitle}</p>
                                 </div>
-                            </Card>
+                            </div>
                         </Link>
                     );
                 })}
             </div>
 
-            {/* Quick Actions & Recent Orders */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Quick Actions */}
-                <Card className="bg-[#161b22] border-[#30363d] lg:col-span-1">
-                    <CardHeader className="pb-3">
-                        <CardTitle className="text-sm font-bold text-[#8b949e] uppercase tracking-wider">Quick Actions</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
+            {/* Operations Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Critical Alerts / Quick Actions */}
+                <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 lg:col-span-1 border-rose-500/5 backdrop-blur-sm">
+                    <h3 className="text-[11px] font-black text-white/20 uppercase tracking-[0.3em] mb-8 flex items-center justify-between">
+                        Tactical Actions
+                        <div className="h-[1px] w-24 bg-white/5" />
+                    </h3>
+                    <div className="space-y-3">
                         {quickActions.map((action, i) => (
                             <Link key={i} href={action.link}>
                                 <div className={cn(
-                                    "flex items-center justify-between p-3 rounded-xl transition-all cursor-pointer",
+                                    "flex items-center justify-between p-4 rounded-2xl transition-all cursor-pointer border group",
                                     action.urgent
-                                        ? "bg-rose-500/5 border border-rose-500/20 hover:bg-rose-500/10"
-                                        : "bg-white/5 hover:bg-white/10"
+                                        ? "bg-rose-500/5 border-rose-500/10 hover:border-rose-500/30"
+                                        : "bg-white/[0.03] border-white/5 hover:border-[#f5a623]/30"
                                 )}>
-                                    <span className="text-sm font-medium text-white">{action.label}</span>
-                                    <Badge className={cn(
-                                        "text-xs font-bold",
+                                    <div>
+                                        <span className="text-[11px] font-black text-white/60 uppercase tracking-widest group-hover:text-white transition-colors">{action.label}</span>
+                                        {action.urgent && <div className="text-[9px] font-black text-rose-500 uppercase tracking-tighter mt-0.5">HIGH_PRIORITY</div>}
+                                    </div>
+                                    <div className={cn(
+                                        "h-8 px-3 rounded-lg flex items-center justify-center text-xs font-black",
                                         action.urgent
-                                            ? "bg-rose-500/20 text-rose-400 border-rose-500/30"
-                                            : "bg-white/10 text-[#8b949e] border-white/10"
+                                            ? "bg-rose-500/20 text-rose-500"
+                                            : "bg-white/5 text-white/20 group-hover:text-[#f5a623] group-hover:bg-[#f5a623]/10 transition-all"
                                     )}>
                                         {action.value}
-                                    </Badge>
+                                    </div>
                                 </div>
                             </Link>
                         ))}
 
-                        <div className="pt-3 border-t border-[#30363d]/50 mt-4">
-                            <div className="grid grid-cols-2 gap-2">
-                                <Link href="/admin/users">
-                                    <Button variant="outline" className="w-full h-10 text-xs font-bold border-[#30363d] hover:bg-white/5">
-                                        <Users className="h-4 w-4 mr-2" />
-                                        Users
-                                    </Button>
-                                </Link>
-                                <Link href="/admin/orders">
-                                    <Button variant="outline" className="w-full h-10 text-xs font-bold border-[#30363d] hover:bg-white/5">
-                                        <ShoppingCart className="h-4 w-4 mr-2" />
-                                        Orders
-                                    </Button>
-                                </Link>
-                            </div>
+                        <div className="pt-6 grid grid-cols-2 gap-3 mt-4">
+                            <Link href="/admin/users">
+                                <button className="w-full h-11 bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-all">
+                                    Entity logs
+                                </button>
+                            </Link>
+                            <Link href="/admin/orders">
+                                <button className="w-full h-11 bg-[#f5a623]/5 hover:bg-[#f5a623]/10 border border-[#f5a623]/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-[#f5a623] transition-all">
+                                    Registry
+                                </button>
+                            </Link>
                         </div>
-                    </CardContent>
-                </Card>
+                    </div>
+                </div>
 
-                {/* Recent Orders */}
-                <Card className="bg-[#161b22] border-[#30363d] lg:col-span-2">
-                    <CardHeader className="flex flex-row items-center justify-between pb-3">
-                        <CardTitle className="text-sm font-bold text-[#8b949e] uppercase tracking-wider">Recent Orders</CardTitle>
+                {/* Live Event Feed (Recent Orders) */}
+                <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 lg:col-span-2 backdrop-blur-sm">
+                    <div className="flex items-center justify-between mb-8">
+                        <h3 className="text-[11px] font-black text-white/20 uppercase tracking-[0.3em] flex items-center gap-3">
+                            Registry Stream
+                            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        </h3>
                         <Link href="/admin/orders">
-                            <Button variant="ghost" size="sm" className="text-xs text-[#8b949e] hover:text-white">
-                                View All <ExternalLink className="h-3 w-3 ml-1" />
-                            </Button>
+                            <button className="text-[10px] font-black text-[#f5a623]/60 hover:text-[#f5a623] uppercase tracking-[0.2em] transition-colors pb-1 border-b border-[#f5a623]/20">
+                                Expand Stream
+                            </button>
                         </Link>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-3">
-                            {recentOrders.length === 0 ? (
-                                <p className="text-center text-[#8b949e] py-8">No orders yet</p>
-                            ) : (
-                                recentOrders.map((order) => (
-                                    <div key={order.id} className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-10 w-10 rounded-lg bg-[#0d1117] flex items-center justify-center">
-                                                <ShoppingCart className="h-4 w-4 text-[#8b949e]" />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-white">{order.orderNumber}</p>
-                                                <p className="text-xs text-[#8b949e]">
-                                                    {order.buyer?.username} → {order.seller?.username}
-                                                </p>
-                                            </div>
+                    </div>
+
+                    <div className="space-y-3">
+                        {recentOrders.length === 0 ? (
+                            <div className="py-20 flex flex-col items-center justify-center opacity-10">
+                                <ShoppingCart className="h-12 w-12 mb-4" />
+                                <p className="text-[10px] font-black uppercase tracking-widest">No Active Sessions</p>
+                            </div>
+                        ) : (
+                            recentOrders.map((order) => (
+                                <div key={order.id} className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-[#f5a623]/20 transition-all group">
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-11 w-11 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-[#f5a623]/10 group-hover:border-[#f5a623]/20 transition-all">
+                                            <ShoppingCart className="h-5 w-5 text-white/20 group-hover:text-[#f5a623]" />
                                         </div>
-                                        <div className="text-right">
-                                            <p className="text-sm font-bold text-emerald-400">${Number(order.finalAmount).toFixed(2)}</p>
-                                            <Badge className={cn(
-                                                "text-[9px] font-bold uppercase",
-                                                order.status === "COMPLETED" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
-                                                    order.status === "ACTIVE" ? "bg-sky-500/10 text-sky-400 border-sky-500/20" :
-                                                        order.status === "CANCELLED" ? "bg-rose-500/10 text-rose-400 border-rose-500/20" :
-                                                            "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                                            )}>
-                                                {order.status}
-                                            </Badge>
+                                        <div>
+                                            <p className="text-[11px] font-black text-white uppercase tracking-widest">{order.orderNumber}</p>
+                                            <p className="text-[10px] font-black text-white/20 uppercase tracking-tighter mt-0.5 whitespace-nowrap overflow-hidden">
+                                                {order.buyer?.username} <span className="text-[#f5a623]/40 mx-1">→</span> {order.seller?.username}
+                                            </p>
                                         </div>
                                     </div>
-                                ))
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
+                                    <div className="text-right">
+                                        <p className="text-sm font-black text-[#f5a623] tracking-tight tabular-nums">${Number(order.finalAmount).toFixed(2)}</p>
+                                        <div className={cn(
+                                            "mt-1 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-[0.2em] inline-block border",
+                                            order.status === "COMPLETED" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                                                order.status === "ACTIVE" ? "bg-sky-500/10 text-sky-400 border-sky-500/20" :
+                                                    order.status === "CANCELLED" ? "bg-rose-500/10 text-rose-400 border-rose-500/20" :
+                                                        "bg-[#f5a623]/10 text-[#f5a623] border-[#f5a623]/20"
+                                        )}>
+                                            {order.status}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );

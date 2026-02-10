@@ -440,7 +440,6 @@ export function MainNavbar({
                                                                     highlight: true
                                                                 },
                                                                 { label: 'Wallet', icon: Wallet, path: '/dashboard/wallet' },
-                                                                { label: 'Messages', icon: MessageCircle, path: '/dashboard/messages' },
                                                                 { label: 'Notifications', icon: Bell, path: '/dashboard/notifications' },
                                                                 { label: 'Feedback', icon: Star, path: '/dashboard/feedback' },
                                                                 { label: 'Settings', icon: Settings, path: '/dashboard/settings' },

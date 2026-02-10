@@ -9,7 +9,9 @@ import {
     Check,
     Building2,
     Loader2,
-    CreditCard
+    CreditCard,
+    Zap,
+    Coins
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -28,39 +30,72 @@ interface WalletWithdrawalViewProps {
     bankInfo: BankInfo | null;
 }
 
-const METHOD_CONFIG = {
-    id: 'stripe' as const,
-    label: 'Bank Transfer',
-    icon: <Building2 className="h-4 w-4" />,
-    minAmount: 10,
-    feeFlat: 2.00,
-    feePercent: 0.04,
-    currency: 'USD',
-    details: [
-        "Direct transfer to your connected bank account via Stripe Connect.",
-        "Funds usually arrive within 1-3 business days.",
-        "Standard payouts incur a 4% fee + $2.00 flat fee.",
-        "Transactions are secure and tracked in your activity log."
-    ]
-};
+const WITHDRAWAL_METHODS = [
+    {
+        id: 'stripe' as const,
+        label: 'Bank Transfer',
+        sublabel: 'Connect via Stripe',
+        icon: <Building2 className="h-4 w-4" />,
+        minAmount: 10,
+        feeFlat: 2.00,
+        feePercent: 0.04,
+        details: [
+            "Direct transfer to your connected bank account.",
+            "Funds arrive within 1-3 business days.",
+            "Standard payouts: 4% fee + $2.00 flat."
+        ]
+    },
+    {
+        id: 'crypto_usdt' as const,
+        label: 'USDT (TRC20)',
+        sublabel: 'Tether Stablecoin',
+        icon: <Zap className="h-4 w-4" />,
+        minAmount: 50,
+        feeFlat: 10.00,
+        feePercent: 0.04,
+        details: [
+            "Fast settlement via TRON (TRC20) network.",
+            "Usually processed within 24 hours.",
+            "Standard Crypto fee: 4% + $10.00 flat."
+        ]
+    },
+    {
+        id: 'crypto_ltc' as const,
+        label: 'Litecoin (LTC)',
+        sublabel: 'Low Network Fee',
+        icon: <Coins className="h-4 w-4" />,
+        minAmount: 30,
+        feeFlat: 10.00,
+        feePercent: 0.04,
+        details: [
+            "Litecoin network settlement.",
+            "Usually processed within 12 hours.",
+            "Standard Crypto fee: 4% + $10.00 flat."
+        ]
+    }
+];
 
 export function WalletWithdrawalView({ balance, stripeConnected, bankInfo }: WalletWithdrawalViewProps) {
     const [amount, setAmount] = useState<string>("");
+    const [selectedMethodId, setSelectedMethodId] = useState<string>(WITHDRAWAL_METHODS[0].id);
+    const [cryptoAddress, setCryptoAddress] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [showSetupForm, setShowSetupForm] = useState(false);
-    const [withdrawSuccess, setWithdrawSuccess] = useState<{ amount: number; received: number } | null>(null);
+    const [withdrawSuccess, setWithdrawSuccess] = useState<{ amount: number; received: number; method: string } | null>(null);
+
+    const selectedMethod = WITHDRAWAL_METHODS.find(m => m.id === selectedMethodId) || WITHDRAWAL_METHODS[0];
 
     const numAmount = Number(amount) || 0;
     const fees = useMemo(() => {
         if (numAmount === 0) return 0;
-        return METHOD_CONFIG.feeFlat + (numAmount * METHOD_CONFIG.feePercent);
-    }, [numAmount]);
+        return selectedMethod.feeFlat + (numAmount * selectedMethod.feePercent);
+    }, [numAmount, selectedMethod]);
 
     const receiveAmount = Math.max(0, numAmount - fees);
 
     const handleSubmit = async () => {
-        if (numAmount < METHOD_CONFIG.minAmount) {
-            toast.error(`Minimum withdrawal is $${METHOD_CONFIG.minAmount}`);
+        if (numAmount < selectedMethod.minAmount) {
+            toast.error(`Minimum withdrawal for ${selectedMethod.label} is $${selectedMethod.minAmount}`);
             return;
         }
         if (numAmount > balance) {
@@ -68,28 +103,40 @@ export function WalletWithdrawalView({ balance, stripeConnected, bankInfo }: Wal
             return;
         }
 
-        if (!stripeConnected) {
+        if (selectedMethodId === 'stripe' && !stripeConnected) {
             toast.error("Please connect your payout method first.");
+            return;
+        }
+
+        if (selectedMethodId.startsWith('crypto') && !cryptoAddress) {
+            toast.error("Please enter your crypto wallet address.");
             return;
         }
 
         setIsLoading(true);
         try {
-            const response = await fetch("/api/stripe/payout", {
+            const apiEndpoint = selectedMethodId === 'stripe' ? "/api/stripe/payout" : "/api/wallet/withdraw";
+            const response = await fetch(apiEndpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: numAmount }),
+                body: JSON.stringify({
+                    amount: numAmount,
+                    method: selectedMethodId.toUpperCase(),
+                    destination: selectedMethodId === 'stripe' ? "BANK" : cryptoAddress
+                }),
             });
 
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error || "Payout failed");
+            if (!response.ok) throw new Error(data.error || "Withdrawal failed");
 
             // Show success state
             setWithdrawSuccess({
                 amount: numAmount,
-                received: receiveAmount
+                received: receiveAmount,
+                method: selectedMethod.label
             });
             setAmount("");
+            setCryptoAddress("");
         } catch (error: any) {
             toast.error(error.message || "Failed to submit request");
         } finally {
@@ -167,64 +214,76 @@ export function WalletWithdrawalView({ balance, stripeConnected, bankInfo }: Wal
                             </div>
                         </div>
 
-                        {/* Method Info Card */}
-                        <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white">
-                                        {METHOD_CONFIG.icon}
+                        {/* Method Selection */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {WITHDRAWAL_METHODS.map((method) => (
+                                <button
+                                    key={method.id}
+                                    onClick={() => setSelectedMethodId(method.id)}
+                                    className={`p-6 rounded-2xl border transition-all text-left flex flex-col gap-3 group ${selectedMethodId === method.id
+                                        ? 'bg-[#f5a623]/10 border-[#f5a623] shadow-[0_0_20px_rgba(245,166,35,0.1)]'
+                                        : 'bg-white/[0.02] border-white/5 hover:border-white/20'
+                                        }`}
+                                >
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${selectedMethodId === method.id ? 'bg-[#f5a623] text-black shadow-[0_0_15px_rgba(245,166,35,0.4)]' : 'bg-white/5 text-white/40'}`}>
+                                        {method.icon}
                                     </div>
                                     <div>
-                                        <h3 className="text-sm font-black text-white uppercase tracking-tight">{METHOD_CONFIG.label}</h3>
-                                        <p className="text-[10px] text-[#8b949e] font-bold uppercase tracking-widest">
-                                            {stripeConnected ? "Connected via Stripe Connect" : "Setup required"}
-                                        </p>
+                                        <h3 className={`text-sm font-black uppercase tracking-tight ${selectedMethodId === method.id ? 'text-white' : 'text-white/60'}`}>{method.label}</h3>
+                                        <p className="text-[10px] text-[#8b949e] font-bold uppercase tracking-widest mt-0.5">{method.sublabel}</p>
                                     </div>
-                                </div>
-                                {stripeConnected ? (
-                                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20">
-                                        <Check className="h-3 w-3 text-green-500" />
-                                        <span className="text-[8px] font-black text-green-500 uppercase tracking-widest">Active</span>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5a623]/10 border border-[#f5a623]/20">
-                                        <span className="text-[8px] font-black text-[#f5a623] uppercase tracking-widest">Not Connected</span>
-                                    </div>
-                                )}
-                            </div>
+                                </button>
+                            ))}
+                        </div>
 
-                            {/* Bank Account Details */}
-                            {stripeConnected && bankInfo && (
-                                <div className="mt-4 pt-4 border-t border-white/5">
-                                    <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/5">
-                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
-                                            <CreditCard className="h-6 w-6 text-blue-400" />
+                        {selectedMethodId === 'stripe' && !stripeConnected && (
+                            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white">
+                                            <Building2 className="h-4 w-4" />
                                         </div>
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-2">
-                                                <h4 className="text-sm font-bold text-white">{bankInfo.bankName}</h4>
-                                                <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                                                    {bankInfo.currency}
-                                                </span>
-                                            </div>
-                                            <p className="text-xs text-[#8b949e] mt-0.5 font-mono">
-                                                •••• •••• •••• {bankInfo.last4}
+                                        <div>
+                                            <h3 className="text-sm font-black text-white uppercase tracking-tight">Setup Required</h3>
+                                            <p className="text-[10px] text-[#8b949e] font-bold uppercase tracking-widest">
+                                                Connect your bank account via Stripe to enable transfers.
                                             </p>
                                         </div>
-                                        <div className="text-right">
-                                            <span className="text-[9px] font-bold uppercase tracking-widest text-[#8b949e]">
-                                                {bankInfo.country}
-                                            </span>
-                                        </div>
                                     </div>
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
+
+                        {stripeConnected && bankInfo && selectedMethodId === 'stripe' && (
+                            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
+                                <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
+                                        <CreditCard className="h-6 w-6 text-blue-400" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <h4 className="text-sm font-bold text-white">{bankInfo.bankName}</h4>
+                                            <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                {bankInfo.currency}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-[#8b949e] mt-0.5 font-mono">
+                                            •••• •••• •••• {bankInfo.last4}
+                                        </p>
+                                    </div>
+                                    <div className="text-right">
+                                        <span className="text-[9px] font-bold uppercase tracking-widest text-[#8b949e]">
+                                            {bankInfo.country}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                             {/* Form Side */}
                             <div className="space-y-8">
-                                {!stripeConnected ? (
+                                {selectedMethodId === 'stripe' && !stripeConnected ? (
                                     showSetupForm ? (
                                         <div className="p-6 border border-white/10 rounded-2xl bg-white/[0.02]">
                                             <PayoutSetupForm onSuccess={() => window.location.reload()} />
@@ -235,8 +294,8 @@ export function WalletWithdrawalView({ balance, stripeConnected, bankInfo }: Wal
                                                 <Building2 className="h-6 w-6" />
                                             </div>
                                             <div className="space-y-1">
-                                                <h3 className="text-sm font-bold text-white uppercase tracking-tight">Setup Required</h3>
-                                                <p className="text-[11px] text-[#8b949e]">Add your bank account to receive payouts.</p>
+                                                <h3 className="text-sm font-bold text-white uppercase tracking-tight">Connect with Stripe</h3>
+                                                <p className="text-[11px] text-[#8b949e]">Add your bank account to receive automated payouts.</p>
                                             </div>
                                             <Button
                                                 onClick={() => setShowSetupForm(true)}
@@ -248,8 +307,20 @@ export function WalletWithdrawalView({ balance, stripeConnected, bankInfo }: Wal
                                     )
                                 ) : (
                                     <div className="space-y-6">
+                                        {selectedMethodId.startsWith('crypto') && (
+                                            <div className="space-y-4">
+                                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">{selectedMethod.label} Address</Label>
+                                                <Input
+                                                    placeholder={`Enter your ${selectedMethod.label} address...`}
+                                                    className="h-14 bg-white/[0.03] border-white/5 focus:border-[#f5a623]/50 rounded-2xl"
+                                                    value={cryptoAddress}
+                                                    onChange={(e) => setCryptoAddress(e.target.value)}
+                                                />
+                                            </div>
+                                        )}
+
                                         <div className="space-y-4">
-                                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Enter amount to withdraw</Label>
+                                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e]">Amount to withdraw (USD)</Label>
                                             <div className="relative">
                                                 <Input
                                                     type="number"
@@ -284,7 +355,7 @@ export function WalletWithdrawalView({ balance, stripeConnected, bankInfo }: Wal
                                                 <Loader2 className="h-5 w-5 animate-spin" />
                                             ) : (
                                                 <div className="flex items-center gap-2">
-                                                    Confirm Withdrawal
+                                                    Verify & Withdraw
                                                     <Check className="h-4 w-4" />
                                                 </div>
                                             )}
@@ -296,17 +367,17 @@ export function WalletWithdrawalView({ balance, stripeConnected, bankInfo }: Wal
                             {/* Info Side */}
                             <div className="bg-black/40 rounded-[2rem] border border-white/5 p-8 self-start space-y-6">
                                 <div className="pb-4 border-b border-white/5">
-                                    <h3 className="text-lg font-black text-white uppercase tracking-tight">Important Info</h3>
+                                    <h3 className="text-lg font-black text-white uppercase tracking-tight">Withdrawal Terms</h3>
                                 </div>
                                 <ul className="space-y-4">
-                                    {METHOD_CONFIG.details.map((detail, i) => (
+                                    {selectedMethod.details.map((detail, i) => (
                                         <li key={i} className="flex gap-3 text-sm text-[#8b949e] leading-relaxed">
                                             <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#f5a623] shrink-0" />
                                             {detail}
                                         </li>
                                     ))}
                                     <li className="flex gap-3 text-xs text-[#8b949e]/50 italic border-t border-white/5 pt-4">
-                                        Minimum withdrawal amount for Bank Transfer is ${METHOD_CONFIG.minAmount}.
+                                        Minimum withdrawal for {selectedMethod.label} is ${selectedMethod.minAmount}.
                                     </li>
                                 </ul>
                             </div>

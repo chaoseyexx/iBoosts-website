@@ -20,7 +20,6 @@ const mobileLinks = [
     { href: "/dashboard/offers", icon: Coins, label: "Offers" },
     { href: "/dashboard/boosting", icon: TrendingUp, label: "Boosting" },
     { href: "/dashboard/wallet", icon: Wallet, label: "Wallet" },
-    { href: "/dashboard/messages", icon: MessageCircle, label: "Messages" },
     { href: "/dashboard/notifications", icon: Bell, label: "Notifications" },
     { href: "/dashboard/settings", icon: Settings, label: "Settings" },
 ];

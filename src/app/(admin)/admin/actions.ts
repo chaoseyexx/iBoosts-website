@@ -970,6 +970,8 @@ export async function fetchUsersWithStats(filters?: {
                 kycStatus: true,
                 emailVerified: true,
                 phoneVerified: true,
+                isShieldActive: true,
+                reputationScore: true,
                 createdAt: true,
                 wallet: { select: { balance: true, pendingBalance: true } },
                 _count: {
@@ -987,9 +989,19 @@ export async function fetchUsersWithStats(filters?: {
             skip: filters?.offset || 0
         });
 
+        // Convert Decimal to number for serialization
+        const serializedUsers = users.map(user => ({
+            ...user,
+            wallet: user.wallet ? {
+                ...user.wallet,
+                balance: Number(user.wallet.balance),
+                pendingBalance: Number(user.wallet.pendingBalance)
+            } : null
+        }));
+
         const totalCount = await prisma.user.count({ where });
 
-        return { users, totalCount };
+        return { users: serializedUsers, totalCount };
     } catch (error) {
         console.error("Error fetching users:", error);
         return { users: [], totalCount: 0 };
@@ -1083,6 +1095,55 @@ export async function bulkCompleteOrders(orderIds: string[], adminId?: string) {
         return { success: true, count: orderIds.length };
     } catch (error: any) {
         console.error("Error in bulk complete:", error);
+        return { error: error.message };
+    }
+}
+
+export async function seedSystemSettings() {
+    try {
+        // Seed Fees
+        const defaultFees = [
+            { name: "BUYER_SERVICE_PERCENT", type: "PERCENTAGE", value: 0.03, description: "Fee charged to buyers on top of the subtotal (as a percentage)." },
+            { name: "BUYER_SERVICE_FLAT", type: "FLAT", value: 0.50, description: "Flat processing fee charged to buyers per order." },
+            { name: "SELLER_COMMISSION_PERCENT", type: "PERCENTAGE", value: 0.10, description: "Commission deducted from the seller's earnings (as a percentage)." },
+            { name: "WITHDRAWAL_PERCENT", type: "PERCENTAGE", value: 0.04, description: "Fee deducted from withdrawals (as a percentage)." },
+            { name: "WITHDRAWAL_FLAT", type: "FLAT", value: 2.00, description: "Flat processing fee for withdrawals." },
+        ];
+
+        for (const f of defaultFees) {
+            await prisma.fee.upsert({
+                where: { name: f.name },
+                update: {},
+                create: {
+                    id: generateId("Fee"),
+                    ...f,
+                    isActive: true
+                }
+            });
+        }
+
+        // Seed Configs
+        const defaultConfigs = [
+            { key: "ORDER_AUTO_CANCEL_HOURS", value: 24, description: "Hours before an unpaid order is automatically cancelled." },
+            { key: "BUYER_CONFIRMATION_HOURS", value: 72, description: "Hours a buyer has to confirm delivery before auto-completion." },
+            { key: "MINIMUM_WITHDRAWAL_USD", value: 10, description: "Minimum balance required to request a withdrawal." },
+            { key: "MANUAL_PAYMENTS_ENABLED", value: false, description: "If enabled, ALL withdrawals require manual approval regardless of risk." },
+        ];
+
+        for (const c of defaultConfigs) {
+            await prisma.config.upsert({
+                where: { key: c.key },
+                update: {},
+                create: {
+                    id: generateId("Config"),
+                    ...c
+                }
+            });
+        }
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error seeding system settings:", error);
         return { error: error.message };
     }
 }
@@ -1210,3 +1271,179 @@ export async function fetchRecentActivity() {
         }
     )();
 }
+
+// ==========================================
+// NEW ADMIN ACTIONS
+// ==========================================
+
+export async function toggleUserShield(userId: string, active: boolean, adminId?: string) {
+    try {
+        await prisma.user.update({
+            where: { id: userId },
+            data: { isShieldActive: active }
+        });
+
+        if (adminId) {
+            await logAdminAction(adminId, active ? "SHIELD_ENABLED" : "SHIELD_DISABLED", userId, { active });
+        }
+
+        revalidatePath("/admin/users");
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error toggling shield:", error);
+        return { error: error.message };
+    }
+}
+
+export async function updateUserReputation(userId: string, score: number, adminId?: string) {
+    try {
+        await prisma.user.update({
+            where: { id: userId },
+            data: { reputationScore: score }
+        });
+
+        if (adminId) {
+            await logAdminAction(adminId, "REPUTATION_UPDATE", userId, { score });
+        }
+
+        revalidatePath("/admin/users");
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error updating reputation:", error);
+        return { error: error.message };
+    }
+}
+
+export async function manualApproveKYC(userId: string, adminId?: string) {
+    try {
+        await prisma.user.update({
+            where: { id: userId },
+            data: { kycStatus: "APPROVED" }
+        });
+
+        if (adminId) {
+            await logAdminAction(adminId, "KYC_MANUAL_APPROVE", userId, {});
+        }
+
+        revalidatePath("/admin/users");
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error approving KYC:", error);
+        return { error: error.message };
+    }
+}
+
+export async function fetchPlatformFees() {
+    try {
+        let fees = await prisma.fee.findMany({
+            where: { isActive: true },
+            orderBy: { name: "asc" }
+        });
+
+        if (fees.length === 0) {
+            await seedSystemSettings();
+            fees = await prisma.fee.findMany({
+                where: { isActive: true },
+                orderBy: { name: "asc" }
+            });
+        }
+
+        return fees.map(fee => ({
+            ...fee,
+            value: Number(fee.value)
+        }));
+    } catch (error: any) {
+        console.error("Error fetching fees:", error);
+        return [];
+    }
+}
+
+export async function updatePlatformFee(feeId: string, value: number, adminId?: string) {
+    try {
+        const fee = await prisma.fee.update({
+            where: { id: feeId },
+            data: { value }
+        });
+
+        if (adminId) {
+            await logAdminAction(adminId, "FEE_UPDATE", feeId, { name: fee.name, value });
+        }
+
+        revalidatePath("/admin/settings");
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error updating fee:", error);
+        return { error: error.message };
+    }
+}
+
+export async function fetchPlatformConfigs() {
+    try {
+        let configs = await prisma.config.findMany({
+            orderBy: { key: "asc" }
+        });
+
+        if (configs.length === 0) {
+            await seedSystemSettings();
+            configs = await prisma.config.findMany({
+                orderBy: { key: "asc" }
+            });
+        }
+
+        return configs;
+    } catch (error: any) {
+        console.error("Error fetching configs:", error);
+        return [];
+    }
+}
+
+export async function updatePlatformConfig(configId: string, value: any, adminId?: string) {
+    try {
+        const config = await prisma.config.update({
+            where: { id: configId },
+            data: { value }
+        });
+
+        if (adminId) {
+            await logAdminAction(adminId, "CONFIG_UPDATE", configId, { key: config.key, value });
+        }
+
+        revalidatePath("/admin/settings");
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error updating config:", error);
+        return { error: error.message };
+    }
+}
+
+export async function togglePlatformConfig(key: string, adminId?: string) {
+    try {
+        let config = await prisma.config.findUnique({ where: { key } });
+
+        // If not found, try seeding first (might be a new config)
+        if (!config) {
+            await seedSystemSettings();
+            config = await prisma.config.findUnique({ where: { key } });
+        }
+
+        if (!config) return { error: `Config '${key}' not found even after seeding.` };
+
+        const newValue = !config.value;
+        await prisma.config.update({
+            where: { id: config.id },
+            data: { value: newValue }
+        });
+
+        if (adminId) {
+            await logAdminAction(adminId, "CONFIG_TOGGLE", config.id, { key, newValue });
+        }
+
+        revalidatePath("/admin/settings");
+        revalidatePath("/admin/finance");
+        return { success: true, newValue };
+    } catch (error: any) {
+        console.error("Error toggling config:", error);
+        return { error: error.message };
+    }
+}
+

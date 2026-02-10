@@ -51,19 +51,27 @@ export function ListingForm({ initialData, categories, games, action, mode }: Li
     const [selectedCategory, setSelectedCategory] = useState<string | null>(initialData?.categoryId || null);
     const [selectedGameId, setSelectedGameId] = useState<string | null>(initialData?.gameId || null);
     const [price, setPrice] = useState<string>(initialData?.price?.toString() || "");
+    const [stock, setStock] = useState<number>(initialData?.stock || 1);
     const [description, setDescription] = useState<string>(initialData?.description || "");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Automatic Delivery State
     const [deliveryMethod, setDeliveryMethod] = useState<"MANUAL" | "AUTOMATIC">("MANUAL");
     const [accountItems, setAccountItems] = useState<{ login?: string, password?: string, extra?: string }[]>([{ login: "", password: "", extra: "" }]);
+
     const [giftCardKeys, setGiftCardKeys] = useState<string>("");
+
+    // Image Upload State
+    const [uploadedImages, setUploadedImages] = useState<string[]>(initialData?.images?.map((img: any) => img.url) || []);
+    const [isUploading, setIsUploading] = useState(false);
 
     const selectedGame = games.find(g => g.id === selectedGameId);
     const selectedCategoryObj = categories.find(c => c.id === selectedCategory);
 
     const isAccountCategory = selectedCategoryObj?.name?.toLowerCase().includes("account");
     const isKeyCategory = selectedCategoryObj?.name?.toLowerCase().includes("gift") || selectedCategoryObj?.name?.toLowerCase().includes("key") || selectedCategoryObj?.name?.toLowerCase().includes("card");
+    const isCurrencyCategory = selectedCategoryObj?.name?.toLowerCase().includes("currency") || selectedCategoryObj?.name?.toLowerCase().includes("top") || selectedCategoryObj?.name?.toLowerCase().includes("boosting");
+    const isItemCategory = selectedCategoryObj?.name?.toLowerCase().includes("item") || isAccountCategory; // Items and Accounts need images
 
     const getDeliveryTimeValue = () => {
         if (!initialData?.deliveryTime) return "20m";
@@ -78,6 +86,53 @@ export function ListingForm({ initialData, categories, games, action, mode }: Li
     React.useEffect(() => {
         if (isKeyCategory) setDeliveryMethod("AUTOMATIC");
     }, [isKeyCategory]);
+
+    // Auto-calculate stock for Automatic Delivery
+    React.useEffect(() => {
+        if (deliveryMethod === "AUTOMATIC") {
+            if (isAccountCategory) {
+                setStock(accountItems.length);
+            } else {
+                setStock(giftCardKeys.split('\n').filter(k => k.trim()).length);
+            }
+        }
+    }, [deliveryMethod, accountItems, giftCardKeys, isAccountCategory]);
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error("File size must be less than 5MB");
+            return;
+        }
+
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const res = await fetch("/api/listings/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!res.ok) throw new Error("Upload failed");
+
+            const data = await res.json();
+            setUploadedImages([...uploadedImages, data.url]);
+            toast.success("Image uploaded!");
+        } catch (error) {
+            toast.error("Failed to upload image");
+            console.error(error);
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const removeImage = (index: number) => {
+        setUploadedImages(uploadedImages.filter((_, i) => i !== index));
+    };
 
     const filteredGames = games.filter(g => g.categories.some((c: any) => c.id === selectedCategory));
 
@@ -283,6 +338,14 @@ export function ListingForm({ initialData, categories, games, action, mode }: Li
                 if (selectedGameId) formData.append("gameId", selectedGameId);
                 if (selectedGame) formData.append("gameName", selectedGame.name);
                 formData.append("description", description);
+                formData.append("imageUrls", JSON.stringify(uploadedImages)); // Append images!
+
+                // Validate images for items/accounts
+                if (isItemCategory && uploadedImages.length === 0) {
+                    toast.error("Please upload at least one image for this category.");
+                    setIsSubmitting(false);
+                    return;
+                }
 
                 try {
                     const res = await action(null, formData);
@@ -331,6 +394,68 @@ export function ListingForm({ initialData, categories, games, action, mode }: Li
                                 </p>
                             </div>
                         </div>
+
+                        {/* Image Upload Section - Conditional */}
+                        {isItemCategory ? (
+                            <div className="bg-[#0d1117]/50 backdrop-blur-sm border border-white/5 rounded-2xl p-4 space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-1 rounded bg-purple-500/10 text-purple-500">
+                                            <Upload className="h-3 w-3" />
+                                        </div>
+                                        <h3 className="text-xs font-bold uppercase tracking-wider text-white">Images</h3>
+                                    </div>
+                                    <span className="text-[9px] font-bold text-[#8b949e]">Max 5MB • JPG/PNG</span>
+                                </div>
+
+                                <div className="grid grid-cols-4 gap-4">
+                                    {uploadedImages.map((url, idx) => (
+                                        <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-white/10 group">
+                                            <Image src={url} alt="Uploaded" fill className="object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeImage(idx)}
+                                                className="absolute top-1 right-1 p-1 bg-black/50 hover:bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                                            >
+                                                <Trash2 className="h-3 w-3" />
+                                            </button>
+                                        </div>
+                                    ))}
+
+                                    {uploadedImages.length < 5 && (
+                                        <label className="aspect-square rounded-xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-[#f5a623]/50 hover:bg-[#f5a623]/5 transition-all text-[#8b949e] hover:text-[#f5a623]">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleImageUpload}
+                                                className="hidden"
+                                                disabled={isUploading}
+                                            />
+                                            {isUploading ? (
+                                                <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full" />
+                                            ) : (
+                                                <>
+                                                    <Upload className="h-5 w-5" />
+                                                    <span className="text-[9px] font-bold uppercase tracking-widest">Upload</span>
+                                                </>
+                                            )}
+                                        </label>
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="bg-[#0d1117]/50 backdrop-blur-sm border border-white/5 rounded-2xl p-4 flex items-center gap-3">
+                                <div className="p-2 rounded-lg bg-[#f5a623]/10 text-[#f5a623]">
+                                    <Gamepad2 className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xs font-bold uppercase tracking-wider text-white">Game Image Used</h3>
+                                    <p className="text-[10px] text-[#8b949e] font-medium">
+                                        Listings in this category automatically use the official game artwork.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Delivery Section - Dynamic based on Category */}
                         <div className="bg-[#0d1117]/50 backdrop-blur-sm border border-white/5 rounded-2xl p-4 space-y-4">
@@ -492,7 +617,17 @@ export function ListingForm({ initialData, categories, games, action, mode }: Li
                                 <div className="space-y-1">
                                     <Label className="text-[9px] font-black uppercase tracking-widest text-[#8b949e] pl-1">Stock</Label>
                                     <div className="relative">
-                                        <Input name="stock" type="number" defaultValue={initialData?.stock || 1} className="h-10 bg-[#010409] border-white/5 rounded-xl text-sm font-black text-white px-3 pr-8" />
+                                        <Input
+                                            name="stock"
+                                            type="number"
+                                            value={stock}
+                                            onChange={(e) => setStock(parseInt(e.target.value) || 0)}
+                                            readOnly={deliveryMethod === "AUTOMATIC"}
+                                            className={cn(
+                                                "h-10 bg-[#010409] border-white/5 rounded-xl text-sm font-black text-white px-3 pr-8",
+                                                deliveryMethod === "AUTOMATIC" && "opacity-50 cursor-not-allowed focus:ring-0"
+                                            )}
+                                        />
                                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-[#8b949e]">Qty</span>
                                     </div>
                                 </div>

@@ -56,7 +56,7 @@ export async function POST(request: Request) {
             }
 
             // 3. Calculate Fees
-            const { fee, netAmount } = calculateWithdrawal(Number(amount));
+            const { fee, netAmount } = calculateWithdrawal(Number(amount), "STRIPE");
 
             if (netAmount <= 0) {
                 throw new Error("Withdrawal amount too small to cover fees");

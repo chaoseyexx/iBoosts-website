@@ -22,16 +22,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     }
 
     return (
-        <div className="flex h-screen bg-[#0d1117] text-[#c9d1d9] overflow-hidden">
+        <div className="flex h-screen bg-[#0a0e13] text-[#fdfcf0] overflow-hidden relative font-sans">
             <AdminSidebar />
 
-            {/* Main Content */}
-            <main className="flex-1 overflow-y-auto relative">
-                <div className="absolute inset-0 bg-[#0d1117] -z-20" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,#f5a62308,transparent_50%)] -z-10" />
-
-                <div className="max-w-[1600px] mx-auto p-10 relative">
-                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#f5a623]/2 rounded-full blur-[120px] -z-10" />
+            {/* Main Content Viewport */}
+            <main className="flex-1 overflow-y-auto relative z-10 no-scrollbar">
+                <div className="min-h-full max-w-[1600px] mx-auto p-6 md:p-8 lg:p-10 relative">
                     {children}
                 </div>
             </main>

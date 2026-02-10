@@ -36,6 +36,7 @@ export const MODEL_PREFIXES = {
     Notification: 'NTF',
     AdminLog: 'ALOG',
     Config: 'CFG',
+    Fee: 'FEE',
     Terms: 'TRM',
     ScheduledJob: 'JOB',
 } as const;

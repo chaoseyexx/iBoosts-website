@@ -18,7 +18,8 @@ export async function getListingForEdit(listingId: string) {
         where: { id: listingId },
         include: {
             game: true,
-            category: true
+            category: true,
+            images: true
         }
     });
 
@@ -91,6 +92,7 @@ export async function updateListing(prevState: any, formData: FormData) {
     const minQuantityStr = formData.get("minQuantity") as string;
     const deliveryTimeStr = formData.get("deliveryTime") as string;
     const deliveryMethodType = formData.get("deliveryMethodType") as string;
+    const imageUrlsStr = formData.get("imageUrls") as string;
 
     // Items
     const accountItemsStr = formData.get("accountItems") as string;
@@ -118,6 +120,14 @@ export async function updateListing(prevState: any, formData: FormData) {
     else if (deliveryTimeStr === "20m") deliveryTime = 20;
     else if (deliveryTimeStr === "1h") deliveryTime = 60;
     else if (deliveryTimeStr === "24h") deliveryTime = 1440;
+
+    // Parse Images
+    let imageUrls: string[] = [];
+    try {
+        if (imageUrlsStr) imageUrls = JSON.parse(imageUrlsStr);
+    } catch (e) {
+        console.error("Failed to parse imageUrls:", e);
+    }
 
     // Generate Title
     const shortDesc = description.substring(0, 50).replace(/<[^>]*>?/gm, '');
@@ -191,7 +201,17 @@ export async function updateListing(prevState: any, formData: FormData) {
                 items: deliveryMethod === "AUTOMATIC" &&
                     (accountItemsStr !== "[]" && giftCardKeysStr !== "")
                     ? listingItemsOps
-                    : undefined
+                    : undefined,
+                images: imageUrls.length > 0 ? {
+                    deleteMany: {},
+                    create: imageUrls.map((url, idx) => ({
+                        id: generateId("ListingImage"),
+                        url,
+                        path: url,
+                        isPrimary: idx === 0,
+                        sortOrder: idx
+                    }))
+                } : undefined
             }
         });
 

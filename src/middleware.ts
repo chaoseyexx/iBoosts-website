@@ -11,6 +11,7 @@ export default async function middleware(request: NextRequest) {
 
     const isStatusSubdomain = domain.startsWith("status.");
     const isSupportSubdomain = domain.startsWith("support.");
+    const isBlogSubdomain = domain.startsWith("blog.");
 
     // 1. Handle Status Subdomain
     if (isStatusSubdomain) {
@@ -65,6 +66,24 @@ export default async function middleware(request: NextRequest) {
         }
     }
 
+    // 2b. Handle Blog Subdomain
+    if (isBlogSubdomain) {
+        if (url.pathname === "/") {
+            return await updateSession(request, NextResponse.rewrite(new URL("/blog", request.url)));
+        }
+
+        const isPublicResource = url.pathname.startsWith('/_next') || url.pathname.startsWith('/api') || url.pathname.match(/\.(png|jpg|jpeg|gif|ico|svg)$/);
+
+        if (url.pathname.startsWith('/blog')) {
+            return await updateSession(request, NextResponse.rewrite(new URL(url.pathname, request.url)));
+        }
+
+        if (!isPublicResource) {
+            const baseDomain = hostname.replace('blog.', '');
+            return NextResponse.redirect(`${url.protocol}//${baseDomain}${url.pathname}${url.search}`, 307);
+        }
+    }
+
     // 3. Handle Main Domain Redirects (Redirect /status and /support to subdomains)
     if (!isStatusSubdomain && url.pathname.startsWith("/status") && !url.pathname.startsWith("/status/api")) {
         const protocol = request.nextUrl.protocol;
@@ -88,6 +107,20 @@ export default async function middleware(request: NextRequest) {
 
         const newHost = `support.${baseDomain}`;
         const newPath = url.pathname.replace(/^\/support/, '') || '/';
+
+        return NextResponse.redirect(`${protocol}//${newHost}${newPath}${url.search}`, 307);
+    }
+
+    // Redirect /blog on main domain to blog subdomain
+    if (!isBlogSubdomain && url.pathname.startsWith("/blog") && !url.pathname.startsWith("/blog/api")) {
+        const protocol = request.nextUrl.protocol;
+        let baseDomain = hostname;
+        if (baseDomain.startsWith('www.')) {
+            baseDomain = baseDomain.replace('www.', '');
+        }
+
+        const newHost = `blog.${baseDomain}`;
+        const newPath = url.pathname.replace(/^\/blog/, '') || '/';
 
         return NextResponse.redirect(`${protocol}//${newHost}${newPath}${url.search}`, 307);
     }

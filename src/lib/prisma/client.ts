@@ -43,7 +43,7 @@ const createPrismaClient = () => {
             $allModels: {
                 async create({ model, args, query }) {
                     // If ID is not provided, generate an elegant one
-                    if (!args.data.id && typeof model === 'string') {
+                    if (args.data && !args.data.id && typeof model === 'string') {
                         args.data.id = generateId(model as ModelName);
                     }
                     return query(args);

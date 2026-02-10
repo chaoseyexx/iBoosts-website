@@ -10,19 +10,26 @@ export const FEES = {
     // Deducted from the sale price when a seller makes a sale
     SELLER_COMMISSION_PERCENT: 0.10, // 10%
 
-    // Deducted from the withdrawal amount
+    // Deducted from the withdrawal amount (Default: Stripe Bank)
     WITHDRAWAL_PERCENT: 0.04,   // 4%
     WITHDRAWAL_FLAT: 2.00,      // $2.00
+
+    // Crypto Fees (Standardized)
+    WITHDRAW_USDT_PERCENT: 0.04,
+    WITHDRAW_USDT_FLAT: 10.00,
+    WITHDRAW_LTC_PERCENT: 0.04,
+    WITHDRAW_LTC_FLAT: 10.00,
 };
 
 /**
  * Calculates the total amount a buyer must pay for an order of a specific amount.
  */
-export function calculateOrderTotal(targetAmount: number, isShield: boolean = false) {
+export function calculateOrderTotal(targetAmount: number, isShield: boolean = false, customFees?: Partial<typeof FEES>) {
+    const activeFees = { ...FEES, ...customFees };
     const discount = isShield ? targetAmount * 0.05 : 0;
     const amountAfterDiscount = targetAmount - discount;
 
-    const serviceFee = (amountAfterDiscount * FEES.BUYER_SERVICE_PERCENT) + FEES.BUYER_SERVICE_FLAT;
+    const serviceFee = (amountAfterDiscount * activeFees.BUYER_SERVICE_PERCENT) + activeFees.BUYER_SERVICE_FLAT;
     const total = amountAfterDiscount + serviceFee;
 
     return {
@@ -37,8 +44,9 @@ export function calculateOrderTotal(targetAmount: number, isShield: boolean = fa
 /**
  * Calculates the breakdown of a marketplace sale.
  */
-export function calculateSale(salePrice: number) {
-    const commission = salePrice * FEES.SELLER_COMMISSION_PERCENT;
+export function calculateSale(salePrice: number, customFees?: Partial<typeof FEES>) {
+    const activeFees = { ...FEES, ...customFees };
+    const commission = salePrice * activeFees.SELLER_COMMISSION_PERCENT;
     const sellerEarnings = salePrice - commission;
 
     return {
@@ -51,8 +59,20 @@ export function calculateSale(salePrice: number) {
 /**
  * Calculates the breakdown for a withdrawal.
  */
-export function calculateWithdrawal(withdrawalAmount: number) {
-    const fee = (withdrawalAmount * FEES.WITHDRAWAL_PERCENT) + FEES.WITHDRAWAL_FLAT;
+export function calculateWithdrawal(withdrawalAmount: number, method: string = "STRIPE", customFees?: Partial<typeof FEES>) {
+    const activeFees = { ...FEES, ...customFees };
+    let percent = activeFees.WITHDRAWAL_PERCENT;
+    let flat = activeFees.WITHDRAWAL_FLAT;
+
+    if (method === "CRYPTO_USDT") {
+        percent = activeFees.WITHDRAW_USDT_PERCENT;
+        flat = activeFees.WITHDRAW_USDT_FLAT;
+    } else if (method === "CRYPTO_LTC") {
+        percent = activeFees.WITHDRAW_LTC_PERCENT;
+        flat = activeFees.WITHDRAW_LTC_FLAT;
+    }
+
+    const fee = (withdrawalAmount * percent) + flat;
     const netAmount = Math.max(0, withdrawalAmount - fee);
 
     return {

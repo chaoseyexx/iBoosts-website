@@ -65,6 +65,7 @@ model User {
   boostingRequests BoostingRequest[]
   isShieldActive  Boolean          @default(false)
   ishieldUntil    DateTime?
+  recommendations Recommendation[]
 
   @@index([email])
   @@index([username])
@@ -220,6 +221,8 @@ model Listing {
   deletedAt        DateTime?
   publishedAt      DateTime?
   gameId           String?
+  isVerifiedByAI   Boolean        @default(false)
+  verifiedAt       DateTime?
   category         Category       @relation(fields: [categoryId], references: [id])
   game             Game?          @relation(fields: [gameId], references: [id])
   seller           User           @relation(fields: [sellerId], references: [id], onDelete: Cascade)
@@ -229,6 +232,7 @@ model Listing {
   orders           Order[]
   reports          Report[]       @relation("ListingReports")
   reviews          Review[]
+  recommendations  Recommendation[]
 
   @@index([sellerId])
   @@index([categoryId])
@@ -799,6 +803,57 @@ enum TransactionType {
   DEBIT
 }
 
+model AgentLog {
+  id        String   @id @default(uuid())
+  agentName String
+  level     String
+  message   String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([agentName])
+  @@index([createdAt])
+  @@index([level])
+}
+
+model SystemHealth {
+  id          String   @id @default(uuid())
+  cpuUsage    Float?
+  memoryUsage Float?
+  diskUsage   Float?
+  dbLatency   Float?
+  timestamp   DateTime @default(now())
+
+  @@index([timestamp])
+}
+
+model Recommendation {
+  id        String   @id @default(uuid())
+  userId    String
+  listingId String
+  score     Float
+  reason    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ContentPost {
+  id        String   @id @default(uuid())
+  title     String
+  slug      String?  @unique
+  content   String   @db.Text
+  platform  String
+  status    String   @default("DRAFT")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([platform, status])
+}
+
 enum ListingStatus {
   DRAFT
   ACTIVE
@@ -850,4 +905,48 @@ enum OfferStatus {
   REJECTED
   EXPIRED
   CANCELLED
+}
+
+model StatusComponent {
+  id          String   @id
+  name        String   @unique
+  displayName String
+  description String?
+  status      String   @default("operational")
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model StatusIncident {
+  id               String           @id
+  title            String
+  description      String?
+  status           String           @default("investigating")
+  severity         String           @default("minor")
+  affectedServices String[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  resolvedAt       DateTime?
+  updates          StatusUpdate[]
+
+  @@index([createdAt])
+}
+
+model StatusUpdate {
+  id          String         @id
+  incidentId  String
+  status      String
+  message     String
+  createdAt   DateTime       @default(now())
+  incident    StatusIncident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
+  @@index([incidentId])
+}
+
+model IShieldConfig {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
 }

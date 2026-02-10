@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { fetchMarketplaceData } from "../marketplace-actions";
 import { CurrencyMarketplaceView } from "@/components/marketplace/currency-marketplace-view";
+import { AccountsMarketplaceView } from "@/components/marketplace/accounts-marketplace-view";
 import { NavbarServer } from "@/components/layout/navbar-server";
 import { Footer } from "@/components/layout/footer";
 
@@ -23,14 +24,24 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         return notFound();
     }
 
+    const isGridCategory = categorySlug.toLowerCase() === "accounts" || categorySlug.toLowerCase() === "items";
+
     return (
         <>
             <NavbarServer variant="landing" />
-            <CurrencyMarketplaceView
-                category={category}
-                game={game}
-                listings={listings || []}
-            />
+            {isGridCategory ? (
+                <AccountsMarketplaceView
+                    category={category}
+                    game={game}
+                    listings={listings || []}
+                />
+            ) : (
+                <CurrencyMarketplaceView
+                    category={category}
+                    game={game}
+                    listings={listings || []}
+                />
+            )}
             <Footer />
         </>
     );

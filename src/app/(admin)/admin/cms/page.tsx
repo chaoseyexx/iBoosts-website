@@ -461,30 +461,35 @@ export default function AdminCMSPage() {
         : games;
 
     return (
-        <div className="space-y-8 pb-20">
-            <div className="flex items-center justify-between">
+        <div className="space-y-10 animate-in fade-in duration-700 relative z-10">
+            {/* HUD Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-8">
                 <div>
-                    <h1 className="text-3xl font-black text-white tracking-tight uppercase">Games & Categories</h1>
-                    <p className="text-[#8b949e] mt-1 font-bold tracking-widest uppercase text-[10px] opacity-60">Manage platform-supported games and marketplace categories.</p>
+                    <div className="flex items-center gap-2 mb-2">
+                        <div className="h-1.5 w-1.5 rounded-full bg-[#f5a623] shadow-[0_0_8px_rgba(245,166,35,0.6)]" />
+                        <span className="text-[10px] font-black text-[#f5a623] uppercase tracking-[0.3em]">Neural Catalog</span>
+                    </div>
+                    <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Games <span className="text-[#f5a623]">& Modules</span></h1>
+                    <p className="text-white/20 text-xs font-black uppercase tracking-[0.1em] mt-1">Configure platform-supported neural clusters and catalog categories</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                     {categories.length === 0 && (
                         <Button
                             variant="outline"
-                            className="border-[#f5a623]/20 text-[#f5a623] hover:bg-[#f5a623]/10 font-bold text-xs"
+                            className="bg-white/5 border-white/10 text-white/40 hover:text-white font-black text-[10px] uppercase tracking-widest h-10 px-6 rounded-xl"
                             onClick={handleSeed}
                             disabled={seeding}
                         >
-                            {seeding ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Layers className="h-4 w-4 mr-2" />}
-                            Seed Data
+                            {seeding ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Layers className="h-3 w-3 mr-2" />}
+                            Initialize Schema
                         </Button>
                     )}
                     <Button
                         onClick={handleOpenNew}
-                        className="bg-[#f5a623] text-black hover:bg-[#e09612] font-black px-6 py-5 rounded-xl shadow-[0_0_30px_rgba(245,166,35,0.2)] group"
+                        className="bg-[#f5a623] text-black hover:bg-[#e09612] font-black px-6 h-12 rounded-2xl shadow-[0_0_30px_rgba(245,166,35,0.2)] group border border-[#f5a623]/30"
                     >
                         <Plus className="h-4 w-4 mr-2 group-hover:rotate-90 transition-transform duration-500" />
-                        Add Game
+                        Add Game Module
                     </Button>
                 </div>
             </div>

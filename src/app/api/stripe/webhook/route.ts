@@ -139,6 +139,42 @@ export async function POST(req: Request) {
                 break;
             }
 
+            case "invoice.payment_succeeded": {
+                const invoice = event.data.object as any; // Cast to any to avoid strict type issues
+                const subscriptionId = invoice.subscription as string;
+
+                if (subscriptionId) {
+                    try {
+                        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+                        // Check if it's an iShield subscription via metadata
+                        // Note: Metadata might be on subscription OR subscription item.
+                        // We set it on subscription_data.metadata which goes to Subscription object.
+                        if (subscription.metadata?.type === "ISHIELD_SUBSCRIPTION") {
+                            const userId = subscription.metadata.userId;
+                            const currentPeriodEnd = new Date((subscription as any).current_period_end * 1000);
+
+                            console.log(`Processing iShield subscription for User: ${userId}`);
+
+                            if (userId) {
+                                await prisma.user.update({
+                                    where: { supabaseId: userId },
+                                    data: {
+                                        isShieldActive: true,
+                                        ishieldUntil: currentPeriodEnd,
+                                        stripeCustomerId: invoice.customer as string
+                                    }
+                                });
+                                console.log(`✅ iShield activated for user ${userId} until ${currentPeriodEnd}`);
+                            }
+                        }
+                    } catch (err: any) {
+                        console.error(`Error processing subscription webhook: ${err.message}`);
+                    }
+                }
+                break;
+            }
+
             case "payment_intent.created": {
                 // Payment intent was created - no action needed
                 console.log(`Payment intent created`);

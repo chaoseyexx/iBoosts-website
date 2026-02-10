@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn, formatPrice } from "@/lib/utils";
+import Image from "next/image";
 
 interface CurrencyListingHeroProps {
     listing: any;
@@ -91,6 +92,26 @@ export function CurrencyListingHero({ listing, gameSlug, gameName, currentUserId
                         </div>
 
                         <div className="p-6 space-y-6">
+                            {/* Listing Image */}
+                            {listing.images && listing.images.length > 0 && (
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 px-1">
+                                        <div className="p-1 rounded bg-[#f5a623]/10 text-[#f5a623]">
+                                            <TrendingUp className="h-3 w-3" />
+                                        </div>
+                                        <h4 className="text-white font-bold text-xs uppercase tracking-wider">Preview</h4>
+                                    </div>
+                                    <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-[#30363d] bg-[#010409]">
+                                        <Image
+                                            src={listing.images[0].url}
+                                            alt={listing.title}
+                                            fill
+                                            className="object-cover hover:scale-105 transition-transform duration-500"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Seller Description (Rich Text) */}
                             {listing.description && (
                                 <div className="space-y-3">

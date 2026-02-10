@@ -593,3 +593,13 @@ a:hover {
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes scan {
+  0% {
+    top: -10%;
+  }
+
+  100% {
+    top: 110%;
+  }
+}

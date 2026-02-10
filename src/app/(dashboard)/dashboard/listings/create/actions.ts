@@ -38,6 +38,7 @@ export async function createListing(prevState: any, formData: FormData) {
     // Items
     const accountItemsStr = formData.get("accountItems") as string;
     const giftCardKeysStr = formData.get("giftCardKeys") as string;
+    const imageUrlsStr = formData.get("imageUrls") as string;
 
     // Validation
     if (!categoryId) return { error: "Category is required." };
@@ -107,6 +108,25 @@ export async function createListing(prevState: any, formData: FormData) {
             }
         }
 
+        // Prepare Images
+        let imagesData: any[] = [];
+        if (imageUrlsStr) {
+            try {
+                const urls = JSON.parse(imageUrlsStr);
+                if (Array.isArray(urls) && urls.length > 0) {
+                    imagesData = urls.map((url, index) => ({
+                        id: generateId("ListingImage"),
+                        url: url,
+                        path: url, // Using URL as path for now
+                        isPrimary: index === 0,
+                        sortOrder: index
+                    }));
+                }
+            } catch (e) {
+                console.error("Error parsing image URLs:", e);
+            }
+        }
+
         // Create Listing
         await prisma.listing.create({
             data: {
@@ -125,6 +145,9 @@ export async function createListing(prevState: any, formData: FormData) {
                 status: "ACTIVE", // Or DRAFT/PENDING based on logic
                 items: {
                     create: listingItemsData
+                },
+                images: {
+                    create: imagesData
                 }
             }
         });

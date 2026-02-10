@@ -24,13 +24,6 @@ const HeroScene = dynamic(
     { ssr: false }
 );
 
-// Popular items data
-const popularItems = [
-    { icon: "https://cdn.iboosts.gg/images/games/brainrot.png", name: "Steal a Brainrot", game: "Garena and Madundsong", price: 11.99, link: "/items/brainrot" },
-    { icon: "https://cdn.iboosts.gg/images/games/tsunami.png", name: "Escape Tsunami For Brainrots", game: "Strawberry Elephant", price: 8.00, link: "/items/tsunami" },
-    { icon: "https://cdn.iboosts.gg/images/games/roblox.png", name: "Roblox", game: "Steal a Brainrot", price: 0.50, link: "/items/roblox" },
-    { icon: "https://cdn.iboosts.gg/images/games/arc-raiders.png", name: "Arc Raiders", game: "Blueprint", price: 3.90, link: "/items/arc" },
-];
 
 interface NavGame {
     id: string;
@@ -46,10 +39,17 @@ interface NavCategory {
     icon: string | null;
 }
 
+interface PlatformStats {
+    totalVolume: string;
+    avgDelivery: string;
+    successRate: string;
+}
+
 interface HomePageClientProps {
     initialCategories?: NavCategory[];
     initialGamesData?: Record<string, { popular: NavGame[]; all: NavGame[] }>;
     initialUserCount?: number;
+    stats?: PlatformStats;
 }
 
 // Feature cards
@@ -107,7 +107,8 @@ function ProductRow({
 export function HomePageClient({
     initialCategories = [],
     initialGamesData = {},
-    initialUserCount = 2000
+    initialUserCount = 2000,
+    stats = { totalVolume: "$0", avgDelivery: "Instant", successRate: "99.9%" }
 }: HomePageClientProps) {
 
     // Helper to get games for a section
@@ -448,16 +449,16 @@ export function HomePageClient({
                                     <div className="flex flex-col gap-8">
                                         <div className="space-y-2">
                                             <p className="text-[#8b949e] text-xs font-black uppercase tracking-widest">Total Trade Volume</p>
-                                            <p className="text-5xl font-black text-white">$2.4M+</p>
+                                            <p className="text-5xl font-black text-white">{stats.totalVolume}</p>
                                         </div>
                                         <div className="grid grid-cols-2 gap-8">
                                             <div className="space-y-1">
                                                 <p className="text-[#8b949e] text-[10px] font-black uppercase tracking-widest">Avg. Delivery</p>
-                                                <p className="text-2xl font-black text-[#f5a623]">2.4 MIN</p>
+                                                <p className="text-2xl font-black text-[#f5a623]">{stats.avgDelivery}</p>
                                             </div>
                                             <div className="space-y-1">
                                                 <p className="text-[#8b949e] text-[10px] font-black uppercase tracking-widest">Success Rate</p>
-                                                <p className="text-2xl font-black text-white">99.9%</p>
+                                                <p className="text-2xl font-black text-white">{stats.successRate}</p>
                                             </div>
                                         </div>
                                         <div className="pt-8 border-t border-white/5 text-center italic text-[#8b949e] text-sm font-medium">

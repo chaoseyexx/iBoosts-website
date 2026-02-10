@@ -22,7 +22,9 @@ import {
     Tags,
     FileCheck,
     XCircle,
-    HelpCircle
+    HelpCircle,
+    TrendingUp,
+    ShieldAlert
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,7 +54,13 @@ import {
 import { cn } from "@/lib/utils";
 import { AddBalanceModal } from "./AddBalanceModal";
 import { BanUserModal } from "./BanUserModal";
-import { activateUser, fetchUsersWithStats } from "@/app/(admin)/admin/actions";
+import {
+    activateUser,
+    fetchUsersWithStats,
+    toggleUserShield,
+    updateUserReputation,
+    manualApproveKYC
+} from "@/app/(admin)/admin/actions";
 import { toast } from "sonner";
 import { formatDistanceToNow, format } from "date-fns";
 
@@ -67,6 +75,8 @@ type UserWithStats = {
     createdAt: Date;
     emailVerified: boolean;
     phoneVerified: boolean;
+    isShieldActive: boolean;
+    reputationScore: number;
     wallet: { balance: any; pendingBalance: any } | null;
     _count: {
         buyerOrders: number;
@@ -124,6 +134,46 @@ export function UsersDataTable({ initialUsers, initialTotal }: {
             loadUsers();
         } else {
             toast.error(result.error || "Failed to activate user");
+        }
+    };
+
+    const handleToggleShield = async (userId: string, active: boolean, username: string) => {
+        const result = await toggleUserShield(userId, active);
+        if (result.success) {
+            toast.success(`iShield ${active ? "enabled" : "disabled"} for ${username}`);
+            loadUsers();
+        } else {
+            toast.error(result.error || "Failed to toggle iShield");
+        }
+    };
+
+    const handleUpdateReputation = async (userId: string, currentScore: number, username: string) => {
+        const input = prompt(`Enter new reputation score for ${username} (Current: ${currentScore})`, currentScore.toString());
+        if (input === null) return;
+        const newScore = parseInt(input);
+        if (isNaN(newScore)) {
+            toast.error("Invalid score entered");
+            return;
+        }
+
+        const result = await updateUserReputation(userId, newScore);
+        if (result.success) {
+            toast.success(`Reputation updated for ${username}`);
+            loadUsers();
+        } else {
+            toast.error(result.error || "Failed to update reputation");
+        }
+    };
+
+    const handleManualApproveKYC = async (userId: string, username: string) => {
+        if (!confirm(`Are you sure you want to manually approve KYC for ${username}?`)) return;
+
+        const result = await manualApproveKYC(userId);
+        if (result.success) {
+            toast.success(`KYC approved for ${username}`);
+            loadUsers();
+        } else {
+            toast.error(result.error || "Failed to approve KYC");
         }
     };
 
@@ -259,8 +309,16 @@ export function UsersDataTable({ initialUsers, initialTotal }: {
                                                     </div>
                                                 )}
                                                 <div className="min-w-0">
-                                                    <div className="font-semibold text-white text-sm truncate max-w-[150px]">{user.username || "No username"}</div>
-                                                    <div className="text-[10px] text-[#8b949e] truncate max-w-[150px]">{user.email}</div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <div className="font-semibold text-white text-sm truncate max-w-[150px]">{user.username || "No username"}</div>
+                                                        {user.isShieldActive && (
+                                                            <Shield className="h-3 w-3 text-[#f5a623] drop-shadow-[0_0_5px_rgba(245,166,35,0.4)]" />
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="text-[10px] text-[#8b949e] truncate max-w-[150px]">{user.email}</div>
+                                                        <div className="text-[9px] font-black text-sky-400 bg-sky-400/10 px-1 rounded uppercase tracking-tighter">REP: {user.reputationScore}</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>
@@ -374,6 +432,37 @@ export function UsersDataTable({ initialUsers, initialTotal }: {
                                                             <DollarSign className="h-3.5 w-3.5 mr-2" />
                                                             Adjust Balance
                                                         </DropdownMenuItem>
+
+                                                        <DropdownMenuSeparator className="bg-[#30363d]" />
+
+                                                        <DropdownMenuItem
+                                                            onClick={() => handleToggleShield(user.id, !user.isShieldActive, user.username || user.email)}
+                                                            className={cn(
+                                                                "cursor-pointer text-xs",
+                                                                user.isShieldActive ? "text-rose-400 hover:bg-rose-500/10" : "text-[#f5a623] hover:bg-[#f5a623]/10"
+                                                            )}
+                                                        >
+                                                            <ShieldAlert className="h-3.5 w-3.5 mr-2" />
+                                                            {user.isShieldActive ? "Disable iShield" : "Enable iShield"}
+                                                        </DropdownMenuItem>
+
+                                                        <DropdownMenuItem
+                                                            onClick={() => handleUpdateReputation(user.id, user.reputationScore, user.username || user.email)}
+                                                            className="text-sky-400 hover:bg-sky-500/10 cursor-pointer text-xs"
+                                                        >
+                                                            <TrendingUp className="h-3.5 w-3.5 mr-2" />
+                                                            Adjust Reputation ({user.reputationScore})
+                                                        </DropdownMenuItem>
+
+                                                        {user.kycStatus !== "APPROVED" && (
+                                                            <DropdownMenuItem
+                                                                onClick={() => handleManualApproveKYC(user.id, user.username || user.email)}
+                                                                className="text-emerald-400 hover:bg-emerald-500/10 cursor-pointer text-xs"
+                                                            >
+                                                                <UserCheck className="h-3.5 w-3.5 mr-2" />
+                                                                Manual Approve KYC
+                                                            </DropdownMenuItem>
+                                                        )}
 
                                                         <DropdownMenuSeparator className="bg-[#30363d]" />
 

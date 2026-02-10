@@ -14,7 +14,6 @@ import {
     User,
     Shield,
     Bell,
-    CreditCard,
     Trash2,
     ChevronRight,
     Upload,
@@ -33,7 +32,7 @@ function SubmitButton() {
         <Button
             type="submit"
             variant="ghost"
-            className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 font-bold tracking-tight"
+            className="text-[#f5a623] hover:text-[#e09612] hover:bg-[#f5a623]/10 font-bold tracking-tight"
             disabled={pending}
         >
             {pending ? "SAVING..." : "SAVE"}
@@ -120,7 +119,7 @@ function EditableRow({
                         </div>
                         <Button
                             variant="ghost"
-                            className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 font-bold tracking-tight"
+                            className="text-[#f5a623] hover:text-[#e09612] hover:bg-[#f5a623]/10 font-bold tracking-tight"
                             onClick={() => setIsEditing(true)}
                         >
                             EDIT
@@ -193,7 +192,7 @@ function AvatarRow({ url, displayChar, onUpload }: AvatarRowProps) {
                     />
                     <Button
                         variant="ghost"
-                        className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 font-bold tracking-tight"
+                        className="text-[#f5a623] hover:text-[#e09612] hover:bg-[#f5a623]/10 font-bold tracking-tight"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploading}
                     >
@@ -299,15 +298,6 @@ export default function SettingsPage() {
                 { label: "Security Alerts", value: "Enabled", toggle: true, enabled: true },
             ],
         },
-        payments: {
-            id: "payments",
-            title: "Payment Methods",
-            icon: CreditCard,
-            items: [
-                { label: "Withdrawal Method", value: "PayPal - demo@iboosts.gg", action: "Change" },
-                { label: "Payout Currency", value: "USD", action: "Change" },
-            ],
-        },
     };
 
     if (loading) {
@@ -341,10 +331,6 @@ export default function SettingsPage() {
                         <button onClick={() => setActiveSection("notifications")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${activeSection === "notifications" ? "bg-[#f5a623]/15 text-[#f5a623]" : "text-[#9ca3af] hover:text-white hover:bg-[#252b33]"}`}>
                             <Bell className="h-5 w-5" />
                             <span className="text-sm font-medium">Notifications</span>
-                        </button>
-                        <button onClick={() => setActiveSection("payments")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${activeSection === "payments" ? "bg-[#f5a623]/15 text-[#f5a623]" : "text-[#9ca3af] hover:text-white hover:bg-[#252b33]"}`}>
-                            <CreditCard className="h-5 w-5" />
-                            <span className="text-sm font-medium">Payment Methods</span>
                         </button>
                         <hr className="my-2 border-white/[0.05]" />
                         <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors">
@@ -394,7 +380,7 @@ export default function SettingsPage() {
                                         <div>
                                             <div className="flex items-center gap-2">
                                                 <span className="text-sm font-bold text-white tracking-tight">{item.label}</span>
-                                                {(item as any).verified && <Badge className="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[10px] font-semibold uppercase tracking-widest shadow-[0_0_10px_rgba(34,211,238,0.1)]">Verified</Badge>}
+                                                {(item as any).verified && <Badge className="bg-[#f5a623]/10 text-[#f5a623] border border-[#f5a623]/20 text-[10px] font-semibold uppercase tracking-widest shadow-[0_0_10px_rgba(245,166,35,0.1)]">Verified</Badge>}
                                                 {(item as any).warning && <Badge className="bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-semibold uppercase tracking-widest">Recommended</Badge>}
                                             </div>
                                             <p className="text-sm text-[#6b7280] mt-0.5">{item.value === "demo@iboosts.gg" && user?.email ? user.email : item.value}</p>
@@ -404,7 +390,7 @@ export default function SettingsPage() {
                                                 <span className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-transform ${(item as any).enabled ? "left-6" : "left-1"}`} />
                                             </button>
                                         ) : (
-                                            <Button variant="ghost" size="sm" className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 font-bold tracking-tight">
+                                            <Button variant="ghost" size="sm" className="text-[#f5a623] hover:text-[#e09612] hover:bg-[#f5a623]/10 font-bold tracking-tight">
                                                 {(item as any).action}
                                                 <ChevronRight className="h-4 w-4 ml-1" />
                                             </Button>

@@ -30,9 +30,10 @@ import { calculateOrderTotal } from "@/lib/utils/fees";
 interface CheckoutViewProps {
     listing: any;
     isShieldActive?: boolean;
+    walletBalance?: number;
 }
 
-export function CheckoutView({ listing, isShieldActive = false }: CheckoutViewProps) {
+export function CheckoutView({ listing, isShieldActive = false, walletBalance = 0 }: CheckoutViewProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const quantityParam = searchParams.get("quantity");
@@ -58,9 +59,21 @@ export function CheckoutView({ listing, isShieldActive = false }: CheckoutViewPr
         total: initialCalc.total
     });
 
+    const isFullWalletPayment = walletBalance >= initialCalc.total;
+
+    const [splitDetails, setSplitDetails] = useState({
+        walletUsed: 0,
+        stripeAmount: initialCalc.total,
+        status: 'PENDING'
+    });
+
     useEffect(() => {
-        handleInitiateCheckout(paymentMethod);
-    }, []);
+        if (isFullWalletPayment) {
+            setPaymentMethod("card"); // Keep card as value but UI will change
+        } else {
+            handleInitiateCheckout(paymentMethod);
+        }
+    }, [isFullWalletPayment]);
 
     const handleInitiateCheckout = async (method: string) => {
         setIsLoading(true);
@@ -74,7 +87,8 @@ export function CheckoutView({ listing, isShieldActive = false }: CheckoutViewPr
                     listingId: listing.id,
                     quantity: quantity,
                     paymentMethod: method === "crypto" ? "crypto" : "card",
-                    isShieldActive: isShieldActive
+                    isShieldActive: isShieldActive,
+                    note: deliveryData // Pass delivery note!
                 }),
             });
 
@@ -83,13 +97,32 @@ export function CheckoutView({ listing, isShieldActive = false }: CheckoutViewPr
                 console.log(`[Checkout] Success:`, data);
                 setClientSecret(data.clientSecret);
                 setOrderId(data.orderId);
-                // Update summary with confirmed server data
+
+                // Update summary with split details
+                // data return: { orderId, clientSecret, total, walletUsed, stripeAmount, status }
                 setSummary({
-                    subtotal: data.subtotal,
-                    fee: data.fee,
+                    subtotal: initialCalc.targetAmount,
+                    fee: (data.stripeAmount > 0 || data.walletUsed > 0) ? (initialCalc.serviceFee) : 0, // Fee logic might need check
                     total: data.total,
-                    discount: isShieldActive ? (data.subtotal * 0.05) : 0
+                    discount: isShieldActive ? (initialCalc.targetAmount - initialCalc.total + initialCalc.serviceFee) : 0
                 });
+
+                // We should add walletUsed to summary state or separate state for display
+                // But passing it via summary object might be cleaner if we expand the state type
+                // For now, I'll store it in a new state
+                setSplitDetails({
+                    walletUsed: data.walletUsed || 0,
+                    stripeAmount: data.stripeAmount || 0,
+                    status: data.status
+                });
+
+                if (data.status === 'ACTIVE') {
+                    toast.success("Order paid with Wallet!");
+                    setTimeout(() => {
+                        router.push(`/dashboard/orders/${data.orderId}`);
+                    }, 1000);
+                }
+
             } else {
                 const err = await response.json();
                 console.error(`[Checkout] Error Response:`, err);
@@ -201,44 +234,59 @@ export function CheckoutView({ listing, isShieldActive = false }: CheckoutViewPr
                         </section>
 
                         {/* Payment Methods - Compact Grid */}
-                        <section className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
-                            <div className="flex items-center gap-2">
-                                <CreditCard className="h-3 w-3 text-[#8b949e]" />
-                                <h3 className="text-[10px] font-black uppercase tracking-wider text-[#8b949e]">Select Payment</h3>
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                {[
-                                    { id: "card", label: "Card", icon: <CreditCard className="h-4 w-4" /> },
-                                    { id: "google_pay", label: "GPay", icon: <span className="font-black text-[10px]">GPay</span> },
-                                    { id: "crypto", label: "Crypto", icon: <Bitcoin className="h-4 w-4" /> }
-                                ].map((method) => (
-                                    <button
-                                        key={method.id}
-                                        onClick={() => {
-                                            setPaymentMethod(method.id as any);
-                                            handleInitiateCheckout(method.id);
-                                        }}
-                                        className={cn(
-                                            "flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border transition-all duration-300",
-                                            paymentMethod === method.id
-                                                ? "bg-[#f5a623]/10 border-[#f5a623] text-white"
-                                                : "bg-[#0d1117]/50 border-white/5 text-[#8b949e] hover:bg-white/5"
-                                        )}
-                                    >
-                                        <div className={cn(
-                                            "w-7 h-7 rounded-lg flex items-center justify-center transition-colors",
-                                            paymentMethod === method.id ? "bg-[#f5a623] text-black" : "bg-white/5"
-                                        )}>
-                                            {method.icon}
-                                        </div>
-                                        <span className="text-[9px] font-black uppercase tracking-wider">{method.label}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </section>
+                        {!isFullWalletPayment && (
+                            <section className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
+                                <div className="flex items-center gap-2">
+                                    <CreditCard className="h-3 w-3 text-[#8b949e]" />
+                                    <h3 className="text-[10px] font-black uppercase tracking-wider text-[#8b949e]">Select Payment</h3>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                    {[
+                                        { id: "card", label: "Card", icon: <CreditCard className="h-4 w-4" /> },
+                                        { id: "google_pay", label: "GPay", icon: <span className="font-black text-[10px]">GPay</span> },
+                                        { id: "crypto", label: "Crypto", icon: <Bitcoin className="h-4 w-4" /> }
+                                    ].map((method) => (
+                                        <button
+                                            key={method.id}
+                                            onClick={() => {
+                                                setPaymentMethod(method.id as any);
+                                                handleInitiateCheckout(method.id);
+                                            }}
+                                            className={cn(
+                                                "flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border transition-all duration-300",
+                                                paymentMethod === method.id
+                                                    ? "bg-[#f5a623]/10 border-[#f5a623] text-white"
+                                                    : "bg-[#0d1117]/50 border-white/5 text-[#8b949e] hover:bg-white/5"
+                                            )}
+                                        >
+                                            <div className={cn(
+                                                "w-7 h-7 rounded-lg flex items-center justify-center transition-colors",
+                                                paymentMethod === method.id ? "bg-[#f5a623] text-black" : "bg-white/5"
+                                            )}>
+                                                {method.icon}
+                                            </div>
+                                            <span className="text-[9px] font-black uppercase tracking-wider">{method.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Info when fully paid by wallet */}
+                        {isFullWalletPayment && (
+                            <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
+                                <div className="p-4 rounded-2xl bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 text-center space-y-2">
+                                    <CheckCircle2 className="h-8 w-8 text-green-400 mx-auto" />
+                                    <h3 className="text-sm font-black uppercase text-green-400">Covered by Wallet</h3>
+                                    <p className="text-[10px] text-green-400/70 font-bold uppercase tracking-wide">
+                                        Your wallet balance covers the full amount. No extra payment needed.
+                                    </p>
+                                </div>
+                            </section>
+                        )}
 
                         {/* Stripe Form Overlay */}
-                        {paymentMethod === "card" && clientSecret && deliveryData && (
+                        {!isFullWalletPayment && paymentMethod === "card" && clientSecret && deliveryData && (
                             <section className="animate-in zoom-in-95 fade-in duration-300">
                                 <div className="bg-[#0d1117]/50 backdrop-blur-md border border-[#f5a623]/20 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
                                     <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#f5a623] to-transparent" />
@@ -260,7 +308,7 @@ export function CheckoutView({ listing, isShieldActive = false }: CheckoutViewPr
                             </section>
                         )}
 
-                        {paymentMethod === "crypto" && (
+                        {!isFullWalletPayment && paymentMethod === "crypto" && (
                             <section className="animate-in zoom-in-95 fade-in duration-300">
                                 <div className="bg-[#0d1117]/50 border border-white/5 p-4 rounded-2xl backdrop-blur-sm">
                                     <div className="p-3 rounded-xl bg-[#f5a623]/5 border border-[#f5a623]/20 space-y-2 text-center">
@@ -281,7 +329,7 @@ export function CheckoutView({ listing, isShieldActive = false }: CheckoutViewPr
                         <section className="space-y-2 animate-in fade-in slide-in-from-right-4 duration-500">
                             <div className="flex items-center gap-2">
                                 <MessageSquare className="h-3 w-3 text-[#8b949e]" />
-                                <h3 className="text-[10px] font-black uppercase tracking-wider text-[#8b949e]">Delivery Details</h3>
+                                <h3 className="text-[10px] font-black uppercase tracking-wider text-[#8b949e]">Delivery Details <span className="text-[#8b949e]/50">(Optional)</span></h3>
                             </div>
                             <div className="bg-[#0d1117]/50 border border-white/5 p-4 rounded-2xl space-y-2 backdrop-blur-sm">
                                 <Input
@@ -292,7 +340,7 @@ export function CheckoutView({ listing, isShieldActive = false }: CheckoutViewPr
                                 />
                                 <div className="flex items-start gap-1.5">
                                     <Info className="h-2.5 w-2.5 text-[#f5a623] mt-0.5" />
-                                    <p className="text-[9px] font-bold text-[#8b949e] uppercase tracking-wide leading-tight">Double check your details to ensure instant delivery.</p>
+                                    <p className="text-[9px] font-bold text-[#8b949e] uppercase tracking-wide leading-tight">Provide details to speed up delivery.</p>
                                 </div>
                             </div>
                         </section>
@@ -329,25 +377,52 @@ export function CheckoutView({ listing, isShieldActive = false }: CheckoutViewPr
                                         )}
                                     </div>
 
-                                    <div className="pt-3 border-t border-white/5 flex justify-between items-end">
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-[#f5a623]">Total</span>
-                                        <span className="text-2xl font-black text-white leading-none tracking-tighter">
-                                            <span className="text-sm text-[#f5a623] mr-0.5">$</span>
-                                            {formatPrice(summary?.total || initialCalc.total, 2)}
-                                        </span>
+                                    <div className="pt-3 border-t border-white/5 space-y-2">
+                                        {/* Wallet Balance Display */}
+                                        {walletBalance > 0 && (
+                                            <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-wider text-green-400">
+                                                <span>Wallet Balance</span>
+                                                <span>Available: ${formatPrice(walletBalance, 2)}</span>
+                                            </div>
+                                        )}
+                                        {splitDetails.walletUsed > 0 && (
+                                            <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-wider text-green-400">
+                                                <span>Wallet Used</span>
+                                                <span>-${formatPrice(splitDetails.walletUsed, 2)}</span>
+                                            </div>
+                                        )}
+
+                                        {isFullWalletPayment && (
+                                            <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-wider text-green-400">
+                                                <span>Payment Method</span>
+                                                <span>WALLET</span>
+                                            </div>
+                                        )}
+
+                                        <div className="flex justify-between items-end pt-2 border-t border-white/5">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-[#f5a623]">
+                                                {splitDetails.stripeAmount > 0 ? "Total to Pay" : "Total"}
+                                            </span>
+                                            <span className="text-2xl font-black text-white leading-none tracking-tighter">
+                                                <span className="text-sm text-[#f5a623] mr-0.5">$</span>
+                                                {formatPrice(splitDetails.stripeAmount > 0 ? splitDetails.stripeAmount : summary?.total, 2)}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div className="pt-2">
-                                    {(paymentMethod !== "card" || !clientSecret) && (
+                                    {(isFullWalletPayment || (paymentMethod !== "card" || !clientSecret)) && (
                                         <Button
-                                            disabled={isLoading || isProcessing || !deliveryData}
+                                            disabled={isLoading || isProcessing}
                                             className={cn(
                                                 "w-full h-11 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 relative overflow-hidden group shadow-lg",
-                                                paymentMethod === "card" ? "bg-[#f5a623] hover:bg-[#e09612] text-black" : "bg-white hover:bg-white/90 text-black"
+                                                isFullWalletPayment || paymentMethod === "card" ? "bg-[#f5a623] hover:bg-[#e09612] text-black" : "bg-white hover:bg-white/90 text-black"
                                             )}
                                             onClick={() => {
-                                                if (paymentMethod === "crypto") {
+                                                if (isFullWalletPayment) {
+                                                    handleInitiateCheckout("card");
+                                                } else if (paymentMethod === "crypto") {
                                                     toast.info("Initializing crypto gateway...");
                                                 } else if (paymentMethod === "card" && !clientSecret) {
                                                     handleInitiateCheckout("card");
@@ -359,7 +434,7 @@ export function CheckoutView({ listing, isShieldActive = false }: CheckoutViewPr
                                                     <Loader2 className="h-4 w-4 animate-spin" />
                                                 ) : (
                                                     <>
-                                                        {paymentMethod === "card" && !clientSecret ? "Initialize Card" : paymentMethod === "card" ? "Pay Now" : "Confirm Order"}
+                                                        {isFullWalletPayment ? "Pay with Wallet" : (paymentMethod === "card" && !clientSecret ? "Initialize Card" : paymentMethod === "card" ? "Pay Now" : "Confirm Order")}
                                                         <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
                                                     </>
                                                 )}
@@ -367,7 +442,7 @@ export function CheckoutView({ listing, isShieldActive = false }: CheckoutViewPr
                                         </Button>
                                     )}
 
-                                    {!deliveryData && (
+                                    {!deliveryData && !isFullWalletPayment && (
                                         <div className="flex justify-center items-center gap-1.5 mt-3 p-1.5 bg-[#df1b41]/5 border border-[#df1b41]/10 rounded-lg">
                                             <AlertCircle className="h-2.5 w-2.5 text-[#df1b41]" />
                                             <p className="text-[8px] font-bold text-[#df1b41] uppercase tracking-wide">

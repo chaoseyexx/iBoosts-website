@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatCurrency } from "@/lib/utils";
+import { TrustBadge } from "@/components/ishield";
 
 interface ListingCardProps {
     listing: {
@@ -14,6 +15,7 @@ interface ListingCardProps {
         category: string;
         image?: string | null;
         stock: number;
+        isVerifiedByAI?: boolean;
         seller: {
             username: string;
             avatar?: string | null;
@@ -54,13 +56,25 @@ export function ListingCard({ listing }: ListingCardProps) {
                             -{discount}%
                         </Badge>
                     )}
+
+                    {/* Verified Badge */}
+                    {listing.isVerifiedByAI && (
+                        <div className="absolute top-2 left-2">
+                            <TrustBadge isVerified={true} size="sm" showText={false} />
+                        </div>
+                    )}
                 </div>
 
                 <div className="p-4">
-                    {/* Category */}
-                    <Badge variant="secondary" size="sm" className="mb-2">
-                        {listing.category}
-                    </Badge>
+                    {/* Category & Verified */}
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <Badge variant="secondary" size="sm">
+                            {listing.category}
+                        </Badge>
+                        {listing.isVerifiedByAI && (
+                            <TrustBadge isVerified={true} size="sm" />
+                        )}
+                    </div>
 
                     {/* Title */}
                     <h3 className="font-semibold text-[var(--text-primary)] line-clamp-2 mb-2 group-hover:text-[var(--olive-400)] transition-colors">

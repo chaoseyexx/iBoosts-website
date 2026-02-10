@@ -71,10 +71,11 @@ export async function fetchMarketplaceData(categorySlug: string, gameSlug?: stri
                         totalSales: true,
                         totalReviews: true,
                         lastActiveAt: true,
+                        supabaseId: true,
                     }
                 },
                 images: {
-                    where: { isPrimary: true },
+                    orderBy: { sortOrder: 'asc' },
                     take: 1
                 }
             },

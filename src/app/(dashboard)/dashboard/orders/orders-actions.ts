@@ -234,6 +234,10 @@ export async function confirmOrder(orderIdentifier: string) {
             return { error: "Only the buyer can confirm the order" };
         }
 
+        if (order.status !== 'ACTIVE' && order.status !== 'DELIVERED') {
+            return { error: `Cannot confirm order with status: ${order.status}` };
+        }
+
         // Use a transaction to update order and wallet
         await prisma.$transaction(async (tx) => {
             // 1. Update order status
@@ -522,6 +526,10 @@ export async function markAsDelivered(orderId: string) {
             return { error: "Only the seller can mark as delivered" };
         }
 
+        if (order.status !== 'ACTIVE') {
+            return { error: `Cannot mark as delivered. Order status is ${order.status}` };
+        }
+
         await prisma.order.update({
             where: { id: order.id },
             data: {
@@ -562,26 +570,89 @@ export async function cancelOrder(orderId: string, reason: string) {
         const isSeller = order.sellerId === profile.id;
         const isAdmin = profile.role === 'ADMIN';
 
+        // Permissions: Seller or Admin can cancel
         if (!isSeller && !isAdmin) {
             return { error: "Unauthorized access" };
         }
 
-        await prisma.order.update({
-            where: { id: order.id },
-            data: {
-                status: "CANCELLED",
-                cancelledAt: new Date(),
-                cancelReason: reason
-            }
-        });
+        // Validate Status: Cannot cancel COMPLETED orders
+        if (order.status === 'COMPLETED' || order.status === 'CANCELLED' || order.status === 'DISPUTED') {
+            return { error: `Cannot cancel order with status: ${order.status}` };
+        }
 
-        await prisma.orderTimeline.create({
-            data: {
-                id: generateId("OrderTimeline"),
-                orderId: order.id,
-                event: "ORDER_CANCELLED",
-                description: `Order cancelled by ${profile.username}. Reason: ${reason}`
+        // Refund Logic (Wallet Only)
+        // If order was PAID (ACTIVE or DELIVERED), we must refund the buyer and debit the seller pending
+        const shouldRefund = order.status === 'ACTIVE' || order.status === 'DELIVERED';
+
+        await prisma.$transaction(async (tx) => {
+            // 1. Refund Buyer (Credit Wallet)
+            if (shouldRefund) {
+                const refundAmount = Number(order.finalAmount);
+                const buyerWallet = await tx.wallet.findUnique({ where: { userId: order.buyerId } });
+
+                // If buyer has no wallet, create one (shouldn't happen if they paid, but safety check)
+                let walletId = buyerWallet?.id;
+                if (!buyerWallet) {
+                    const newWallet = await tx.wallet.create({
+                        data: { id: generateId("Wallet"), userId: order.buyerId }
+                    });
+                    walletId = newWallet.id;
+                }
+
+                // Credit Buyer
+                await tx.wallet.update({
+                    where: { id: walletId },
+                    data: { balance: { increment: refundAmount } }
+                });
+
+                // Log Refund Transaction
+                await tx.walletTransaction.create({
+                    data: {
+                        id: generateId("WalletTransaction"),
+                        walletId: walletId!,
+                        type: "REFUND",
+                        amount: refundAmount,
+                        balanceBefore: buyerWallet ? Number(buyerWallet.balance) : 0,
+                        balanceAfter: (buyerWallet ? Number(buyerWallet.balance) : 0) + refundAmount,
+                        description: `Refund for Order #${order.orderNumber}`,
+                        reference: order.id
+                    }
+                });
+
+                // 2. Debit Seller (Revert Pending)
+                // Note: We only revert pending. If order was Active, money is in Pending.
+                // If seller somehow already withdrew (impossible if not Completed), we'd have an issue.
+                // But status check prevents cancellation of Completed.
+                const sellerWallet = await tx.wallet.findUnique({ where: { userId: order.sellerId } });
+                if (sellerWallet) {
+                    const earnings = Number(order.sellerEarnings);
+                    await tx.wallet.update({
+                        where: { id: sellerWallet.id },
+                        data: { pendingBalance: { decrement: earnings } }
+                    });
+                    // Note: We don't log a Transaction for pending reversal usually, but we could.
+                }
             }
+
+            // 3. Update Order Status
+            await tx.order.update({
+                where: { id: order.id },
+                data: {
+                    status: "CANCELLED",
+                    cancelledAt: new Date(),
+                    cancelReason: reason
+                }
+            });
+
+            // 4. Log Timeline
+            await tx.orderTimeline.create({
+                data: {
+                    id: generateId("OrderTimeline"),
+                    orderId: order.id,
+                    event: "ORDER_CANCELLED",
+                    description: `Order cancelled by ${profile.username}. Reason: ${reason}. Refunded to Wallet.`
+                }
+            });
         });
 
         revalidatePath(`/dashboard/orders/${order.orderNumber}`);
